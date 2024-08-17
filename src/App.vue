@@ -19,7 +19,9 @@
     const whitelistedPages = [
         '/u/login',
         '/u/register',
-        '/u/forgot-password',
+        '/u/password/forget',
+        '/u/password/verify',
+        '/u/password/reset',
         '/pages/scan-food'
     ]
 

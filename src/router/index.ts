@@ -28,9 +28,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/auth/RegisterPage.vue')
       },
       {
-        path: 'forget-password',
+        path: 'password/forget',
         name: 'forget-password',
         component: () => import('@/views/auth/ForgetPasswordPage.vue')
+      },
+      {
+        path: 'password/verify',
+        name: 'verify-password-reset',
+        component: () => import('@/views/auth/ResetVerificationPage.vue')
+      },
+      {
+        path: 'password/reset',
+        name: 'reset-password',
+        component: () => import('@/views/auth/ResetPasswordPage.vue')
       }
     ]
   },

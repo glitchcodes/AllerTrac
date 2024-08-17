@@ -1,13 +1,21 @@
 <script setup lang="ts">
   import { ref } from "vue";
 
-  import { IonIcon, IonPage, IonContent, IonButton } from '@ionic/vue';
+  import { IonIcon, IonPage, IonContent, IonButton, useIonRouter } from '@ionic/vue';
   import { arrowBack, mailOutline } from "ionicons/icons";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import InputComponent from "@/components/auth/InputComponent.vue";
 
+  const ionRouter = useIonRouter();
   const email = ref<string>('');
+
+  const submitResetRequest = async () => {
+    if (email.value.length <= 0) return;
+
+    // TODO: Implement password reset request
+    ionRouter.push({ name: 'verify-password-reset' })
+  }
 </script>
 
 
@@ -28,7 +36,7 @@
               We need your email address to send a verification code.
             </p>
 
-            <form class="mt-8 mb-10">
+            <form class="mt-8 mb-10" @submit.prevent="submitResetRequest">
 
               <div class="text-left mb-8">
                 <!-- Email Address -->
@@ -40,7 +48,7 @@
                 <!-- END Email Address -->
               </div>
 
-              <ion-button expand="block" shape="round">
+              <ion-button expand="block" shape="round" type="submit">
                 Confirm
               </ion-button>
             </form>
