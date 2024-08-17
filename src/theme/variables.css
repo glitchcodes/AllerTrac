@@ -64,3 +64,12 @@ ion-icon.primary {
 .bg-secondary {
     background-color: #fbfdfe;
 }
+
+a {
+    color: var(--ion-color-primary);
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
