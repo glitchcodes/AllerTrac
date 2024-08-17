@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { IonInput } from "@ionic/vue";
+  import { IonInput, IonInputPasswordToggle } from "@ionic/vue";
 
   type InputTypeAttribute = "text" | "password" | "email" | "number" | "search" | "tel" | "url"
 
@@ -30,6 +30,7 @@
                :placeholder="props.placeholder"
                :type="props.type"
                @ionInput="updateModel">
+      <ion-input-password-toggle v-if="type === 'password'" slot="end"></ion-input-password-toggle>
     </ion-input>
   </div>
 </template>
