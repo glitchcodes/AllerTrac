@@ -54,6 +54,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'home',
+        name: 'home',
         component: HomePage
       },
       {
