@@ -54,24 +54,28 @@
 
       await router.push({ name: 'home' })
     } catch (error) {
-      if (error instanceof FetchError) {
-        switch (error.data.code) {
-          case "INPUT_INVALID":
-            inputErrors.value = error.data.errors;
-            break;
-          default:
-            await toast.presentToast({
-              message: 'Error: ' + error.data.message,
-              duration: 5000,
-              position: 'top',
-              icon: alertCircle
-            })
-        }
-      }
+      await handleAuthErrors(error);
     }
 
     // Hide loading indicator
     isSubmitting.value = false;
+  }
+
+  const handleAuthErrors = async (error: any) => {
+    if (error instanceof FetchError) {
+      switch (error.data.code) {
+        case "INPUT_INVALID":
+          inputErrors.value = error.data.errors;
+          break;
+        default:
+          await toast.presentToast({
+            message: 'Error: ' + error.data.message,
+            duration: 5000,
+            position: 'top',
+            icon: alertCircle
+          })
+      }
+    }
   }
 </script>
 
