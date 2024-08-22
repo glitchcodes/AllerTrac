@@ -3,7 +3,11 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 
 import { Preferences } from "@capacitor/preferences";
+import { useFetchAPI } from "@/composables/useFetchAPI";
 import type { User } from "@/types/User";
+
+import NotAllowedError from "@/utils/errors/NotAllowedError";
+import FetchError from "@/utils/errors/FetchError";
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>();
@@ -21,5 +25,19 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  return { user, bearerToken, getBearerToken, setBearerToken }
+  const validateToken = async () => {
+    try {
+      await useFetchAPI({ url: '/auth/check', method: 'GET' });
+    } catch (error) {
+
+      if (error instanceof FetchError) {
+        throw new NotAllowedError(error.data)
+      } else {
+        throw new Error("Unknown error")
+
+      }
+    }
+  }
+
+  return { user, bearerToken, getBearerToken, setBearerToken, validateToken }
 })

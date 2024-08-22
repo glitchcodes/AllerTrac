@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 
+import { useAuthStore } from "@/store/auth";
+
 import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
 
 import HomePage from "@/views/HomePage.vue";
@@ -55,6 +57,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'home',
+        meta: {
+          requiresAuth: true
+        },
         component: HomePage
       },
       {
@@ -80,6 +85,26 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
+})
+
+// Navigation Guards
+router.beforeEach(async (to, from) => {
+  const authStore = useAuthStore();
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // If not authenticated, return false
+    try {
+      await authStore.validateToken();
+    } catch (error) {
+      console.error(error);
+
+      if (from.name === undefined) {
+        return { name: 'login' }
+      } else {
+        return false;
+      }
+    }
+  }
 })
 
 export default router
