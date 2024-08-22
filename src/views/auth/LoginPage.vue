@@ -123,7 +123,7 @@
                 </router-link>
               </div>
 
-              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit">
+              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit" data-cy="submit">
                 Login
               </ion-button>
 

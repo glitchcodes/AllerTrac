@@ -35,3 +35,16 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add('login', (email, password) => {
+  cy.request({
+    method: 'POST',
+    url: Cypress.env('api_server') + '/auth/login',
+    body: {
+      email: email,
+      password: password
+    }
+  }).then(async (response) => {
+    window.localStorage.setItem("CapacitorStorage.access_token", response.body.token)
+  })
+})
