@@ -27,7 +27,7 @@
   const password = ref<string>('');
 
   const genericError = ref<string>('');
-  const inputErrors: any = ref({});
+  const inputErrors = ref<any>({});
 
   // Actions
   const submitForm = async () => {
@@ -71,7 +71,6 @@
           await toast.presentToast({
             message: 'Error: ' + error.data.message,
             duration: 5000,
-            position: 'top',
             icon: alertCircle
           })
       }
