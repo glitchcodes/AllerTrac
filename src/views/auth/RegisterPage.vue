@@ -11,22 +11,35 @@
     IonHeader,
     IonToolbar,
     IonTitle,
-    isPlatform
+    isPlatform,
+    IonSpinner
   } from '@ionic/vue';
-  import { arrowBack, key, mailOutline } from "ionicons/icons";
+  import { alertCircle, arrowBack, key, mailOutline } from "ionicons/icons";
   import { OverlayEventDetail } from '@ionic/core/components';
   import { StatusBar, Style } from "@capacitor/status-bar";
+  import { useRouter } from "vue-router";
+  import { useToastController } from "@/composables/useToastController";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import InputComponent from "@/components/auth/InputComponent.vue";
+  import FetchError from "@/utils/errors/FetchError";
+
+  const router = useRouter();
+  const toast = useToastController();
 
   // States
+  const isSubmitting = ref<boolean>(false);
+
   const email = ref<string>('');
   const password = ref<string>('');
   const confirmPassword = ref<string>('');
 
   const tosAgreed = ref<boolean>(false);
   const privacyAgreed = ref<boolean>(false);
+
+  const genericError = ref<string>('');
+  const inputErrors = ref<any>({});
 
   const showStatusBar = async () => {
     if (!isPlatform('android')) return;
@@ -69,6 +82,81 @@
     await hideStatusBar()
   }
 
+  // Actions
+  const submitForm = async () => {
+    // Show error message if terms and conditions checkbox is not checked
+    if (!tosAgreed.value) {
+      await toast.presentToast({
+        message: "You must agree to our Terms and Conditions",
+        duration: 3000,
+        icon: alertCircle
+      })
+
+      return;
+    }
+
+    // Show error message if privacy policy checkbox is not checked
+    if (!privacyAgreed.value) {
+      await toast.presentToast({
+        message: "You must agree to our Privacy Policy",
+        duration: 3000,
+        icon: alertCircle
+      })
+
+      return;
+    }
+
+    // Show loading indicator
+    isSubmitting.value = true;
+
+    // Reset errors
+    genericError.value = "";
+    inputErrors.value = {};
+
+    const body = {
+      email: email.value,
+      password: password.value,
+      password_confirmation: confirmPassword.value
+    }
+
+    try {
+      const response = await useFetchAPI({
+        url: '/auth/register',
+        method: 'POST',
+        data: JSON.stringify(body)
+      })
+
+      const redirectTo = response.data.redirect_to
+
+      if (redirectTo === 'onboarding') {
+        await router.push({ name: 'home' })
+      } else if (redirectTo === 'verification') {
+        await router.push({ name: 'verify-registration', query: { i: response.data.identifier } })
+      }
+    } catch (error) {
+      await handleErrors(error);
+    }
+
+    // Hide loading indicator
+    isSubmitting.value = false;
+  }
+
+  const handleErrors = async (error: any) => {
+    if (error instanceof FetchError) {
+      switch (error.data.code) {
+        case "INPUT_INVALID":
+          inputErrors.value = error.data.errors;
+          break;
+        default:
+          await toast.presentToast({
+            message: 'Error: ' + error.data.message,
+            duration: 5000,
+            icon: alertCircle
+          })
+      }
+    }
+  }
+
 </script>
 
 <template>
@@ -85,10 +173,10 @@
               Sign Up
             </h5>
 
-            <form class="mt-8 mb-10">
+            <form class="mt-8 mb-10" @submit.prevent="submitForm">
               <div class="flex flex-col gap-4 text-left">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" :errors="inputErrors.email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>
@@ -96,7 +184,7 @@
                 <!-- END Email Address -->
 
                 <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password">
+                <InputComponent v-model="password" placeholder="Password" type="password" :errors="inputErrors.password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -104,7 +192,7 @@
                 <!-- END Password -->
 
                 <!-- Password -->
-                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password">
+                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" :errors="inputErrors.password_confirmation">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -124,8 +212,15 @@
                 </ion-checkbox>
               </div>
 
-              <ion-button class="mt-4" expand="block" shape="round">
+              <ion-button v-if="!isSubmitting" class="mt-4" expand="block" shape="round" type="submit" data-cy="submit">
                 Sign up
+              </ion-button>
+
+              <ion-button v-if="isSubmitting" class="mt-4" expand="block" shape="round" disabled>
+                <span class="mr-2">
+                  Please wait...
+                </span>
+                <ion-spinner name="circular"></ion-spinner>
               </ion-button>
 
             </form>

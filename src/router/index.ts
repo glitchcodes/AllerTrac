@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
+import { Preferences } from "@capacitor/preferences";
 
 import { useAuthStore } from "@/store/auth";
 
@@ -18,6 +19,9 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/u/',
     component: OnboardingLayout,
+    meta: {
+      requiresNoAuth: true
+    },
     children: [
       {
         path: 'login',
@@ -30,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/auth/RegisterPage.vue')
       },
       {
+        path: 'register/verify',
+        name: 'verify-registration',
+        component: () => import('@/views/auth/OTPVerificationPage.vue')
+      },
+      {
         path: 'password/forget',
         name: 'forget-password',
         component: () => import('@/views/auth/ForgetPasswordPage.vue')
@@ -37,7 +46,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'password/verify',
         name: 'verify-password-reset',
-        component: () => import('@/views/auth/ResetVerificationPage.vue')
+        component: () => import('@/views/auth/OTPVerificationPage.vue')
       },
       {
         path: 'password/reset',
@@ -91,11 +100,23 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore();
 
+  if (to.matched.some(record => record.meta.requiresNoAuth)) {
+    const hasBearerToken = await Preferences.get({ key: 'access_token' });
+
+    if (hasBearerToken.value && hasBearerToken.value.length > 0) {
+      return { name: 'home' }
+    }
+  }
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // If not authenticated, return false
     try {
       await authStore.validateToken();
     } catch (error) {
+      // Remove the access token from the Preferences
+      await Preferences.remove({ key: 'access_token' })
+
+      // Log the error
       console.error(error);
 
       if (from.name === undefined) {
