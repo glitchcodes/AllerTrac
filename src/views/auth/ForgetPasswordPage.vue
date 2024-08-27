@@ -40,7 +40,7 @@
 
               <div class="text-left mb-8">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>

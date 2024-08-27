@@ -32,7 +32,7 @@
             <form class="mt-8">
               <div class="flex flex-col gap-4 text-left mb-8">
                 <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password">
+                <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -40,7 +40,7 @@
                 <!-- END Password -->
 
                 <!-- Confirm Password -->
-                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password">
+                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" data-cy="confirm-password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -48,7 +48,7 @@
                 <!-- END Confirm Password -->
               </div>
 
-              <ion-button expand="block" shape="round" type="submit">
+              <ion-button expand="block" shape="round" type="submit" data-cy="submit-button">
                 Confirm
               </ion-button>
             </form>

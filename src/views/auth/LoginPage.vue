@@ -94,7 +94,7 @@
             <form class="mt-8 mb-10" @submit.prevent="submitForm">
               <div class="flex flex-col gap-4 text-left">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email" :errors="inputErrors.email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email" :errors="inputErrors.email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>
@@ -102,7 +102,7 @@
                 <!-- END Email Address -->
 
                 <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password" :errors="inputErrors.password">
+                <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password" :errors="inputErrors.password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>

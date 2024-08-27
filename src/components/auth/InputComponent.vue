@@ -7,6 +7,7 @@
   const props = defineProps<{
     placeholder: string,
     type: InputTypeAttribute,
+    dataCy?: string
     errors?: Array<string>
   }>()
 
@@ -29,7 +30,7 @@
         <slot name="icon"></slot>
       </div>
       <ion-input class="px-4 py-3"
-                 :data-cy="type"
+                 :data-cy="dataCy"
                  :placeholder="props.placeholder"
                  :type="props.type"
                  @ionInput="updateModel">

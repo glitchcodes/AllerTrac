@@ -176,7 +176,7 @@
             <form class="mt-8 mb-10" @submit.prevent="submitForm">
               <div class="flex flex-col gap-4 text-left">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email" :errors="inputErrors.email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email" :errors="inputErrors.email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>
@@ -184,7 +184,7 @@
                 <!-- END Email Address -->
 
                 <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password" :errors="inputErrors.password">
+                <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password" :errors="inputErrors.password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -192,20 +192,20 @@
                 <!-- END Password -->
 
                 <!-- Password -->
-                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" :errors="inputErrors.password_confirmation">
+                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" data-cy="confirm-password" :errors="inputErrors.password_confirmation">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
                 </InputComponent>
                 <!-- END Password -->
 
-                <ion-checkbox v-model="tosAgreed" label-placement="end" justify="start">
+                <ion-checkbox v-model="tosAgreed" label-placement="end" justify="start" data-cy="tos-checkbox">
                   <p class="ion-text-wrap">
                     I agree to AllerTrac's <a @click="$event.stopPropagation()" id="open-tos-modal">Terms & Conditions</a>
                   </p>
                 </ion-checkbox>
 
-                <ion-checkbox v-model="privacyAgreed" label-placement="end" justify="start">
+                <ion-checkbox v-model="privacyAgreed" label-placement="end" justify="start" data-cy="privacy-checkbox">
                   <p class="ion-text-wrap">
                     I agree to AllerTrac's <a id="open-privacy-modal" @click.stop>Privacy Policy</a>
                   </p>
