@@ -8,7 +8,7 @@
   import { alertCircle, key, mailOutline } from "ionicons/icons";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/InputComponent.vue";
+  import InputComponent from "@/components/auth/input/TextInput.vue";
 
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import FetchError from "@/utils/errors/FetchError";

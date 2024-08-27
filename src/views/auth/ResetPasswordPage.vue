@@ -5,7 +5,7 @@
   import { key } from "ionicons/icons";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/InputComponent.vue";
+  import InputComponent from "@/components/auth/input/TextInput.vue";
 
   const password = ref<string>('');
   const confirmPassword = ref<string>('');
