@@ -1,3 +1,22 @@
+<script setup lang="ts">
+  import { computed } from "vue";
+  import { IonPage, IonContent, IonIcon } from '@ionic/vue';
+  import { fastFood } from "ionicons/icons";
+  import { useAuthStore } from "@/store/auth";
+
+  const authStore = useAuthStore();
+
+  const full_name = computed(() => {
+    if (authStore._user) {
+      const user = authStore._user;
+
+      return `${user.first_name} ${user.last_name}`;
+    }
+
+    return 'John Doe'
+  })
+</script>
+
 <template>
   <ion-page>
     <ion-content class="ion-padding" :fullscreen="true">
@@ -8,7 +27,7 @@
         </h5>
       </div>
       <h1 class="text-4xl font-bold">
-        Juan Dela Cruz
+        {{ full_name }}
       </h1>
 
       <div class="bg-white rounded-2xl shadow-xl p-5 mt-6">
@@ -27,11 +46,6 @@
     </ion-content>
   </ion-page>
 </template>
-
-<script setup lang="ts">
-  import { IonPage, IonContent, IonIcon } from '@ionic/vue';
-  import { fastFood } from "ionicons/icons";
-</script>
 
 <style scoped lang="scss">
 

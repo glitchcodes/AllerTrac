@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { defineStore } from "pinia";
 
@@ -12,6 +12,8 @@ import FetchError from "@/utils/errors/FetchError";
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>();
   const bearerToken = ref<string | null>();
+
+  const _user = computed(() => user.value)
 
   const getBearerToken = async () => {
     const token = await Preferences.get({ key: 'access_token' });
@@ -27,7 +29,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const validateToken = async () => {
     try {
-      await useFetchAPI({ url: '/auth/check', method: 'GET' });
+      const response = await useFetchAPI({ url: '/auth/check', method: 'GET' });
+
+      // Update the user state
+      user.value = response.data.user;
     } catch (error) {
 
       if (error instanceof FetchError) {
@@ -39,5 +44,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, bearerToken, getBearerToken, setBearerToken, validateToken }
+  return { user, _user, bearerToken, getBearerToken, setBearerToken, validateToken }
 })
