@@ -52,7 +52,15 @@
 
       await auth.setBearerToken(response.data.token);
 
-      await router.push({ name: 'home' })
+      const redirectTo = response.data.redirect_to;
+
+      // Redirect to welcome screen if the user hasn't completed onboarding
+      if (redirectTo === 'onboarding') {
+        await router.push({ name: 'onboarding-welcome' })
+      } else {
+        await router.push({ name: 'home' })
+      }
+
     } catch (error) {
       await handleAuthErrors(error);
     }
