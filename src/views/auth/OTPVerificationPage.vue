@@ -6,8 +6,8 @@
   import VOtpInput from "vue3-otp-input"
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useToastController } from "@/composables/useToastController";
-  import {useFetchAPI} from "@/composables/useFetchAPI";
 
   const toast = useToastController();
 
@@ -44,6 +44,31 @@
 
   const verifyOTP = async () => {
     isSubmitting.value = true
+
+    const body = {
+      identifier: identifier.value.full_identifier,
+      code: otp.value
+    }
+
+    try {
+      const response = await useFetchAPI({
+        url: '/auth/verify-account',
+        method: 'PATCH',
+        data: JSON.stringify(body)
+      })
+
+      await toast.presentToast({
+        message: response.data.message,
+        duration: 3000,
+        icon: informationCircle
+      })
+
+      await router.push({ name: 'login' });
+    } catch (error) {
+      handleErrors('verify', error);
+    }
+
+    isSubmitting.value = false;
   }
 
   const resendOTP = async () => {
