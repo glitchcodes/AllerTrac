@@ -56,6 +56,25 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/o/',
+    component: OnboardingLayout,
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: 'welcome',
+        name: 'onboarding-welcome',
+        component: () => import('@/views/onboarding/WelcomePage.vue')
+      },
+      {
+        path: 'allergies',
+        name: 'onboarding-allergens',
+        component: () => import('@/views/onboarding/AllergensPage.vue')
+      }
+    ]
+  },
+  {
     path: '/pages/',
     component: DefaultLayout,
     children: [
