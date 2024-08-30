@@ -45,7 +45,7 @@
         data: JSON.stringify(body)
       });
 
-      await router.push({ name: 'onboarding-allergies' });
+      await router.push({ name: 'onboarding-allergens' });
     } catch (error) {
       if (error instanceof FetchError) {
         switch (error.data.code) {
