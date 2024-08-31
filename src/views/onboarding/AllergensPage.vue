@@ -27,7 +27,7 @@
         data: JSON.stringify(body)
       })
 
-      await router.push({ name: 'home' })
+      await router.push({ name: 'onboarding-final' })
     } catch (error) {
       console.error(error)
     }
