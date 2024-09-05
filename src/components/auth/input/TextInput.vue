@@ -33,6 +33,7 @@
                  :data-cy="dataCy"
                  :placeholder="props.placeholder"
                  :type="props.type"
+                 :value="modelValue"
                  @ionInput="updateModel">
         <ion-input-password-toggle v-if="type === 'password'" slot="end"></ion-input-password-toggle>
       </ion-input>

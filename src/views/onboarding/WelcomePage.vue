@@ -1,11 +1,10 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { ref, onMounted } from "vue";
   import { useRouter } from "vue-router";
 
   import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from '@ionic/vue';
   import { person, call, today, alertCircle } from "ionicons/icons";
-  // import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/input/TextInput.vue";
+  import TextInput from "@/components/auth/input/TextInput.vue";
 
   import DatePickerInput from "@/components/auth/input/DatePickerInput.vue";
   import { useToastController } from "@/composables/useToastController";
@@ -23,6 +22,21 @@
   const last_name = ref<string>('');
   const phone_number = ref<string>('');
   const birthday = ref<string>('');
+
+  // Get current user information
+  onMounted(async () => {
+    try {
+      const response = await useFetchAPI({
+        url: '/user/miniature',
+        method: 'GET'
+      });
+
+      first_name.value = response.data.user.first_name;
+      last_name.value = response.data.user.last_name;
+    } catch (error) {
+      console.error(error)
+    }
+  })
 
   const submitForm = async () => {
     // Show the loading indicator
@@ -88,27 +102,27 @@
             <form @submit.prevent="submitForm">
               <div class="flex flex-col gap-4 text-left mb-6">
                 <!-- First name -->
-                <InputComponent v-model="first_name" placeholder="First name" type="text" :errors="inputErrors.first_name">
+                <TextInput v-model="first_name" placeholder="First name" type="text" :errors="inputErrors.first_name">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="person" />
                   </template>
-                </InputComponent>
+                </TextInput>
                 <!-- END First name -->
 
                 <!-- Last name -->
-                <InputComponent v-model="last_name" placeholder="Last name" type="text" :errors="inputErrors.last_name">
+                <TextInput v-model="last_name" placeholder="Last name" type="text" :errors="inputErrors.last_name">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="person" />
                   </template>
-                </InputComponent>
+                </TextInput>
                 <!-- END Last name -->
 
                 <!-- Phone number -->
-                <InputComponent v-model="phone_number" placeholder="Phone number" type="text" :errors="inputErrors.last_name">
+                <TextInput v-model="phone_number" placeholder="Phone number" type="text" :errors="inputErrors.last_name">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="call" />
                   </template>
-                </InputComponent>
+                </TextInput>
                 <!-- END Last name -->
 
                 <!-- Birthday -->

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from "@ionic/vue";
+  import { ref, onMounted } from "vue";
+  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
+  import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
   import { useRouter } from "vue-router";
   import { useAuthStore } from "@/store/auth";
   import { useToastController } from "@/composables/useToastController";
@@ -12,6 +13,17 @@
 
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import FetchError from "@/utils/errors/FetchError";
+
+  // Initialize Google OAuth
+  onMounted(() => {
+    const clientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+    GoogleAuth.initialize({
+      clientId: clientId,
+      scopes: ['email', 'profile'],
+      grantOfflineAccess: true
+    })
+  })
 
   // Composable
   const router = useRouter();
@@ -84,6 +96,36 @@
       }
     }
   }
+
+  const loginWithGoogle = () => {
+    GoogleAuth.signIn()
+        .then(async (response) => {
+          await sendOAuthResponse(response.email, response.givenName, response.familyName);
+        })
+        .catch((error) => {
+          console.error(error)
+        });
+  }
+
+  const sendOAuthResponse = async (email: string, first_name: string, last_name: string) => {
+    const response = await useFetchAPI({
+      url: '/auth/login-oauth',
+      method: 'POST',
+      data: JSON.stringify({
+        email: email,
+        first_name: first_name,
+        last_name: last_name
+      })
+    })
+
+    await auth.setBearerToken(response.data.token);
+
+    if (response.data.redirect_to) {
+      await router.push({ name: 'onboarding-welcome' })
+    } else {
+      await router.push({ name: 'home' })
+    }
+  }
 </script>
 
 <template>
@@ -150,7 +192,7 @@
             </p>
 
             <div class="mt-4 mb-6">
-              <ion-button class="oauth" expand="block" shape="round" fill="outline">
+              <ion-button class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
                 <img src="/icons/google-logo.svg" alt="Google Logo" />
                 <span class="ml-3">
                 Continue with Google

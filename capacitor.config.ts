@@ -10,6 +10,13 @@ const config: CapacitorConfig = {
     },
     Keyboard: {
       resizeOnFullScreen: true
+    },
+    GoogleAuth: {
+      scopes: [
+        'email',
+        'profile'
+      ],
+      serverClientId: '593030014005-sbree9pbnp02gh8u349d1tb71jkmlhru.apps.googleusercontent.com'
     }
   }
 };
