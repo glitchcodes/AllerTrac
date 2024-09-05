@@ -5,7 +5,7 @@
   import { arrowBack, mailOutline } from "ionicons/icons";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/InputComponent.vue";
+  import InputComponent from "@/components/auth/input/TextInput.vue";
 
   const ionRouter = useIonRouter();
   const email = ref<string>('');
@@ -40,7 +40,7 @@
 
               <div class="text-left mb-8">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>

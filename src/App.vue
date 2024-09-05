@@ -36,8 +36,7 @@
     if (isPlatform('hybrid')) {
       const settings = {
         style: isDarkStatusBar ? Style.Dark : Style.Light,
-        overlay: isAndroid ? isWhitelistedPage : false,
-        // color: isScanning ? 'transparent' : '#efeee9'
+        overlay: isAndroid ? isWhitelistedPage : false
       }
 
       await StatusBar.setBackgroundColor({ color: '#efeee9' });
@@ -52,22 +51,5 @@
         await StatusBar.show();
       }
     }
-
-    // if (isPlatform('hybrid')) {
-    //   if (newValue === "/pages/scan-food") {
-    //     await StatusBar.setStyle({ style: Style.Dark });
-    //     if (isPlatform('android')) await StatusBar.setOverlaysWebView({ overlay: true });
-    //   } else {
-    //     await StatusBar.setStyle({ style: Style.Light });
-    //     await StatusBar.setBackgroundColor({
-    //       color: '#efeee9'
-    //     })
-    //     if (isPlatform('android')) await StatusBar.setOverlaysWebView({ overlay: false });
-    //     await StatusBar.show()
-    //   }
-    // }
   }, { immediate: true })
-
-
-
 </script>

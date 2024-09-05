@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
+import { Preferences } from "@capacitor/preferences";
+
+import { useAuthStore } from "@/store/auth";
 
 import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
 
@@ -16,6 +19,9 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/u/',
     component: OnboardingLayout,
+    meta: {
+      requiresNoAuth: true
+    },
     children: [
       {
         path: 'login',
@@ -28,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/auth/RegisterPage.vue')
       },
       {
+        path: 'register/verify',
+        name: 'verify-registration',
+        component: () => import('@/views/auth/OTPVerificationPage.vue')
+      },
+      {
         path: 'password/forget',
         name: 'forget-password',
         component: () => import('@/views/auth/ForgetPasswordPage.vue')
@@ -35,12 +46,36 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'password/verify',
         name: 'verify-password-reset',
-        component: () => import('@/views/auth/ResetVerificationPage.vue')
+        component: () => import('@/views/auth/OTPVerificationPage.vue')
       },
       {
         path: 'password/reset',
         name: 'reset-password',
         component: () => import('@/views/auth/ResetPasswordPage.vue')
+      }
+    ]
+  },
+  {
+    path: '/o/',
+    component: OnboardingLayout,
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: 'welcome',
+        name: 'onboarding-welcome',
+        component: () => import('@/views/onboarding/WelcomePage.vue')
+      },
+      {
+        path: 'allergies',
+        name: 'onboarding-allergens',
+        component: () => import('@/views/onboarding/AllergensPage.vue')
+      },
+      {
+        path: 'congrats',
+        name: 'onboarding-final',
+        component: () => import('@/views/onboarding/FinalPage.vue')
       }
     ]
   },
@@ -55,6 +90,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'home',
+        meta: {
+          requiresAuth: true
+        },
         component: HomePage
       },
       {
@@ -80,6 +118,38 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
+})
+
+// Navigation Guards
+router.beforeEach(async (to, from) => {
+  const authStore = useAuthStore();
+
+  if (to.matched.some(record => record.meta.requiresNoAuth)) {
+    const hasBearerToken = await Preferences.get({ key: 'access_token' });
+
+    if (hasBearerToken.value && hasBearerToken.value.length > 0) {
+      return { name: 'home' }
+    }
+  }
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // If not authenticated, return false
+    try {
+      await authStore.validateToken();
+    } catch (error) {
+      // Remove the access token from the Preferences
+      await Preferences.remove({ key: 'access_token' })
+
+      // Log the error
+      console.error(error);
+
+      if (from.name === undefined) {
+        return { name: 'login' }
+      } else {
+        return false;
+      }
+    }
+  }
 })
 
 export default router

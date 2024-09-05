@@ -1,6 +1,7 @@
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from "@ionic/vue";
+  import { ref, onMounted } from "vue";
+  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
+  import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
   import { useRouter } from "vue-router";
   import { useAuthStore } from "@/store/auth";
   import { useToastController } from "@/composables/useToastController";
@@ -8,10 +9,21 @@
   import { alertCircle, key, mailOutline } from "ionicons/icons";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/InputComponent.vue";
+  import InputComponent from "@/components/auth/input/TextInput.vue";
 
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import FetchError from "@/utils/errors/FetchError";
+
+  // Initialize Google OAuth
+  onMounted(() => {
+    const clientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+    GoogleAuth.initialize({
+      clientId: clientId,
+      scopes: ['email', 'profile'],
+      grantOfflineAccess: true
+    })
+  })
 
   // Composable
   const router = useRouter();
@@ -27,7 +39,7 @@
   const password = ref<string>('');
 
   const genericError = ref<string>('');
-  const inputErrors: any = ref({});
+  const inputErrors = ref<any>({});
 
   // Actions
   const submitForm = async () => {
@@ -52,26 +64,67 @@
 
       await auth.setBearerToken(response.data.token);
 
-      await router.push({ name: 'home' })
-    } catch (error) {
-      if (error instanceof FetchError) {
-        switch (error.data.code) {
-          case "INPUT_INVALID":
-            inputErrors.value = error.data.errors;
-            break;
-          default:
-            await toast.presentToast({
-              message: 'Error: ' + error.data.message,
-              duration: 5000,
-              position: 'top',
-              icon: alertCircle
-            })
-        }
+      const redirectTo = response.data.redirect_to;
+
+      // Redirect to welcome screen if the user hasn't completed onboarding
+      if (redirectTo === 'onboarding') {
+        await router.push({ name: 'onboarding-welcome' })
+      } else {
+        await router.push({ name: 'home' })
       }
+
+    } catch (error) {
+      await handleAuthErrors(error);
     }
 
     // Hide loading indicator
     isSubmitting.value = false;
+  }
+
+  const handleAuthErrors = async (error: any) => {
+    if (error instanceof FetchError) {
+      switch (error.data.code) {
+        case "INPUT_INVALID":
+          inputErrors.value = error.data.errors;
+          break;
+        default:
+          await toast.presentToast({
+            message: 'Error: ' + error.data.message,
+            duration: 5000,
+            icon: alertCircle
+          })
+      }
+    }
+  }
+
+  const loginWithGoogle = () => {
+    GoogleAuth.signIn()
+        .then(async (response) => {
+          await sendOAuthResponse(response.email, response.givenName, response.familyName);
+        })
+        .catch((error) => {
+          console.error(error)
+        });
+  }
+
+  const sendOAuthResponse = async (email: string, first_name: string, last_name: string) => {
+    const response = await useFetchAPI({
+      url: '/auth/login-oauth',
+      method: 'POST',
+      data: JSON.stringify({
+        email: email,
+        first_name: first_name,
+        last_name: last_name
+      })
+    })
+
+    await auth.setBearerToken(response.data.token);
+
+    if (response.data.redirect_to) {
+      await router.push({ name: 'onboarding-welcome' })
+    } else {
+      await router.push({ name: 'home' })
+    }
   }
 </script>
 
@@ -91,7 +144,7 @@
             <form class="mt-8 mb-10" @submit.prevent="submitForm">
               <div class="flex flex-col gap-4 text-left">
                 <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email" :errors="inputErrors.email">
+                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email" :errors="inputErrors.email">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="mailOutline" />
                   </template>
@@ -99,7 +152,7 @@
                 <!-- END Email Address -->
 
                 <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password" :errors="inputErrors.password">
+                <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password" :errors="inputErrors.password">
                   <template v-slot:icon>
                     <ion-icon aria-hidden="true" :icon="key" />
                   </template>
@@ -119,7 +172,7 @@
                 </router-link>
               </div>
 
-              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit">
+              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit" data-cy="submit">
                 Login
               </ion-button>
 
@@ -139,7 +192,7 @@
             </p>
 
             <div class="mt-4 mb-6">
-              <ion-button class="oauth" expand="block" shape="round" fill="outline">
+              <ion-button class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
                 <img src="/icons/google-logo.svg" alt="Google Logo" />
                 <span class="ml-3">
                 Continue with Google
