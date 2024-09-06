@@ -1,18 +1,18 @@
 <script setup lang="ts">
   import { ref, onMounted } from "vue";
   import { IonPage, IonContent, IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
+  import { alertCircle, key, mailOutline } from "ionicons/icons";
   import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
   import { useRouter } from "vue-router";
   import { useAuthStore } from "@/store/auth";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useToastController } from "@/composables/useToastController";
 
-  import { alertCircle, key, mailOutline } from "ionicons/icons";
-
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/input/TextInput.vue";
-
-  import { useFetchAPI } from "@/composables/useFetchAPI";
+  import InputComponent from "@/components/auth/input/TextInput.vue"
+    ;
   import FetchError from "@/utils/errors/FetchError";
+  import type { OAuthProvider } from "@/types/OAuthProvider";
 
   // Initialize Google OAuth
   onMounted(() => {
@@ -81,6 +81,57 @@
     isSubmitting.value = false;
   }
 
+  const loginWithGoogle = () => {
+    GoogleAuth.signIn()
+        .then(async (response) => {
+          await sendOAuthResponse(
+              response.email,
+              response.givenName,
+              response.familyName,
+              "google",
+              response.id,
+              response.authentication.idToken
+          );
+        })
+        .catch((error) => {
+          console.error(error)
+        });
+  }
+
+  const sendOAuthResponse = async (
+      email: string,
+      first_name: string,
+      last_name: string,
+      provider: OAuthProvider,
+      account_id: string,
+      id_token: string
+  ) => {
+    try {
+      const response = await useFetchAPI({
+        url: '/auth/login-oauth',
+        method: 'POST',
+        data: JSON.stringify({
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+          account_id: account_id,
+          provider: provider,
+          id_token: id_token
+        })
+      })
+
+      await auth.setBearerToken(response.data.token);
+
+      if (response.data.redirect_to) {
+        await router.push({ name: 'onboarding-welcome' })
+      } else {
+        await router.push({ name: 'home' })
+      }
+    } catch (error) {
+      await handleAuthErrors(error);
+    }
+  }
+
   const handleAuthErrors = async (error: any) => {
     if (error instanceof FetchError) {
       switch (error.data.code) {
@@ -94,36 +145,6 @@
             icon: alertCircle
           })
       }
-    }
-  }
-
-  const loginWithGoogle = () => {
-    GoogleAuth.signIn()
-        .then(async (response) => {
-          await sendOAuthResponse(response.email, response.givenName, response.familyName);
-        })
-        .catch((error) => {
-          console.error(error)
-        });
-  }
-
-  const sendOAuthResponse = async (email: string, first_name: string, last_name: string) => {
-    const response = await useFetchAPI({
-      url: '/auth/login-oauth',
-      method: 'POST',
-      data: JSON.stringify({
-        email: email,
-        first_name: first_name,
-        last_name: last_name
-      })
-    })
-
-    await auth.setBearerToken(response.data.token);
-
-    if (response.data.redirect_to) {
-      await router.push({ name: 'onboarding-welcome' })
-    } else {
-      await router.push({ name: 'home' })
     }
   }
 </script>

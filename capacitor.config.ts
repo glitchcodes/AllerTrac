@@ -16,7 +16,8 @@ const config: CapacitorConfig = {
         'email',
         'profile'
       ],
-      serverClientId: '593030014005-sbree9pbnp02gh8u349d1tb71jkmlhru.apps.googleusercontent.com'
+      clientId: '258636234738-tkmdlebvme0o7tqd2a4ej0o8a092mi2v.apps.googleusercontent.com',
+      androidClientId: '258636234738-33l3gaomb6mhtlhqkfm6eqru7v0dug3t.apps.googleusercontent.com',
     }
   }
 };
