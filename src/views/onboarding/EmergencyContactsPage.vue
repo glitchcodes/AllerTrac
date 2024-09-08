@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref,} from "vue";
 import { useRouter } from "vue-router";
 
 import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from '@ionic/vue';
 import {person, call, alertCircle, people, mail} from "ionicons/icons";
 import TextInput from "@/components/auth/input/TextInput.vue";
 
-import DatePickerInput from "@/components/auth/input/DatePickerInput.vue";
 import { useToastController } from "@/composables/useToastController";
 import { useFetchAPI } from "@/composables/useFetchAPI";
 import FetchError from "@/utils/errors/FetchError";
