@@ -8,6 +8,7 @@
   import { useFetchAPI } from "@/composables/useFetchAPI";
 
   import type { Allergen } from "@/types/Allergen";
+  import LogoComponent from "@/components/auth/LogoComponent.vue";
 
   const router = useRouter();
 
@@ -39,7 +40,7 @@
     <ion-content>
       <div class="h-full px-4">
         <div class="flex flex-col h-full items-center justify-center gap-4">
-          <!-- <LogoComponent /> -->
+           <LogoComponent />
 
           <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {IonButton, IonContent, IonPage} from "@ionic/vue";
+import LogoComponent from "@/components/auth/LogoComponent.vue";
 </script>
 
 <template>
@@ -7,7 +8,7 @@ import {IonButton, IonContent, IonPage} from "@ionic/vue";
     <ion-content>
       <div class="h-full px-4">
         <div class="flex flex-col h-full items-center justify-center gap-4">
-          <!-- <LogoComponent /> -->
+           <LogoComponent />
 
           <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 

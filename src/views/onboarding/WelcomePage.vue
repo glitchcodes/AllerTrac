@@ -10,6 +10,7 @@
   import { useToastController } from "@/composables/useToastController";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import FetchError from "@/utils/errors/FetchError";
+  import LogoComponent from "@/components/auth/LogoComponent.vue";
 
   const router = useRouter();
   const toast = useToastController();
@@ -59,7 +60,7 @@
         data: JSON.stringify(body)
       });
 
-      await router.push({ name: 'onboarding-allergens' });
+      await router.push({ name: 'onboarding-emergency' });
     } catch (error) {
       if (error instanceof FetchError) {
         switch (error.data.code) {
@@ -86,7 +87,7 @@
     <ion-content>
       <div class="h-full px-4">
         <div class="flex flex-col h-full items-center justify-center gap-4">
-          <!-- <LogoComponent /> -->
+           <LogoComponent />
 
           <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 

@@ -68,6 +68,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/onboarding/WelcomePage.vue')
       },
       {
+        path: 'emergency',
+        name: 'onboarding-emergency',
+        component: () => import('@/views/onboarding/EmergencyContactsPage.vue')
+      },
+      {
         path: 'allergies',
         name: 'onboarding-allergens',
         component: () => import('@/views/onboarding/AllergensPage.vue')
