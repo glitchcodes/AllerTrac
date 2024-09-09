@@ -7,10 +7,10 @@ import { createOutline, logOutOutline, addOutline } from 'ionicons/icons';
   <ion-page>
     <ion-content class="ion-padding" :fullscreen="true">
       <div class="flex justify-between mb-4">
-        <ion-button color="primary" shape="round">
+        <ion-button class="active:shadow-lg active:scale-95 transition duration-200 ease-in-out" color="primary" shape="round">
           <ion-icon :icon="createOutline"></ion-icon>
         </ion-button>
-        <ion-button color="primary" shape="round">
+        <ion-button class="active:shadow-lg active:scale-95 transition duration-200 ease-in-out" color="primary" shape="round">
           <ion-icon :icon="logOutOutline"></ion-icon>
         </ion-button>
       </div>
@@ -74,10 +74,10 @@ import { createOutline, logOutOutline, addOutline } from 'ionicons/icons';
         <div class="flex items-center mb-4 justify-between">
           <h6 class="font-bold">Alarms</h6>
           <div class="flex">
-            <ion-button color="primary" shape="round">
+            <ion-button class="mr-2 active:shadow-lg active:scale-95 transition duration-200 ease-in-out" color="primary" shape="round">
               <ion-icon :icon="addOutline"></ion-icon>
             </ion-button>
-            <ion-button color="primary" shape="round">
+            <ion-button class="active:shadow-lg active:scale-95 transition duration-200 ease-in-out" color="primary" shape="round">
               <ion-icon :icon="createOutline"></ion-icon>
             </ion-button>
           </div>

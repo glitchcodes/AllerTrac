@@ -112,6 +112,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/Tab3Page.vue')
       },
       {
+        path: 'alarm',
+        component: () => import('@/views/AlarmPage.vue')
+      },
+      {
         path: 'profile',
         component: () => import('@/views/ProfilePage.vue')
       }
