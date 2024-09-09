@@ -104,6 +104,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => ScanResult
       },
       {
+        path: 'emergency',
+        name: 'emergency-index',
+        component: () => import('@/views/emergency/IndexPage.vue')
+      },
+      {
         path: 'tab2',
         component: () => import('@/views/Tab2Page.vue')
       },

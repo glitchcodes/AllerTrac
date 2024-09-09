@@ -53,7 +53,7 @@
 <!--          <ion-label>Home</ion-label>-->
         </ion-tab-button>
 
-        <ion-tab-button tab="pages/tab2" href="/pages/tab2">
+        <ion-tab-button tab="pages/emergency" href="/pages/emergency">
           <ion-icon aria-hidden="true" src="/icons/alert.svg" />
 <!--          <ion-label>Alerts</ion-label>-->
         </ion-tab-button>
