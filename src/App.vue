@@ -9,8 +9,17 @@
   import { useRoute } from "vue-router";
   import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/vue';
   import { StatusBar, Style } from "@capacitor/status-bar";
+  import { NativeAudio } from "@capacitor-community/native-audio";
 
   const route = useRoute();
+
+  // Preload alert sound
+  NativeAudio.preload({
+    assetId: 'emergency-alert',
+    assetPath: 'alert.wav',
+    audioChannelNum: 1,
+    isUrl: false
+  })
 
   watch(() => route.path, async (newRoute) => {
     const isAndroid = isPlatform('android');
