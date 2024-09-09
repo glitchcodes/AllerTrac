@@ -1,9 +1,9 @@
 <script lang="ts">
-import { IonDatetime, IonToggle } from '@ionic/vue';
+import {IonContent, IonDatetime, IonPage, IonToggle} from '@ionic/vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  components: { IonDatetime, IonToggle },
+  components: { IonDatetime, IonToggle, IonPage, IonContent },
 });
 </script>
 
