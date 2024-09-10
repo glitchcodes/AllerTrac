@@ -34,6 +34,7 @@
 
   // States
   const isSubmitting = ref<boolean>(false);
+  const isLoggingInWithGoogle = ref<boolean>(false);
 
   const email = ref<string>('');
   const password = ref<string>('');
@@ -82,6 +83,9 @@
   }
 
   const loginWithGoogle = () => {
+    // Show loading indicator
+    isLoggingInWithGoogle.value = true;
+
     GoogleAuth.signIn()
         .then(async (response) => {
           await sendOAuthResponse(
@@ -94,6 +98,10 @@
           );
         })
         .catch((error) => {
+          // Hide loading indicator
+          isLoggingInWithGoogle.value = false;
+
+          // Log the error
           console.error(error)
         });
   }
@@ -213,11 +221,19 @@
             </p>
 
             <div class="mt-4 mb-6">
-              <ion-button class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
+              <ion-button v-if="!isLoggingInWithGoogle" class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
                 <img src="/icons/google-logo.svg" alt="Google Logo" />
                 <span class="ml-3">
-                Continue with Google
-              </span>
+                  Continue with Google
+                </span>
+              </ion-button>
+
+              <ion-button v-else class="oauth" expand="block" shape="round" fill="outline" disabled>
+                <img src="/icons/google-logo.svg" alt="Google Logo" />
+                <span class="ml-3 mr-2">
+                  Logging into Google...
+                </span>
+                <ion-spinner name="circular"></ion-spinner>
               </ion-button>
             </div>
             <!-- END OAuth Providers -->
