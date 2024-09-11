@@ -1,8 +1,13 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import { IonPage, IonContent, IonIcon } from '@ionic/vue';
+  import {IonPage, IonContent, IonIcon, IonChip, IonSkeletonText} from '@ionic/vue';
   import { fastFood } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
+
+  import FactCarousel from "@/components/FactCarousel.vue";
+  import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
+  import FactCategorySlider from "@/components/FactCategorySlider.vue";
+  import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
 
   const authStore = useAuthStore();
 
@@ -30,7 +35,7 @@
         {{ full_name }}
       </h1>
 
-      <div class="bg-white rounded-2xl shadow-xl p-5 mt-2">
+      <div class="bg-white rounded-2xl shadow-xl p-5 mt-4">
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-xl text-primary font-bold mb-3">
@@ -53,42 +58,31 @@
         </h5>
       </div>
 
-      <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap space-x-4">
-        <button class="bg-[#417776] text-sm rounded-2xl font-bold text-[#F4EDEF] px-4 py-2 hover:bg-[#3b6967] text-nowrap items-center">Common Allergens</button>
-        <button class="bg-[#417776] text-sm rounded-2xl font-bold text-[#F4EDEF] px-4 py-2 hover:bg-[#3b6967] text-nowrap items-center">Food Allergy</button>
-        <button class="bg-[#417776] text-sm rounded-2xl font-bold text-[#F4EDEF] px-4 py-2 hover:bg-[#3b6967] text-nowrap items-center">Emergency Plan</button>
-        <button class="bg-[#417776] text-sm rounded-2xl font-bold text-[#F4EDEF] px-4 py-2 hover:bg-[#3b6967] text-nowrap items-center">Recipes</button>
-      </div>
+      <Suspense>
+        <FactCategorySlider class="mt-2 mb-4" />
 
-      <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x">
-        <div class="rounded-2xl shadow-xl mx-2 p-4 bg-cover bg-center min-h-96 min-w-80 max-h-96 max-w-80 overflow-hidden snap-center flex flex-col-reverse space-y-4 space-y-reverse" style="background-image: url('/images/allergies/shellfish.jpg');">
-          <div class="p-4 bg-[#417776] rounded-lg opacity-90">
-            <h3 class="font-bold text-lg text-[#F4EDEF]">Shellfish Allergy</h3>
-            <p class="text-sm text-black">Shellfish allergy is an atypical response by the body's immune system to proteins in certain marine animals.</p>
+        <template #fallback>
+          <SkeletonChipSlider class="mt-2 mb-4" />
+        </template>
+      </Suspense>
+
+      <Suspense>
+        <FactCarousel />
+
+        <template #fallback>
+          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
-        </div>
-        <div class="rounded-2xl shadow-xl mx-2 p-4 bg-cover bg-center min-h-96 min-w-80 max-h-96 max-w-80 overflow-hidden snap-center flex flex-col-reverse space-y-4 space-y-reverse" style="background-image: url('/images/allergies/fish.jpg');">
-          <div class="bottom-100 left-4 w-full p-4 bg-[#417776] rounded-lg opacity-90">
-            <h3 class="font-bold text-lg text-[#F4EDEF]">Fish Allergy</h3>
-            <p class="text-sm text-black">Fish allergy is a common food allergy that can cause severe reactions.</p>
-          </div>
-        </div>
-        <div class="rounded-2xl shadow-xl mx-2 p-4 bg-cover bg-center min-h-96 min-w-80 max-h-80 max-w-80 overflow-hidden snap-center flex flex-col-reverse space-y-4 space-y-reverse" style="background-image: url('/images/allergies/nut.jpg');">
-          <div class="bottom-4 left-4 w-full p-4 bg-[#417776] rounded-lg opacity-90">
-            <h3 class="font-bold text-lg text-[#F4EDEF]">Nut Allergy</h3>
-            <p class="text-sm text-black">Peanut allergy is one of the most common causes of severe food allergies.</p>
-          </div>
-        </div>
-        <div class="rounded-2xl shadow-xl mx-2 p-4 bg-cover bg-center min-h-96 min-w-80 max-h-80 max-w-80 overflow-hidden snap-center flex flex-col-reverse space-y-4 space-y-reverse" style="background-image: url('/images/allergies/allergies.jpg');">
-          <button class="bottom-4 left-4 w-full p-4 bg-[#417776] rounded-lg opacity-90">
-            <h3 class="font-bold text-lg text-[#F4EDEF]">See All</h3>
-          </button>
-        </div>
-      </div>
+        </template>
+      </Suspense>
     </ion-content>
   </ion-page>
 </template>
 
 <style scoped lang="scss">
-
+ion-chip {
+  --background: #417776;
+}
 </style>
