@@ -101,6 +101,6 @@
     background-image: url("/camera-helper.png");
     background-repeat: no-repeat;
     background-size: contain;
-    background-position: right;
+    background-position: right -15% bottom 10%;
   }
 </style>
