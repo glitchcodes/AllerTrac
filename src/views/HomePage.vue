@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import {IonPage, IonContent, IonIcon, IonChip, IonSkeletonText} from '@ionic/vue';
+  import { IonPage, IonContent, IonIcon } from '@ionic/vue';
   import { fastFood } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
 
