@@ -13,6 +13,11 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>();
   const bearerToken = ref<string | null>();
 
+  const _isLoggedIn = computed(() => {
+    if (!bearerToken.value) return false;
+
+    return bearerToken.value.length > 0;
+  })
   const _user = computed(() => user.value)
 
   const getBearerToken = async () => {
@@ -24,6 +29,12 @@ export const useAuthStore = defineStore('auth', () => {
     await Preferences.set({
       key: 'access_token',
       value: token
+    })
+  }
+
+  const removeBearerToken = async () => {
+    await Preferences.remove({
+      key: 'access_token'
     })
   }
 
@@ -44,5 +55,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, _user, bearerToken, getBearerToken, setBearerToken, validateToken }
+  return { user, _user, bearerToken, _isLoggedIn, getBearerToken, setBearerToken, removeBearerToken, validateToken }
 })
