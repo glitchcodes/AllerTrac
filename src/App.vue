@@ -20,7 +20,9 @@
 
   // Inject safe area variables on ready state
   onMounted(() => {
-    injectSafeAreaVariables()
+    if (isPlatform('ios')) {
+      injectSafeAreaVariables()
+    }
   })
 
   // Preload alert sound
