@@ -1,8 +1,12 @@
 <script setup lang="ts">
   import { IonPage, IonContent, IonButton } from "@ionic/vue";
+  import { useAuthStore } from "@/store/auth";
   import { useEmergencyStore } from "@/store/emergency";
-  import AlertButton from "@/components/AlertButton.vue";
 
+  import AlertButton from "@/components/AlertButton.vue";
+  import WarningAlert from "@/components/alert/WarningAlert.vue";
+
+  const authStore = useAuthStore();
   const emergencyStore = useEmergencyStore();
 
   // Animations
@@ -28,7 +32,7 @@
 <template>
   <ion-page>
     <ion-content class="ion-padding" :fullscreen="true">
-      <div class="bg-white/50 rounded-lg shadow-2xl w-full text-center p-4 mb-6">
+      <div class="bg-white/50 rounded-lg shadow-lg w-full text-center p-4 mb-6">
         <h1 class="text-2xl font-bold text-[#eb0c1b] ion-text-uppercase">
           Emergency
         </h1>
@@ -38,6 +42,11 @@
            :class="{ 'border-2 border-[#eb0c1b]': emergencyStore.isAlertActivated }">
 
         <transition-group name="fade" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
+          <WarningAlert v-if="!authStore._isLoggedIn"
+                        class="shadow"
+                        text="Sending alerts to emergency contacts are only available to registered users"
+          />
+
           <h1 v-if="!emergencyStore.isAlertActivated" class="text-2xl font-bold text-primary text-center" :key="'text-1'">
             Having an Allergic Reaction?
           </h1>
