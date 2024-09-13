@@ -5,13 +5,23 @@
 </template>
 
 <script setup lang="ts">
-  import { watch } from "vue";
+  import { onMounted, watch } from "vue";
   import { useRoute } from "vue-router";
   import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/vue';
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
+  import { SafeAreaController } from "@aashu-dubey/capacitor-statusbar-safe-area";
 
   const route = useRoute();
+
+  const injectSafeAreaVariables = () => {
+    SafeAreaController.injectCSSVariables();
+  };
+
+  // Inject safe area variables on ready state
+  onMounted(() => {
+    injectSafeAreaVariables()
+  })
 
   // Preload alert sound
   NativeAudio.preload({

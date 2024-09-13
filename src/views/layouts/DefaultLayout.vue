@@ -81,6 +81,10 @@
 </template>
 
 <style scoped lang="scss">
+  ion-router-outlet {
+    margin-top: var(--status-bar-height);
+  }
+
   ion-tab-bar {
     background-color: #fff;
     box-shadow: 0px -12px 42px -1px rgba(0, 0, 0, 0.1);

@@ -12,6 +12,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@aashu-dubey/capacitor-statusbar-safe-area": "^3.0.0",
     "@capacitor-community/camera-preview": "^6.0.0",
     "@capacitor-community/native-audio": "^6.0.0",
     "@capacitor/android": "6.1.0",
