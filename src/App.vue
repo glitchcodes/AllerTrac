@@ -31,7 +31,8 @@
         '/u/password/forget',
         '/u/password/verify',
         '/u/password/reset',
-        '/pages/scan-food'
+        '/pages/scan-food',
+        '/logout'
     ]
 
     // Show dark themed status bar on these pages

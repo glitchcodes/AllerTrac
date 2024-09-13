@@ -24,7 +24,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
         assetId: 'emergency-alert'
       });
 
-      NativeAudio.setVolume({
+      await NativeAudio.setVolume({
         assetId: 'emergency-alert',
         volume: 1.0
       })
