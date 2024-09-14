@@ -3,12 +3,12 @@
   import { IonChip, IonLabel, IonIcon } from "@ionic/vue";
   import { addCircleOutline, removeCircleOutline } from "ionicons/icons";
   import { useFetchAPI } from "@/composables/useFetchAPI";
-  import type { Allergen } from "@/types/Allergen";
+  import type { Allergens } from "@/types/Allergens";
 
   const model = defineModel();
 
-  const allergens = ref<Allergen[]>([]);
-  const selectedAllergens = ref<Allergen[]>([]);
+  const allergens = ref<Allergens[]>([]);
+  const selectedAllergens = ref<Allergens[]>([]);
 
   watchEffect(() => {
     model.value = selectedAllergens.value

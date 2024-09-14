@@ -7,11 +7,11 @@
   import { useRouter } from "vue-router";
   import { useFetchAPI } from "@/composables/useFetchAPI";
 
-  import type { Allergen } from "@/types/Allergen";
+  import type { Allergens } from "@/types/Allergens";
 
   const router = useRouter();
 
-  const allergens = ref<Allergen[]>();
+  const allergens = ref<Allergens[]>();
 
   const handleSubmitForm = async () => {
     const allergenIds = allergens.value?.map((a) => a.id);

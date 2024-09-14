@@ -10,6 +10,7 @@ import HomePage from "@/views/HomePage.vue";
 import ScanFood from "@/views/ScanFoodPage.vue";
 import ScanResult from "@/views/ScanResultPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
+import AllergensPage from "@/views/allergens/AllergensPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -110,9 +111,29 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'tab3',
         component: () => import('@/views/Tab3Page.vue')
+      },
+      {
+        path: '/facts',
+        name: 'facts',
+        component: () => import('@/views/facts/Facts.vue')
+      },
+      {
+        path: '/facts/:id',
+        name: 'factsPage',
+        component: () => FactsPage
+      },
+      {
+        path: '/allergens',
+        name: 'allergens',
+        component: () => import('@/views/allergens/Allergens.vue')
+      },
+      {
+        path: '/allergens/:id',
+        name: 'allergensPage',
+        component: () => AllergensPage
       }
     ]
-  }
+  },
 ]
 
 const router = createRouter({
