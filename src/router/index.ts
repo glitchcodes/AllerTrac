@@ -117,6 +117,18 @@ const routes: Array<RouteRecordRaw> = [
         path: 'tab3',
         component: () => import('@/views/Tab3Page.vue')
       },
+      {
+        path: 'alarm',
+        component: () => import('@/views/AlarmPage.vue')
+      },
+      {
+        path: 'profile',
+        component: () => import('@/views/ProfilePage.vue')
+      },
+      {
+        path: 'edit-profile',
+        component: () => import('@/views/Edit-ProfilePage.vue')
+      }
     ]
   },
   {
