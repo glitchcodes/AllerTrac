@@ -110,24 +110,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/emergency/IndexPage.vue')
       },
       {
-        path: 'tab2',
-        component: () => import('@/views/Tab2Page.vue')
-      },
-      {
-        path: 'tab3',
-        component: () => import('@/views/Tab3Page.vue')
-      },
-      {
         path: 'alarm',
-        component: () => import('@/views/AlarmPage.vue')
+        name: 'user-alarms',
+        component: () => import('@/views/profile/AlarmPage.vue')
       },
       {
         path: 'profile',
-        component: () => import('@/views/ProfilePage.vue')
+        name: 'user-profile',
+        component: () => import('@/views/profile/ProfilePage.vue')
       },
       {
-        path: 'edit-profile',
-        component: () => import('@/views/Edit-ProfilePage.vue')
+        path: 'profile/edit',
+        name: 'user-profile-edit',
+        component: () => import('@/views/profile/EditProfilePage.vue')
       }
     ]
   },
