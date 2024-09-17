@@ -1,10 +1,12 @@
 <script setup lang="ts">
-  import { computed, inject, onBeforeUnmount, onMounted } from "vue";
+  import { inject, onBeforeUnmount, onMounted, ref } from "vue";
   import { useRouter } from "vue-router"
-  import { IonContent, IonPage, isPlatform, onIonViewDidEnter, onIonViewWillLeave } from "@ionic/vue";
+  import { IonContent, IonPage, onIonViewDidEnter, onIonViewWillLeave } from "@ionic/vue";
+  import { Preferences } from "@capacitor/preferences";
   import { CameraPreview, CameraPreviewOptions, CameraPreviewPictureOptions } from "@capacitor-community/camera-preview";
   import { useScannerStore } from "@/store/useScannerStore";
   import { Emitter } from "mitt";
+  import ScannerToast from "@/components/ScannerToast.vue";
 
   type Events = {
     cameraStatusChanged: boolean,
@@ -14,12 +16,21 @@
   const router = useRouter();
   const scannerStore = useScannerStore();
 
-  const emitter: Emitter<Events> = inject('emitter')!;
-  const statusBarHeight = computed(() => {
-    if (isPlatform('desktop')) return 20;
+  const isToastDismissed = ref(false);
 
-    return screen.height - window.innerHeight;
-  })
+  const checkToastStatus = async () => {
+    const isDismissed = await Preferences.get({ key: 'scanner_toast_dismissed' });
+
+    if (!isDismissed.value) return false;
+
+    isToastDismissed.value = JSON.parse(isDismissed.value);
+  }
+
+  const updateToastStatus = async () => {
+    await checkToastStatus()
+  }
+
+  const emitter: Emitter<Events> = inject('emitter')!;
 
   const cameraPreviewOptions: CameraPreviewOptions = {
     parent: "camera-preview",
@@ -54,30 +65,20 @@
       // Redirect to results page
       await router.push({ path: '/pages/scan-results' })
     })
+
+    // Check toast message status
+    checkToastStatus()
   })
 
   onBeforeUnmount(() => {
     emitter.off('capturePhoto')
-  })
+  });
 </script>
 
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-      <div class="bg-primary camera-notice rounded-xl shadow-md m-5 p-5 z-[1000] absolute w-[calc(100%-2.5rem)] flex items-center"
-           :style="{
-             'margin-top': statusBarHeight + 'px'
-           }">
-        <div>
-          <h5 class="text-xl font-bold mb-3">
-            Check Out What's Cookin' In Your Grub!
-          </h5>
-          <p class="text-sm">
-            Capturing a photograph of your meal can assist in identifying its ingredients.
-          </p>
-        </div>
-        <div class="w-[200px]"></div>
-      </div>
+      <ScannerToast v-if="!isToastDismissed" @dismiss="updateToastStatus" />
       <div id="camera-preview"></div>
     </ion-content>
   </ion-page>
@@ -101,6 +102,6 @@
     background-image: url("/camera-helper.png");
     background-repeat: no-repeat;
     background-size: contain;
-    background-position: right;
+    background-position: right -15% bottom 10%;
   }
 </style>
