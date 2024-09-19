@@ -5,8 +5,22 @@
 <template>
   <div class="bg-[#43727a] p-4 rounded-lg text-white">
     <div class="mb-4">
-      <h5 class="font-bold mt-1">Selected</h5>
-      <p>Nothing selected yet</p>
+      <h5 class="font-bold mt-1">Selected Allergens</h5>
+      <ion-chip>
+        <ion-label>
+          <ion-skeleton-text :animated="true" style="width: 70px; border-radius: 8px"></ion-skeleton-text>
+        </ion-label>
+      </ion-chip>
+      <ion-chip>
+        <ion-label>
+          <ion-skeleton-text :animated="true" style="width: 70px; border-radius: 8px"></ion-skeleton-text>
+        </ion-label>
+      </ion-chip>
+      <ion-chip>
+        <ion-label>
+          <ion-skeleton-text :animated="true" style="width: 70px; border-radius: 8px"></ion-skeleton-text>
+        </ion-label>
+      </ion-chip>
     </div>
 
     <div>
