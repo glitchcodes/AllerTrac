@@ -1,5 +1,13 @@
 <script setup lang="ts">
-  import { IonPage, IonContent, IonButton } from "@ionic/vue";
+  import {
+    IonPage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButton,
+    isPlatform
+  } from "@ionic/vue";
   import { useAuthStore } from "@/store/auth";
   import { useEmergencyStore } from "@/store/emergency";
 
@@ -31,14 +39,20 @@
 
 <template>
   <ion-page>
+    <ion-header>
+      <ion-toolbar v-if="isPlatform('ios')">
+        <ion-title>Emergency</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
     <ion-content class="ion-padding" :fullscreen="true">
-      <div class="bg-white/50 rounded-lg shadow-lg w-full text-center p-4 mb-6">
+      <div v-if="!isPlatform('ios')" class="bg-white/50 rounded-lg shadow-lg w-full text-center p-4 mb-6">
         <h1 class="text-2xl font-bold text-[#eb0c1b] ion-text-uppercase">
           Emergency
         </h1>
       </div>
 
-      <div class="flex flex-col items-center justify-center bg-white/50 rounded-2xl shadow-2xl p-4 gap-6 custom-flex"
+      <div class="flex flex-col items-center justify-center bg-white/50 rounded-2xl shadow-2xl px-4 py-8 gap-6 custom-flex"
            :class="{ 'border-2 border-[#eb0c1b]': emergencyStore.isAlertActivated }">
 
         <transition-group name="fade" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
@@ -85,7 +99,7 @@
 </template>
 
 <style scoped lang="scss">
-  .custom-flex {
-    height: calc(100% - 16px - 64px - 24px);
-  }
+  //.custom-flex {
+  //  height: calc(100% - 16px - 64px - 24px);
+  //}
 </style>
