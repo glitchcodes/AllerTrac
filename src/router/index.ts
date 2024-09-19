@@ -10,12 +10,13 @@ import HomePage from "@/views/HomePage.vue";
 import ScanFood from "@/views/ScanFoodPage.vue";
 import ScanResult from "@/views/ScanResultPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
+import LogoutPage from "@/views/auth/LogoutPage.vue";
 import AllergensPage from "@/views/allergens/AllergensPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/u/login'
+    redirect: '/pages/home'
   },
   {
     path: '/u/',
@@ -91,9 +92,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'home',
-        meta: {
-          requiresAuth: true
-        },
+        // meta: {
+        //   requiresAuth: true
+        // },
         component: HomePage
       },
       {
@@ -105,12 +106,29 @@ const routes: Array<RouteRecordRaw> = [
         component: () => ScanResult
       },
       {
+        path: 'emergency',
+        name: 'emergency-index',
+        component: () => import('@/views/emergency/IndexPage.vue')
+      },
+      {
         path: 'tab2',
         component: () => import('@/views/Tab2Page.vue')
       },
       {
         path: 'tab3',
         component: () => import('@/views/Tab3Page.vue')
+      },
+      {
+        path: 'alarm',
+        component: () => import('@/views/AlarmPage.vue')
+      },
+      {
+        path: 'profile',
+        component: () => import('@/views/ProfilePage.vue')
+      },
+      {
+        path: 'edit-profile',
+        component: () => import('@/views/Edit-ProfilePage.vue')
       },
       {
         path: '/facts',
@@ -134,6 +152,11 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  {
+    path: '/logout',
+    name: 'logout',
+    component: LogoutPage
+  }
 ]
 
 const router = createRouter({
@@ -151,6 +174,8 @@ router.beforeEach(async (to, from) => {
     if (hasBearerToken.value && hasBearerToken.value.length > 0) {
       return { name: 'home' }
     }
+
+    return true;
   }
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -170,6 +195,14 @@ router.beforeEach(async (to, from) => {
         return false;
       }
     }
+  }
+
+  // Validate token regardless
+  try {
+    await authStore.validateToken();
+  } catch (error) {
+    // Remove the access token from the Preferences
+    await Preferences.remove({key: 'access_token'})
   }
 })
 

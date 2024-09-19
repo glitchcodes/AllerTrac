@@ -1,6 +1,20 @@
 <script setup lang="ts">
-  import {computed, ref} from "vue";
-  import { IonInput, IonDatetime, IonModal, IonContent, DatetimeCustomEvent } from "@ionic/vue";
+  import { computed, ref } from "vue";
+  import {
+    isPlatform,
+    IonInput,
+    IonDatetime,
+    IonModal,
+    IonContent,
+    IonIcon,
+    IonToolbar,
+    IonHeader,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    DatetimeCustomEvent
+  } from "@ionic/vue";
+  import { checkmarkOutline, closeOutline } from "ionicons/icons";
 
   const props = defineProps<{
     placeholder: string,
@@ -9,6 +23,7 @@
   }>()
 
   const model = defineModel();
+  const birthdayModal = ref<InstanceType<typeof IonModal>>();
   const inputValue = ref<string>('');
 
   const pickerId = computed(() => {
@@ -30,12 +45,25 @@
     return formattedDate.format(date);
   })
 
-  const updateModel = (e: DatetimeCustomEvent) => {
-    model.value = e.detail.value;
-
+  const updateBirthday = (e: DatetimeCustomEvent) => {
     if (typeof e.detail.value === "string") {
       inputValue.value = e.detail.value;
     }
+  }
+
+  const confirmModal = () => {
+    model.value = inputValue.value;
+
+    birthdayModal.value!.$el.dismiss();
+  }
+
+  const dismissModal = () => {
+    // Reset value
+    model.value = "";
+    inputValue.value = "";
+
+    // Dismiss the modal
+    birthdayModal.value!.$el.dismiss();
   }
 
   const isInvalid = computed(() => props.errors && props.errors.length > 0)
@@ -51,15 +79,36 @@
 
     <ion-input :id="pickerId" :placeholder="placeholder" :value="friendlyDate" readonly></ion-input>
 
-    <ion-modal :trigger="pickerId" :initial-breakpoint="0.5" :breakpoints="[0, 0.25, 0.5, 0.75]">
-      <ion-content>
-<!--        <h1>Balls</h1>-->
+    <ion-modal ref="birthdayModal" :trigger="pickerId" :initial-breakpoint="0.75" :breakpoints="[0.5, 0.75]" :backdrop-dismiss="false">
+      <ion-header :class="{ 'ion-no-border': !isPlatform('ios') }">
+        <ion-toolbar class="relative">
+          <ion-buttons slot="start">
+            <ion-button @click="dismissModal">
+              <ion-icon slot="icon-only" :icon="closeOutline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+
+          <ion-title class="text-center">
+            Birthday
+          </ion-title>
+
+          <ion-buttons slot="end">
+            <ion-button @click="confirmModal">
+              <ion-icon slot="icon-only" :icon="checkmarkOutline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
         <ion-datetime presentation="date"
                       size="cover"
-                      :show-default-buttons="true"
-                      @ionChange="updateModel">
+                      :show-default-title="true"
+                      @ionChange="updateBirthday">
+          <span slot="title">Select your birthday</span>
         </ion-datetime>
       </ion-content>
+
     </ion-modal>
   </div>
 
@@ -79,9 +128,17 @@
     --highlight-color-focused: none;
   }
 
+  ion-datetime {
+    border-radius: 0.5rem;
+  }
+
   :slotted(ion-icon) {
     font-size: 24px;
     position: relative;
     top: 1px;
+  }
+
+  ion-modal {
+    --width: 100%;
   }
 </style>

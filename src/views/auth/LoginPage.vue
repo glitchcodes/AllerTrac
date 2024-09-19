@@ -1,39 +1,33 @@
 <script setup lang="ts">
   import { ref, onMounted } from "vue";
-  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
+  import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from "@ionic/vue";
   import { alertCircle, key, mailOutline } from "ionicons/icons";
-  import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
   import { useRouter } from "vue-router";
+  import { useGoogleAuth } from "@/composables/useGoogleAuth";
   import { useAuthStore } from "@/store/auth";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useToastController } from "@/composables/useToastController";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
-  import InputComponent from "@/components/auth/input/TextInput.vue"
-    ;
+  import InputComponent from "@/components/auth/input/TextInput.vue";
   import FetchError from "@/utils/errors/FetchError";
-  import type { OAuthProvider } from "@/types/OAuthProvider";
-
-  // Initialize Google OAuth
-  onMounted(() => {
-    const clientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
-
-    GoogleAuth.initialize({
-      clientId: clientId,
-      scopes: ['email', 'profile'],
-      grantOfflineAccess: true
-    })
-  })
 
   // Composable
   const router = useRouter();
   const toast = useToastController();
+  const googleAuth = useGoogleAuth();
+
+  // Initialize Google OAuth
+  onMounted(() => {
+    googleAuth.initialize();
+  })
 
   // Stores
   const auth = useAuthStore();
 
   // States
   const isSubmitting = ref<boolean>(false);
+  const isLoggingInWithGoogle = ref<boolean>(false);
 
   const email = ref<string>('');
   const password = ref<string>('');
@@ -81,55 +75,15 @@
     isSubmitting.value = false;
   }
 
-  const loginWithGoogle = () => {
-    GoogleAuth.signIn()
-        .then(async (response) => {
-          await sendOAuthResponse(
-              response.email,
-              response.givenName,
-              response.familyName,
-              "google",
-              response.id,
-              response.authentication.idToken
-          );
-        })
-        .catch((error) => {
-          console.error(error)
-        });
-  }
+  const loginWithGoogle = async () => {
+    // Show loading indicator
+    isLoggingInWithGoogle.value = true;
 
-  const sendOAuthResponse = async (
-      email: string,
-      first_name: string,
-      last_name: string,
-      provider: OAuthProvider,
-      account_id: string,
-      id_token: string
-  ) => {
-    try {
-      const response = await useFetchAPI({
-        url: '/auth/login-oauth',
-        method: 'POST',
-        data: JSON.stringify({
-          email: email,
-          first_name: first_name,
-          last_name: last_name,
-          account_id: account_id,
-          provider: provider,
-          id_token: id_token
-        })
-      })
+    // Sign in with Google
+    await googleAuth.signIn()
 
-      await auth.setBearerToken(response.data.token);
-
-      if (response.data.redirect_to) {
-        await router.push({ name: 'onboarding-welcome' })
-      } else {
-        await router.push({ name: 'home' })
-      }
-    } catch (error) {
-      await handleAuthErrors(error);
-    }
+    // Hide loading indicator
+    isLoggingInWithGoogle.value = false;
   }
 
   const handleAuthErrors = async (error: any) => {
@@ -213,11 +167,19 @@
             </p>
 
             <div class="mt-4 mb-6">
-              <ion-button class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
+              <ion-button v-if="!isLoggingInWithGoogle" class="oauth" expand="block" shape="round" fill="outline" @click="loginWithGoogle">
                 <img src="/icons/google-logo.svg" alt="Google Logo" />
                 <span class="ml-3">
-                Continue with Google
-              </span>
+                  Continue with Google
+                </span>
+              </ion-button>
+
+              <ion-button v-else class="oauth" expand="block" shape="round" fill="outline" disabled>
+                <img src="/icons/google-logo.svg" alt="Google Logo" />
+                <span class="ml-3 mr-2">
+                  Logging into Google...
+                </span>
+                <ion-spinner name="circular"></ion-spinner>
               </ion-button>
             </div>
             <!-- END OAuth Providers -->
