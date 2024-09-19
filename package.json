@@ -30,6 +30,7 @@
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
     "@vueuse/core": "^10.11.0",
+    "animate.css": "^4.1.1",
     "ionicons": "^7.0.0",
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",

@@ -1,0 +1,51 @@
+@import 'animate.css';
+
+.animate__animated.animate__slideInLeft,
+.animate__animated.animate__slideOutRight {
+  --animate-duration: 300ms;
+}
+
+body {
+  --background: transparent !important;
+}
+
+ion-content {
+  --ion-background-color: #efeee9;
+  --ion-background-color-rgb: 239,238,233;
+}
+
+ion-icon.primary {
+  color: var(--ion-color-primary);
+}
+
+.text-primary {
+  color: var(--ion-color-primary);
+}
+
+.bg-primary {
+  background-color: #43727a;
+  color: white;
+}
+
+.bg-secondary {
+  background-color: #fbfdfe;
+}
+
+a {
+  color: var(--ion-color-primary);
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
