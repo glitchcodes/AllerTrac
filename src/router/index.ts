@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import { Preferences } from "@capacitor/preferences";
 
+import { useAlertController } from "@/composables/useAlertController";
 import { useAuthStore } from "@/store/auth";
 
 import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
@@ -117,6 +118,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'profile',
         name: 'user-profile',
+        meta: {
+          requiresAuth: true
+        },
         component: () => import('@/views/profile/ProfilePage.vue')
       },
       {
@@ -140,6 +144,7 @@ const router = createRouter({
 
 // Navigation Guards
 router.beforeEach(async (to, from) => {
+  const alertController = useAlertController();
   const authStore = useAuthStore();
 
   if (to.matched.some(record => record.meta.requiresNoAuth)) {
@@ -166,6 +171,18 @@ router.beforeEach(async (to, from) => {
       if (from.name === undefined) {
         return { name: 'login' }
       } else {
+        // Show an alert
+        await alertController.presentAlert({
+          header: "Unauthorized",
+          message: "This page is only for logged-in users",
+          buttons: [
+            {
+              text: "Okay",
+              role: 'cancel'
+            }
+          ]
+        })
+
         return false;
       }
     }
