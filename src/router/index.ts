@@ -115,7 +115,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/facts',
         name: 'facts',
-        component: () => import('@/views/facts/Facts.vue')
+        component: () => import('@/views/facts/FactsListPage.vue')
       },
       {
         path: '/facts/:id',
@@ -125,7 +125,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/allergens',
         name: 'allergens',
-        component: () => import('@/views/allergens/Allergens.vue')
+        component: () => import('@/views/allergens/AllergensListPage.vue')
       },
       {
         path: '/allergens/:id',
