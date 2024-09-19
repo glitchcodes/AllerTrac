@@ -80,13 +80,13 @@
         </ion-segment>
       </div>
 
-        <transition enter-active-class="animate__animated animate__slideInLeft"
-                    leave-active-class="animate__animated animate__slideOutRight"
-                    mode="out-in">
-          <keep-alive>
-            <component :is="segments[currentSegment]" class="my-4"></component>
-          </keep-alive>
-        </transition>
+      <transition enter-active-class="animate__animated animate__slideInLeft"
+                  leave-active-class="animate__animated animate__slideOutRight"
+                  mode="out-in">
+        <keep-alive>
+          <component :is="segments[currentSegment]" class="my-4"></component>
+        </keep-alive>
+      </transition>
 
     </ion-content>
   </ion-page>
