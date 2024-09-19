@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { IonIcon } from "@ionic/vue";
-  import { informationCircle } from "ionicons/icons";
+  import { warningOutline } from "ionicons/icons";
 
   const props = defineProps<{
     text: string
@@ -9,7 +9,7 @@
 
 <template>
   <div class="flex items-center p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 gap-3" role="alert">
-    <ion-icon class="alert-icon" aria-hidden="true" :icon="informationCircle" />
+    <ion-icon class="alert-icon" aria-hidden="true" :icon="warningOutline" />
     <div>
       {{ props.text }}
     </div>
