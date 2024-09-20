@@ -1,10 +1,28 @@
 <script setup lang="ts">
+  import { computed } from "vue";
   import { IonAvatar } from "@ionic/vue";
-  import { useAuthStore } from "@/store/auth";
-  import { storeToRefs } from "pinia";
+  import type { User } from "@/types/User";
 
-  const authStore = useAuthStore();
-  const { user } = storeToRefs(authStore)
+  const props = defineProps<{
+    user: User
+  }>();
+
+  const full_name = computed(() => {
+    return `${props.user.first_name || 'John' } ${props.user.last_name || 'Doe' }`
+  });
+
+  const friendlyDate = computed(() => {
+    if (props.user.birthday.length === 0) return;
+
+    const date = new Date(props.user.birthday);
+    const formattedDate = new Intl.DateTimeFormat('en', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    return formattedDate.format(date);
+  });
 </script>
 
 <template>
@@ -16,21 +34,21 @@
       <div>
         <h6 class="font-bold">Welcome!</h6>
         <h2 class="text-xl text-primary font-bold mb-3">
-          {{ user!.full_name }}
+          {{ full_name }}
         </h2>
 
         <ul class="text-sm">
           <li class="text-[12px]">
             <span class="text-primary font-bold">Phone Number:</span>
-            {{ user!.phone_number }}
+            {{ props.user.phone_number }}
           </li>
           <li class="text-[12px]">
             <span class="text-primary font-bold">Email Address:</span>
-            {{ user!.email }}
+            {{ props.user.email }}
           </li>
           <li class="text-[12px]">
             <span class="text-primary font-bold">Birthday:</span>
-            {{ user!.birthday }}
+            {{ friendlyDate }}
           </li>
         </ul>
       </div>
