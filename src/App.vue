@@ -10,13 +10,13 @@
   import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/vue';
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
-  import { SafeAreaController } from "@aashu-dubey/capacitor-statusbar-safe-area";
+ /* import { SafeAreaController } from "@aashu-dubey/capacitor-statusbar-safe-area";*/
 
   const route = useRoute();
 
-  const injectSafeAreaVariables = () => {
+/*  const injectSafeAreaVariables = () => {
     SafeAreaController.injectCSSVariables();
-  };
+  };*/
 
   // Inject safe area variables on ready state
   onMounted(() => {
