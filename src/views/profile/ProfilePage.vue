@@ -25,13 +25,12 @@
 
   // Load immediately
   import EditProfileModal from "@/components/modal/EditProfileModal.vue";
+  import AllergensSegment from "@/components/profile/AllergensSegment.vue";
+  import EmergencyContactsSegment from "@/components/profile/EmergencyContactsSegment.vue";
+  import AlarmsSegment from "@/components/profile/AlarmsSegment.vue";
 
   // Lazy-load
   const ProfileCard = defineAsyncComponent(() => import("@/components/profile/ProfileCard.vue"));
-  const AllergensSegment = defineAsyncComponent(() => import("@/components/profile/AllergensSegment.vue"));
-  const EmergencyContactsSegment = defineAsyncComponent(() => import("@/components/profile/EmergencyContactsSegment.vue"));
-  const AlarmsSegment = defineAsyncComponent(() => import("@/components/profile/AlarmsSegment.vue"));
-  // const EditProfileModal = defineAsyncComponent(() => import("@/components/modal/EditProfileModal.vue"));
 
   const router = useRouter();
   const authStore = useAuthStore();
