@@ -40,6 +40,11 @@ a:hover {
   text-decoration: underline;
 }
 
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease-in-out;
