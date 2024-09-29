@@ -53,7 +53,7 @@
   const handleLogout = async () => {
     // Show alert to confirm changes
     await alertController.presentAlert({
-      header: "Are you sure?",
+      header: "Logout",
       message: "You will lose to several features until you login again",
       buttons: [
         {
