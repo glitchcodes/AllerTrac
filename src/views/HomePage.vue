@@ -91,10 +91,9 @@
         </div>
       </div>
 
-      <WarningAlert v-if="!authStore._isLoggedIn"
-                    class="mt-4 mb-5 shadow"
-                    text="Some features are only available to registered users."
-      />
+      <WarningAlert v-if="!authStore._isLoggedIn" class="mt-4 mb-5 shadow">
+        Some features are only available to registered users.
+      </WarningAlert>
 
       <div class="bg-white rounded-2xl shadow-xl p-5 mt-4">
         <div class="flex justify-between items-center">

@@ -56,10 +56,9 @@
            :class="{ 'border-2 border-[#eb0c1b]': emergencyStore.isAlertActivated }">
 
         <transition-group name="fade" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
-          <WarningAlert v-if="!authStore._isLoggedIn"
-                        class="shadow"
-                        text="Sending alerts to emergency contacts are only available to registered users"
-          />
+          <WarningAlert v-if="!authStore._isLoggedIn" class="shadow">
+            Sending alerts to emergency contacts are only available to registered users
+          </WarningAlert>
 
           <h1 v-if="!emergencyStore.isAlertActivated" class="text-2xl font-bold text-primary text-center" :key="'text-1'">
             Having an Allergic Reaction?

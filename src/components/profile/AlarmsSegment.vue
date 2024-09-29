@@ -26,7 +26,9 @@ import { addSharp, alarm } from "ionicons/icons";
 
     </div>
 
-    <InfoAlert class=" my-4" text="Tap on an alarm to edit it" />
+    <InfoAlert class="my-4">
+      Tap on an alarm to edit it
+    </InfoAlert>
 
     <div class="flex flex-col gap-3">
       <div class="flex items-center justify-between w-full ion-activatable ripple-parent overflow-hidden">
