@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, defineAsyncComponent, reactive, ref } from "vue";
+  import { defineAsyncComponent, reactive, ref } from "vue";
   import { arrowBack, createOutline, save } from "ionicons/icons";
   import {
     DatetimeCustomEvent,
@@ -21,6 +21,7 @@
   import { useAuthStore } from "@/store/auth";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import FetchError from "@/utils/errors/FetchError";
+  import { phoneMaskOptions, formatToFriendlyDate } from "@/utils/helpers";
   import type { User } from "@/types/User";
 
   // Lazy-load components
@@ -39,32 +40,6 @@
 
   const inputErrors = ref<any>({});
   const profile = reactive(props.user);
-
-  const friendlyDate = computed(() => {
-    if (profile.birthday.length === 0) return;
-
-    const date = new Date(profile.birthday);
-    const formattedDate = new Intl.DateTimeFormat('en', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-
-    return formattedDate.format(date);
-  });
-
-  // Masking
-  const phoneOptions = {
-    mask: ['0', '9', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/],
-    elementPredicate: (el: HTMLIonInputElement) => {
-      return new Promise((resolve) => {
-        requestAnimationFrame(async () => {
-          const input = await el.getInputElement();
-          resolve(input);
-        })
-      })
-    }
-  }
 
   const updateBirthday = (e: DatetimeCustomEvent) => {
     if (e.detail.value === undefined) return;
@@ -115,10 +90,10 @@
               message: error.data.message
             })
         }
-
-        // Dismiss loading modal
-        await isSubmitting.dismiss();
       }
+
+      // Dismiss loading modal
+      await isSubmitting.dismiss();
     }
   }
 
@@ -156,8 +131,8 @@
         {
           text: 'Yes',
           role: 'confirm',
-          handler: () => {
-            handleSaveChanges()
+          handler: async () => {
+            await handleSaveChanges()
           }
         },
       ]
@@ -186,11 +161,11 @@
   <ion-content class="ion-padding">
     <ProfileCard :user="profile" class="mb-4"></ProfileCard>
 
-    <div class="bg-white rounded-md shadow-md ion-padding">
-      <h5 class="text-lg font-bold mb-2">
-        Personal Information
-      </h5>
+    <h5 class="text-lg font-bold mb-2">
+      Personal Information
+    </h5>
 
+    <div class="bg-white rounded-md shadow-md ion-padding">
       <ion-list lines="none">
         <ion-item class="ion-no-padding">
           <ion-input v-model="profile.first_name"
@@ -214,7 +189,7 @@
         </ion-item>
         <ion-item class="ion-no-padding">
           <ion-input v-model="profile.phone_number"
-                     v-maskito="phoneOptions"
+                     v-maskito="phoneMaskOptions"
                      type="tel"
                      label="Phone"
                      label-placement="fixed"
@@ -227,7 +202,7 @@
         <ion-item button class="ion-no-padding" :detail="false">
           <ion-input id="birthday-input" label="Birthday"
                      label-placement="fixed"
-                     :value="friendlyDate"
+                     :value="formatToFriendlyDate(profile.birthday)"
                      readonly
                      :class="{ 'ion-touched ion-invalid': inputErrors.birthday }"
                      :error-text="getErrorMessage('birthday')"
