@@ -122,11 +122,6 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true
         },
         component: () => import('@/views/profile/ProfilePage.vue')
-      },
-      {
-        path: 'profile/edit',
-        name: 'user-profile-edit',
-        component: () => import('@/views/profile/EditProfilePage.vue')
       }
     ]
   },

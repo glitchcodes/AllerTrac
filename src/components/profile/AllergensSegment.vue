@@ -47,7 +47,7 @@
 
 <template>
   <div class="bg-white shadow-md p-4 rounded-lg">
-    <div class="flex flex-grow items-center text-2xl gap-2 mb-4 min-h-[44px]">
+    <div class="flex flex-grow items-center text-2xl gap-2 mb-4">
       <ion-icon :icon="fastFood" />
 
       <h6 class="font-bold text-xl flex-grow">
