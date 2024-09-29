@@ -31,7 +31,7 @@ import { addSharp, alarm } from "ionicons/icons";
     </InfoAlert>
 
     <div class="flex flex-col gap-3">
-      <div class="flex items-center justify-between w-full ion-activatable ripple-parent overflow-hidden">
+      <div class="flex items-center justify-between w-full ion-activatable ripple-parent">
         <ion-ripple-effect></ion-ripple-effect>
         <div class="bg-neutral-100 rounded-2xl p-6 text-primary font-bold flex items-center w-full justify-between border-2 shadow-md">
           <h2 class="text-2xl text-primary font-bold">
@@ -65,10 +65,5 @@ import { addSharp, alarm } from "ionicons/icons";
 </template>
 
 <style scoped lang="scss">
-  .ripple-parent {
-    position: relative;
-    overflow: hidden;
 
-    border-radius: 1rem;
-  }
 </style>
