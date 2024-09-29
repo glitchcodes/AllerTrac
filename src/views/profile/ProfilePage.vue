@@ -12,6 +12,7 @@
     IonToolbar,
     IonTitle,
     IonButtons,
+    IonSpinner,
     isPlatform,
     modalController,
     SegmentCustomEvent
