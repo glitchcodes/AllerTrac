@@ -4,25 +4,6 @@ import { useAuthStore } from "@/store/auth";
 import WarningAlert from "@/components/alert/WarningAlert.vue";
 
 const authStore = useAuthStore();
-
-// Animations
-const onBeforeEnter = (el: any) => {
-  el.style.opacity = 0;
-}
-
-const onEnter = (el: any, done: any) => {
-  el.offsetHeight;
-  el.style.transition = 'opacity 0.5s ease';
-  el.style.opacity = 1;
-
-  done();
-}
-
-const onLeave = (el: any, done: any) => {
-  el.style.transition = 'opacity 0.5s ease';
-  el.style.opacity = 0;
-  done();
-}
 </script>
 
 <template>
@@ -45,15 +26,11 @@ const onLeave = (el: any, done: any) => {
 
       <div class="flex flex-col items-center justify-center bg-white/50 rounded-2xl shadow-2xl p-4 gap-6">
 
-        <transition-group name="fade" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
-          <WarningAlert v-if="!authStore._isLoggedIn"
-                        class="shadow"
-                        text="Sending ingredients are only available to registered users"
-          />
-          <ion-searchbar></ion-searchbar>
-
-
-        </transition-group>
+        <WarningAlert v-if="!authStore._isLoggedIn"
+                      class="shadow"
+                      text="Sending ingredients are only available to registered users"
+        />
+        <ion-searchbar></ion-searchbar>
 
       </div>
 
