@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
 import { isPlatform } from "@ionic/vue";
 import { alertCircle } from "ionicons/icons";
@@ -12,7 +13,7 @@ import FetchError from "@/utils/errors/FetchError";
 export const useGoogleAuth = () => {
   const router = useRouter();
   const auth = useAuthStore();
-  const toast = useToastController()
+  const toast = useToastController();
 
   const initialize = async () => {
     const webClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -35,7 +36,8 @@ export const useGoogleAuth = () => {
         last_name: response.familyName,
         provider: 'google',
         account_id: response.id,
-        id_token: response.authentication.idToken
+        id_token: response.authentication.idToken,
+        device_type: Capacitor.getPlatform()
       });
 
       const result = await useFetchAPI({
