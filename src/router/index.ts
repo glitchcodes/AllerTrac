@@ -10,6 +10,7 @@ import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
 import HomePage from "@/views/HomePage.vue";
 import ScanFood from "@/views/ScanFoodPage.vue";
 import ScanResult from "@/views/ScanResultPage.vue";
+import SearchFoodPage from "@/views/SearchFoodPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
 import LogoutPage from "@/views/auth/LogoutPage.vue";
 
@@ -92,9 +93,6 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'home',
-        // meta: {
-        //   requiresAuth: true
-        // },
         component: HomePage
       },
       {
@@ -104,6 +102,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'scan-results',
         component: () => ScanResult
+      },
+      {
+        path: 'search',
+        component: SearchFoodPage
       },
       {
         path: 'emergency',
