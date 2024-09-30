@@ -280,13 +280,13 @@
       <ion-modal ref="tosModal" trigger="open-tos-modal" @willPresent="showStatusBar" @willDismiss="onWillDismiss">
         <ion-header>
           <ion-toolbar>
+            <ion-title>
+              Terms & Conditions
+            </ion-title>
             <ion-buttons slot="start">
               <ion-button @click="closeModal('tos')">
                 <ion-icon aria-hidden="true" :icon="arrowBack" />
               </ion-button>
-              <ion-title>
-                Terms & Conditions
-              </ion-title>
             </ion-buttons>
           </ion-toolbar>
         </ion-header>
@@ -309,13 +309,13 @@
       <ion-modal ref="privacyModal" trigger="open-privacy-modal" @willPresent="showStatusBar" @willDismiss="onWillDismiss">
         <ion-header>
           <ion-toolbar>
+            <ion-title>
+              Privacy Policy
+            </ion-title>
             <ion-buttons slot="start">
               <ion-button @click="closeModal('privacy')">
                 <ion-icon aria-hidden="true" :icon="arrowBack" />
               </ion-button>
-              <ion-title>
-                Privacy Policy
-              </ion-title>
             </ion-buttons>
           </ion-toolbar>
         </ion-header>

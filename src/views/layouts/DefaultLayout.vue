@@ -65,7 +65,7 @@
 <!--          <ion-label>Tab 3</ion-label>-->
         </ion-tab-button>
 
-        <ion-tab-button tab="pages/tab4" href="/pages/home">
+        <ion-tab-button tab="pages/tab4" href="/pages/profile">
           <ion-icon aria-hidden="true" :icon="person" />
 <!--          <ion-label>Food</ion-label>-->
         </ion-tab-button>

@@ -1,7 +1,18 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import { IonPage, IonContent, IonIcon, IonButton, popoverController } from '@ionic/vue';
-  import { fastFood, logIn, menu } from "ionicons/icons";
+  import {
+    IonPage,
+    IonHeader,
+    IonContent,
+    IonIcon,
+    IonButton,
+    popoverController,
+    isPlatform,
+    IonToolbar,
+    IonButtons,
+    IonTitle
+  } from '@ionic/vue';
+  import { ellipsisHorizontal, fastFood, logIn,  menu } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
 
   import FactCarousel from "@/components/FactCarousel.vue";
@@ -42,6 +53,20 @@
 
 <template>
   <ion-page>
+    <ion-header>
+      <ion-toolbar v-if="isPlatform('ios')">
+        <ion-buttons slot="primary">
+          <ion-button v-if="authStore._isLoggedIn" @click="openUserMenu">
+            <ion-icon slot="icon-only" :icon="ellipsisHorizontal"></ion-icon>
+          </ion-button>
+          <ion-button v-else router-link="/u/login" shape="round">
+            <ion-icon slot="icon-only" aria-label="Login Button" :icon="logIn"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Home</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
     <ion-content class="ion-padding" :fullscreen="true">
       <div class="flex items-center">
         <div class="flex-1">
@@ -55,7 +80,7 @@
             {{ greetingMessage }}
           </h1>
         </div>
-        <div>
+        <div v-if="!isPlatform('ios')">
           <ion-button v-if="!authStore._isLoggedIn" router-link="/u/login" shape="round">
             <ion-icon slot="icon-only" aria-label="Login Button" :icon="logIn"></ion-icon>
           </ion-button>
@@ -66,10 +91,9 @@
         </div>
       </div>
 
-      <WarningAlert v-if="!authStore._isLoggedIn"
-                    class="mt-4 mb-5 shadow"
-                    text="Some features are only available to registered users."
-      />
+      <WarningAlert v-if="!authStore._isLoggedIn" class="mt-4 mb-5 shadow">
+        Some features are only available to registered users.
+      </WarningAlert>
 
       <div class="bg-white rounded-2xl shadow-xl p-5 mt-4">
         <div class="flex justify-between items-center">

@@ -3,17 +3,59 @@
   import { IonChip, IonLabel, IonIcon } from "@ionic/vue";
   import { addCircleOutline, removeCircleOutline } from "ionicons/icons";
   import { useFetchAPI } from "@/composables/useFetchAPI";
+  import { useAuthStore } from "@/store/auth";
   import type { Allergen } from "@/types/Allergen";
 
+  const emit = defineEmits<{
+    (event: 'change', isChanged: boolean): void
+  }>();
+
+  const authStore = useAuthStore();
   const model = defineModel();
 
+  const previousAllergens = ref<string>('');
   const allergens = ref<Allergen[]>([]);
   const selectedAllergens = ref<Allergen[]>([]);
 
   watchEffect(() => {
     model.value = selectedAllergens.value
+
+    // Compare and emit an event when the selected allergens are changed
+    const currentAllergens = JSON.stringify(selectedAllergens.value);
+
+    if (currentAllergens !== previousAllergens.value) {
+      emit('change', true);
+    } else {
+      emit('change', false);
+    }
   })
 
+  // Fetch user allergens
+  const fetchUserAllergens = async () => {
+    try {
+      const response = await useFetchAPI({
+        url: '/user/allergens',
+        method: 'GET'
+      });
+
+      const userAllergens: Allergen[] = response.data.allergens
+
+      userAllergens.forEach((allergen) => {
+        selectedAllergens.value.push(allergen);
+
+        // Remove it from the list
+        const index = allergens.value.map(item => item.id).indexOf(allergen.id)
+        allergens.value.splice(index, 1);
+      })
+
+      // Store it as previous allergens
+      previousAllergens.value = JSON.stringify(selectedAllergens.value)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // Fetch allergens from the database
   try {
     const response = await useFetchAPI({
       url: '/allergens',
@@ -21,6 +63,10 @@
     });
 
     allergens.value = response.data.allergens;
+
+    if (authStore._isLoggedIn) {
+      await fetchUserAllergens()
+    }
   } catch (error) {
     console.error(error)
   }
@@ -32,7 +78,7 @@
     selectedAllergens.value.push(allergen);
 
     // Remove it from the allergen list
-    allergens.value.splice(index, 1)
+    allergens.value.splice(index, 1);
   }
 
   const handleChipDeselect = (index: number) => {

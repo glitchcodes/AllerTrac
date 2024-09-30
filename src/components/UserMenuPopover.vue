@@ -41,6 +41,7 @@ const logoutUser = async () => {
 
 <style scoped lang="scss">
   ion-content {
+    --background: white;
     border-radius: 0.5rem;
   }
 </style>

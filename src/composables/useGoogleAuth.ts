@@ -15,10 +15,11 @@ export const useGoogleAuth = () => {
   const toast = useToastController()
 
   const initialize = async () => {
-    const clientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
+    const webClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const mobileClientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
 
     await GoogleAuth.initialize({
-      clientId: clientId,
+      clientId: isPlatform('desktop') ? webClientId : mobileClientId,
       scopes: ['email', 'profile'],
       grantOfflineAccess: true
     });
