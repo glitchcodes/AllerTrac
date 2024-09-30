@@ -8,8 +8,8 @@ import { useAuthStore } from "@/store/auth";
 import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
 
 import HomePage from "@/views/HomePage.vue";
-import ScanFood from "@/views/ScanFoodPage.vue";
-import ScanResult from "@/views/ScanResultPage.vue";
+import ScanFoodPage from "@/views/ScanFoodPage.vue";
+import ScanResultPage from "@/views/ScanResultPage.vue";
 import SearchFoodPage from "@/views/SearchFoodPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
 import LogoutPage from "@/views/auth/LogoutPage.vue";
@@ -97,11 +97,11 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'scan-food',
-        component: ScanFood
+        component: ScanFoodPage
       },
       {
         path: 'scan-results',
-        component: () => ScanResult
+        component: ScanResultPage
       },
       {
         path: 'search',
