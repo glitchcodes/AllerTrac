@@ -6,7 +6,6 @@
     IonContent,
     IonIcon,
     IonButton,
-    popoverController,
     isPlatform,
     IonToolbar,
     IonButtons,
@@ -14,15 +13,16 @@
   } from '@ionic/vue';
   import { ellipsisHorizontal, fastFood, logIn,  menu } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
+  import { useMenuNav } from "@/composables/useMenuNav";
 
   import FactCarousel from "@/components/FactCarousel.vue";
   import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
   import FactCategorySlider from "@/components/FactCategorySlider.vue";
   import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
-  import UserMenuPopover from "@/components/UserMenuPopover.vue";
   import WarningAlert from "@/components/alert/WarningAlert.vue";
 
   const authStore = useAuthStore();
+  const { openUserMenu } = useMenuNav();
 
   const greetingMessage = computed(() => {
     const currentHour = new Date().getHours();
@@ -35,20 +35,6 @@
       return "Good Evening!"
     }
   });
-
-  const openUserMenu = async (ev: Event) => {
-    const popover = await popoverController.create({
-      component: UserMenuPopover,
-      componentProps: {
-        user: authStore._user
-      },
-      event: ev
-    })
-
-    popover.style.cssText = '--min-width: 270px; --offset-y: 10px;';
-
-    await popover.present()
-  }
 </script>
 
 <template>

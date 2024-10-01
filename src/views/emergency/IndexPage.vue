@@ -6,16 +6,22 @@
     IonTitle,
     IonContent,
     IonButton,
+    IonIcon,
+    IonButtons,
     isPlatform
   } from "@ionic/vue";
+  import { ellipsisHorizontal, logIn } from "ionicons/icons";
+
   import { useAuthStore } from "@/store/auth";
   import { useEmergencyStore } from "@/store/emergency";
+  import { useMenuNav } from "@/composables/useMenuNav";
 
   import AlertButton from "@/components/AlertButton.vue";
   import WarningAlert from "@/components/alert/WarningAlert.vue";
 
   const authStore = useAuthStore();
   const emergencyStore = useEmergencyStore();
+  const { openUserMenu } = useMenuNav();
 
   // Animations
   const onBeforeEnter = (el: any) => {
@@ -42,6 +48,16 @@
     <ion-header>
       <ion-toolbar v-if="isPlatform('ios')">
         <ion-title>Emergency</ion-title>
+
+        <ion-buttons slot="primary">
+          <ion-button v-if="authStore._isLoggedIn" @click="openUserMenu">
+            <ion-icon slot="icon-only" :icon="ellipsisHorizontal"></ion-icon>
+          </ion-button>
+          <ion-button v-else router-link="/u/login" shape="round">
+            <ion-icon slot="icon-only" aria-label="Login Button" :icon="logIn"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+
       </ion-toolbar>
     </ion-header>
 
