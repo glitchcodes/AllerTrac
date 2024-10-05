@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, watch, computed } from "vue";
+  import { ref } from "vue";
   import { useFetchAPI } from "@/composables/useFetchAPI";
 
   import MealComponent from "@/components/meal/MealComponent.vue";
