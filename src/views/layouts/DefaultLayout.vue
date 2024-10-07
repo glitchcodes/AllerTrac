@@ -60,7 +60,7 @@
 
         <ion-tab-button tab="pages/scan-food" disabled></ion-tab-button>
 
-        <ion-tab-button tab="pages/tab3" href="/pages/tab3">
+        <ion-tab-button tab="pages/search" href="/pages/search">
           <ion-icon aria-hidden="true" :icon="fastFood" />
 <!--          <ion-label>Tab 3</ion-label>-->
         </ion-tab-button>

@@ -6,24 +6,31 @@
 
 <script setup lang="ts">
   import { onMounted, watch } from "vue";
-  import { useRoute } from "vue-router";
   import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/vue';
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
- /* import { SafeAreaController } from "@aashu-dubey/capacitor-statusbar-safe-area";*/
+  import { Network } from "@capacitor/network";
+
+  import { useRoute } from "vue-router";
+  import { useNetworkStore } from "@/store/network";
 
   const route = useRoute();
+  const networkStore = useNetworkStore();
 
 /*  const injectSafeAreaVariables = () => {
     SafeAreaController.injectCSSVariables();
   };*/
 
-  // Inject safe area variables on ready state
-  onMounted(() => {
-    // if (isPlatform('ios')) {
-    //   injectSafeAreaVariables()
-    // }
-  })
+  onMounted(async () => {
+    // Init network status
+    const networkStatus = await Network.getStatus();
+    await networkStore.updateNetworkStatus(networkStatus);
+
+    // Listen for network connection change
+    Network.addListener('networkStatusChange', status => {
+      networkStore.updateNetworkStatus(status);
+    })
+  });
 
   // Preload alert sound
   NativeAudio.preload({

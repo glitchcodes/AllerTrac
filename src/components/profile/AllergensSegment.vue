@@ -2,13 +2,13 @@
   import { ref } from "vue";
   import { IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
   import { checkmarkCircleOutline, fastFood, save } from "ionicons/icons";
-  import { useAllergenForm } from "@/composables/useAllergenForm";
+  import { useAllergenStore } from "@/store/allergen";
   import { useToastController } from "@/composables/useToastController";
   import SkeletonAllergens from "@/components/skeleton/SkeletonAllergens.vue";
   import AllergenSelector from "@/components/AllergenSelector.vue";
   import type { Allergen } from "@/types/Allergen";
 
-  const { updateAllergens } = useAllergenForm();
+  const allergenStore = useAllergenStore();
   const { presentToast } = useToastController()
 
   const allergens = ref<Allergen[]>();
@@ -24,7 +24,7 @@
 
     try {
       // Update allergens
-      await updateAllergens(allergens.value)
+      await allergenStore.updateAllergens(allergens.value)
 
       // Show toast
       await presentToast({
