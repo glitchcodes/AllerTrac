@@ -18,7 +18,6 @@
 
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
-  import { useAllergenStore } from "@/store/allergen";
   import { useMenuNav } from "@/composables/useMenuNav";
   import { randomString } from "@/utils/helpers";
 
@@ -27,16 +26,11 @@
 
   const authStore = useAuthStore();
   const networkStore = useNetworkStore();
-  const allergenStore = useAllergenStore();
   const { openUserMenu } = useMenuNav();
 
   const componentId = ref<string>('');
   const searchQuery = ref<string>('');
   const hasSearchedOnce = ref<boolean>(false);
-
-  if (networkStore._isConnected) {
-    allergenStore.getAllergens();
-  }
 
   const randomMeal = computed(() => {
     const placeholders = [

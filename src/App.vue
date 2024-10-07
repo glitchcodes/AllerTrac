@@ -30,10 +30,12 @@
   import { useRoute } from "vue-router";
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
+  import { useAllergenStore } from "@/store/allergen";
 
   const route = useRoute();
   const authStore = useAuthStore();
   const networkStore = useNetworkStore();
+  const allergenStore = useAllergenStore();
 
 /*  const injectSafeAreaVariables = () => {
     SafeAreaController.injectCSSVariables();
@@ -51,9 +53,12 @@
       networkStore.updateNetworkStatus(status);
     })
 
-    // Validate user session
     if (networkStore._isConnected) {
+      // Validate user session
       await authStore.validateToken();
+
+      // Get user allergens
+      await allergenStore.getAllergens();
     }
 
     isInitializing.value = false;
