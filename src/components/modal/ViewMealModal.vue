@@ -12,8 +12,11 @@
   } from "@ionic/vue";
   import { Share } from "@capacitor/share";
   import { arrowBack, bookmarkOutline, shareOutline } from "ionicons/icons";
+  import { convertToHttps } from "@/utils/helpers";
+
   import MealIngredients from "@/components/meal/MealIngredients.vue";
   import MealHealth from "@/components/meal/MealHealth.vue";
+
   import type { EdamamLinks, EdamamRecipe } from "@/types/Edamam";
 
   const props = defineProps<{
@@ -51,9 +54,12 @@
   }
 
   const handleShareMeal =  async () => {
+    // Convert link into https
+    const secureUrl = convertToHttps(props.meal.shareAs)
+
     await Share.share({
       title: props.meal.label,
-      url: props.meal.shareAs,
+      url: secureUrl,
       dialogTitle: props.meal.label
     });
   }

@@ -42,3 +42,14 @@ export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export const convertToHttps = (url: string): string => {
+  try {
+    const parsedUrl = new URL(url);
+    parsedUrl.protocol = 'https:';
+
+    return parsedUrl.toString();
+  } catch (error) {
+    console.error('Invalid URL:', error);
+    return url;
+  }
+};
