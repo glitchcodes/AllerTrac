@@ -39,7 +39,7 @@
       </WarningAlert>
 
       <ion-chip v-for="label in allergensDetected" :key="label" color="danger">
-        {{ label }}
+        {{ label }}-Free
       </ion-chip>
     </div>
 
