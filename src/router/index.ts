@@ -184,14 +184,6 @@ router.beforeEach(async (to, from) => {
       }
     }
   }
-
-  // Validate token regardless
-  try {
-    await authStore.validateToken();
-  } catch (error) {
-    // Remove the access token from the Preferences
-    await Preferences.remove({key: 'access_token'})
-  }
 })
 
 export default router
