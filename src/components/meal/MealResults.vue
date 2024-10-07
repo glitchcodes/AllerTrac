@@ -40,7 +40,7 @@
 <template>
   <div class="grid grid-cols-2 gap-4">
     <template v-for="(meal, index) in meals" :key="index">
-      <MealComponent :meal="meal.recipe"></MealComponent>
+      <MealComponent :meal="meal.recipe" :links="meal._links"></MealComponent>
     </template>
   </div>
 </template>

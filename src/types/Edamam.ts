@@ -17,6 +17,7 @@ export interface EdamamLink {
 
 export interface EdamamRecipes {
   recipe: EdamamRecipe;
+  _links: EdamamLinks;
 }
 
 export interface EdamamRecipe {
@@ -57,7 +58,13 @@ export interface EdamamImage {
 }
 
 export interface EdamamIngredient {
-  text: string;
+  foodId: string;
+  food: string;
+  foodCategory: string;
+  text: string
+  image: string;
+  quantity: number;
+  measure: string;
   weight: number;
 }
 
