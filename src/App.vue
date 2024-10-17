@@ -54,11 +54,15 @@
     })
 
     if (networkStore._isConnected) {
-      // Validate user session
-      await authStore.validateToken();
+      try {
+        // Validate user session
+        await authStore.validateToken();
 
-      // Get user allergens
-      await allergenStore.getAllergens();
+        // Get user allergens
+        await allergenStore.getAllergens();
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     isInitializing.value = false;
