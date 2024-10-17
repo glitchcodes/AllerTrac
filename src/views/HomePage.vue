@@ -90,7 +90,7 @@
           Here are some facts!
         </h5>
         <h5 class="font-bold mt-1 hover:underline">
-          <router-link :to="{ name: 'register' }" class="font-bold hover:underline">See All </router-link>
+          <router-link :to="{ name: 'facts' }" class="font-bold hover:underline">See All </router-link>
         </h5>
       </div>
 
