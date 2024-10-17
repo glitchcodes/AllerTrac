@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import { IonIcon } from "@ionic/vue";
-  import { warningOutline } from "ionicons/icons";
+  import { informationCircle } from "ionicons/icons";
 </script>
 
 <template>
-  <div class="flex items-center p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 gap-3" role="alert">
-    <ion-icon class="alert-icon" aria-hidden="true" :icon="warningOutline" />
+  <div class="flex items-center p-4 text-sm text-blue-800 rounded-lg bg-blue-100 gap-3" role="alert">
+    <ion-icon class="alert-icon" aria-hidden="true" :icon="informationCircle" />
     <slot></slot>
   </div>
 </template>

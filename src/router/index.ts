@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import { Preferences } from "@capacitor/preferences";
 
+import { useAlertController } from "@/composables/useAlertController";
 import { useAuthStore } from "@/store/auth";
 
 import DefaultLayout from '@/views/layouts/DefaultLayout.vue';
 
 import HomePage from "@/views/HomePage.vue";
-import ScanFood from "@/views/ScanFoodPage.vue";
-import ScanResult from "@/views/ScanResultPage.vue";
+import ScanFoodPage from "@/views/ScanFoodPage.vue";
+import ScanResultPage from "@/views/ScanResultPage.vue";
+import SearchFoodPage from "@/views/SearchFoodPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
 import LogoutPage from "@/views/auth/LogoutPage.vue";
 import AllergensPage from "@/views/allergens/AllergensPage.vue";
@@ -92,18 +94,19 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         name: 'home',
-        // meta: {
-        //   requiresAuth: true
-        // },
         component: HomePage
       },
       {
         path: 'scan-food',
-        component: ScanFood
+        component: ScanFoodPage
       },
       {
         path: 'scan-results',
-        component: () => ScanResult
+        component: ScanResultPage
+      },
+      {
+        path: 'search',
+        component: SearchFoodPage
       },
       {
         path: 'emergency',
@@ -111,44 +114,17 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/emergency/IndexPage.vue')
       },
       {
-        path: 'tab2',
-        component: () => import('@/views/Tab2Page.vue')
-      },
-      {
-        path: 'tab3',
-        component: () => import('@/views/Tab3Page.vue')
-      },
-      {
         path: 'alarm',
-        component: () => import('@/views/AlarmPage.vue')
+        name: 'user-alarms',
+        component: () => import('@/views/profile/AlarmPage.vue')
       },
       {
         path: 'profile',
-        component: () => import('@/views/ProfilePage.vue')
-      },
-      {
-        path: 'edit-profile',
-        component: () => import('@/views/Edit-ProfilePage.vue')
-      },
-      {
-        path: '/facts',
-        name: 'facts',
-        component: () => import('@/views/facts/FactsListPage.vue')
-      },
-      {
-        path: '/facts/:id',
-        name: 'factsPage',
-        component: () => FactsPage
-      },
-      {
-        path: '/allergens',
-        name: 'allergens',
-        component: () => import('@/views/allergens/AllergensListPage.vue')
-      },
-      {
-        path: '/allergens/:id',
-        name: 'allergensPage',
-        component: () => AllergensPage
+        name: 'user-profile',
+        meta: {
+          requiresAuth: true
+        },
+        component: () => import('@/views/profile/ProfilePage.vue')
       }
     ]
   },
@@ -166,6 +142,7 @@ const router = createRouter({
 
 // Navigation Guards
 router.beforeEach(async (to, from) => {
+  const alertController = useAlertController();
   const authStore = useAuthStore();
 
   if (to.matched.some(record => record.meta.requiresNoAuth)) {
@@ -192,17 +169,21 @@ router.beforeEach(async (to, from) => {
       if (from.name === undefined) {
         return { name: 'login' }
       } else {
+        // Show an alert
+        await alertController.presentAlert({
+          header: "Unauthorized",
+          message: "This page is only for logged-in users",
+          buttons: [
+            {
+              text: "Okay",
+              role: 'cancel'
+            }
+          ]
+        })
+
         return false;
       }
     }
-  }
-
-  // Validate token regardless
-  try {
-    await authStore.validateToken();
-  } catch (error) {
-    // Remove the access token from the Preferences
-    await Preferences.remove({key: 'access_token'})
   }
 })
 

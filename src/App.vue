@@ -1,29 +1,68 @@
 <template>
   <ion-app>
-    <ion-router-outlet />
+    <transition enter-active-class="animate__animated animate__slideInLeft"
+                leave-active-class="animate__animated animate__slideOutRight"
+                mode="out-in">
+      <div v-show="isInitializing" class="bg-[#efeee9] w-[100vw] h-[100vh] fixed top-0 left-0 flex items-center justify-center">
+        <div>
+          <img src="/images/logo-128x128.png" alt="AllerTrac logo" />
+
+          <ion-progress-bar type="indeterminate"></ion-progress-bar>
+        </div>
+      </div>
+    </transition>
+
+    <transition enter-active-class="animate__animated animate__slideInLeft"
+                leave-active-class="animate__animated animate__slideOutRight"
+                mode="out-in">
+      <ion-router-outlet v-show="!isInitializing" />
+    </transition>
   </ion-app>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, watch } from "vue";
-  import { useRoute } from "vue-router";
-  import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/vue';
+  import { ref, onMounted, watch } from "vue";
+  import { IonApp, IonRouterOutlet, IonProgressBar, isPlatform } from '@ionic/vue';
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
-  import { SafeAreaController } from "@aashu-dubey/capacitor-statusbar-safe-area";
+  import { Network } from "@capacitor/network";
+
+  import { useRoute } from "vue-router";
+  import { useAuthStore } from "@/store/auth";
+  import { useNetworkStore } from "@/store/network";
+  import { useAllergenStore } from "@/store/allergen";
 
   const route = useRoute();
+  const authStore = useAuthStore();
+  const networkStore = useNetworkStore();
+  const allergenStore = useAllergenStore();
 
-  const injectSafeAreaVariables = () => {
+/*  const injectSafeAreaVariables = () => {
     SafeAreaController.injectCSSVariables();
-  };
+  };*/
 
-  // Inject safe area variables on ready state
-  onMounted(() => {
-    if (isPlatform('ios')) {
-      injectSafeAreaVariables()
+  const isInitializing = ref<boolean>(true);
+
+  onMounted(async () => {
+    // Init network status
+    const networkStatus = await Network.getStatus();
+    await networkStore.updateNetworkStatus(networkStatus);
+
+    // Listen for network connection change
+    Network.addListener('networkStatusChange', status => {
+      networkStore.updateNetworkStatus(status);
+    })
+
+    if (networkStore._isConnected) {
+      // Validate user session
+      await authStore.validateToken();
+
+      // Get user allergens
+      await allergenStore.getAllergens();
     }
-  })
+
+    isInitializing.value = false;
+  });
 
   // Preload alert sound
   NativeAudio.preload({

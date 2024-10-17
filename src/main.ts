@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { maskito } from '@maskito/vue';
 import App from './App.vue'
 import router from './router';
 
@@ -48,6 +49,7 @@ defineCustomElements(window);
 
 const pinia = createPinia();
 const app = createApp(App)
+  .directive('maskito', maskito)
   .use(IonicVue)
   .use(router)
   .use(pinia);

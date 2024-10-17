@@ -1,33 +1,26 @@
 <script setup lang="ts">
   import { ref } from "vue";
   import { IonContent, IonPage, IonButton } from "@ionic/vue";
+  import { useRouter } from "vue-router";
+  import { useAllergenForm } from "@/composables/useAllergenForm";
   import AllergenSelector from "@/components/AllergenSelector.vue";
   import SkeletonAllergens from "@/components/skeleton/SkeletonAllergens.vue";
-
-  import { useRouter } from "vue-router";
-  import { useFetchAPI } from "@/composables/useFetchAPI";
-
-  import type { Allergens } from "@/types/Allergens";
+  import type { Allergen } from "@/types/Allergen";
 
   const router = useRouter();
+  const { updateAllergens } = useAllergenForm()
 
-  const allergens = ref<Allergens[]>();
+  const allergens = ref<Allergen[]>();
 
   const handleSubmitForm = async () => {
-    const allergenIds = allergens.value?.map((a) => a.id);
-
-    const body = {
-      allergens: allergenIds
-    }
-
     try {
-      await useFetchAPI({
-        url: '/user/update-allergens',
-        method: 'PATCH',
-        data: JSON.stringify(body)
-      })
+      // Update allergens
+      await updateAllergens(allergens.value)
 
-      await router.push({ name: 'onboarding-final' })
+      // Redirect to final onboarding page
+      await router.push({
+        name: 'onboarding-final'
+      })
     } catch (error) {
       console.error(error)
     }

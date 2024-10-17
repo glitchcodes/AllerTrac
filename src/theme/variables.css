@@ -1,6 +1,8 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
 
+@import "./main.scss";
+
 @font-face {
     font-family: "Poppins";
     font-style: normal;
@@ -37,49 +39,4 @@ http://ionicframework.com/docs/theming/ */
 html {
     --ion-dynamic-font: var(--ion-default-dynamic-font);
     --ion-font-family: "Poppins";
-}
-
-body {
-    --background: transparent !important;
-}
-
-ion-content {
-    --ion-background-color: #efeee9;
-    --ion-background-color-rgb: 239,238,233;
-}
-
-ion-icon.primary {
-    color: var(--ion-color-primary);
-}
-
-.text-primary {
-    color: var(--ion-color-primary);
-}
-
-.bg-primary {
-    background-color: #43727a;
-    color: white;
-}
-
-.bg-secondary {
-    background-color: #fbfdfe;
-}
-
-a {
-    color: var(--ion-color-primary);
-    font-weight: bold;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease-in-out;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
 }
