@@ -54,7 +54,7 @@
     await networkStore.updateNetworkStatus(networkStatus);
 
     // Listen for network connection change
-    Network.addListener('networkStatusChange', status => {
+    await Network.addListener('networkStatusChange', status => {
       networkStore.updateNetworkStatus(status);
     })
 
