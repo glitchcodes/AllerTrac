@@ -8,10 +8,15 @@
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    modalController, isPlatform, SegmentCustomEvent
+    modalController,
+    loadingController,
+    isPlatform,
+    SegmentCustomEvent
   } from "@ionic/vue";
   import { Share } from "@capacitor/share";
-  import { arrowBack, bookmarkOutline, shareOutline } from "ionicons/icons";
+  import { arrowBack, bookmark, bookmarkOutline, checkmarkCircleOutline, shareOutline } from "ionicons/icons";
+  import { useBookmarkStore } from "@/store/bookmark";
+  import { useToastController } from "@/composables/useToastController";
   import { convertToHttps } from "@/utils/helpers";
 
   import MealIngredients from "@/components/meal/MealIngredients.vue";
@@ -19,10 +24,17 @@
 
   import type { EdamamLinks, EdamamRecipe } from "@/types/Edamam";
 
+  const bookmarkStore = useBookmarkStore();
+  const toastController = useToastController();
+
   const props = defineProps<{
     meal: EdamamRecipe,
     links: EdamamLinks
   }>();
+
+  const isBookmarked = computed(() => {
+    return bookmarkStore._bookmarks.URIs.some(uri => uri.uri === props.meal.uri);
+  })
 
   const isImageLoading = ref<boolean>(true);
   const currentSegment = ref<string>('MealIngredients');
@@ -64,6 +76,60 @@
     });
   }
 
+  const handleBookmarkMeal = async () => {
+    // Show loading modal
+    const isSubmitting = await loadingController.create({
+      message: 'Bookmarking...'
+    });
+
+    await isSubmitting.present();
+
+    try {
+      const response = await bookmarkStore.create(props.meal.uri);
+
+      if (response.status === 201) {
+        await toastController.presentToast({
+          message: "Meal bookmarked",
+          position: "bottom",
+          positionAnchor: 'scan-food-button',
+          duration: 3000,
+          icon: checkmarkCircleOutline
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    await isSubmitting.dismiss();
+  }
+
+  const handleRemoveBookmark = async () => {
+    // Show loading modal
+    const isSubmitting = await loadingController.create({
+      message: 'Deleting bookmark...'
+    });
+
+    await isSubmitting.present();
+
+    try {
+      const response = await bookmarkStore.remove(props.meal.uri);
+
+      if (response.status === 200) {
+        await toastController.presentToast({
+          message: "Bookmark removed",
+          position: "bottom",
+          positionAnchor: 'scan-food-button',
+          duration: 3000,
+          icon: checkmarkCircleOutline
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    await isSubmitting.dismiss();
+  }
+
   const handleImageLoaded = async () => isImageLoading.value = false;
   const dismissModal = () => modalController.dismiss(null , 'close');
 
@@ -77,9 +143,14 @@
       </ion-button>
       <div class="flex-1"></div>
       <div class="flex gap-2">
-        <ion-button shape="round">
+
+        <ion-button v-if="isBookmarked" shape="round" @click="handleRemoveBookmark">
+          <ion-icon slot="icon-only" class="bookmarked" :icon="bookmark" />
+        </ion-button>
+        <ion-button v-else shape="round" @click="handleBookmarkMeal">
           <ion-icon slot="icon-only" :icon="bookmarkOutline" />
         </ion-button>
+
         <ion-button shape="round" @click="handleShareMeal">
           <ion-icon slot="icon-only" :icon="shareOutline" />
         </ion-button>
@@ -132,5 +203,9 @@
       --background: #efeee9;
       --color: black;
     }
+  }
+
+  ion-icon.bookmarked {
+    color: #ED6A5A;
   }
 </style>
