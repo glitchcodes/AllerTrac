@@ -65,6 +65,11 @@
       }
     }
 
+    // Force close loading screen after 10 seconds
+    setTimeout(() => {
+      isInitializing.value = false;
+    }, 10000);
+
     isInitializing.value = false;
   });
 
