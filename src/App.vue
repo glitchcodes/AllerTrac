@@ -44,6 +44,11 @@
   const isInitializing = ref<boolean>(true);
 
   onMounted(async () => {
+    // Force close loading screen after 10 seconds
+    setTimeout(() => {
+      isInitializing.value = false;
+    }, 10000);
+
     // Init network status
     const networkStatus = await Network.getStatus();
     await networkStore.updateNetworkStatus(networkStatus);
@@ -64,11 +69,6 @@
         console.error(error)
       }
     }
-
-    // Force close loading screen after 10 seconds
-    setTimeout(() => {
-      isInitializing.value = false;
-    }, 10000);
 
     isInitializing.value = false;
   });
