@@ -11,10 +11,18 @@
     modalController,
     loadingController,
     isPlatform,
-    SegmentCustomEvent
+    SegmentCustomEvent,
+    useBackButton
   } from "@ionic/vue";
   import { Share } from "@capacitor/share";
-  import { arrowBack, bookmark, bookmarkOutline, checkmarkCircleOutline, shareOutline } from "ionicons/icons";
+  import {
+    alertCircle,
+    arrowBack,
+    bookmark,
+    bookmarkOutline,
+    checkmarkCircleOutline,
+    shareOutline
+  } from "ionicons/icons";
   import { useBookmarkStore } from "@/store/bookmark";
   import { useToastController } from "@/composables/useToastController";
   import { convertToHttps } from "@/utils/helpers";
@@ -91,13 +99,19 @@
         await toastController.presentToast({
           message: "Meal bookmarked",
           position: "bottom",
-          positionAnchor: 'scan-food-button',
           duration: 3000,
           icon: checkmarkCircleOutline
         });
       }
     } catch (error) {
       console.error(error);
+
+      await toastController.presentToast({
+        message: "Something went wrong while trying to bookmark this meal",
+        position: "bottom",
+        duration: 3000,
+        icon: alertCircle
+      })
     }
 
     await isSubmitting.dismiss();
@@ -118,7 +132,6 @@
         await toastController.presentToast({
           message: "Bookmark removed",
           position: "bottom",
-          positionAnchor: 'scan-food-button',
           duration: 3000,
           icon: checkmarkCircleOutline
         });
@@ -133,6 +146,7 @@
   const handleImageLoaded = async () => isImageLoading.value = false;
   const dismissModal = () => modalController.dismiss(null , 'close');
 
+  useBackButton(100, () => dismissModal())
 </script>
 
 <template>
