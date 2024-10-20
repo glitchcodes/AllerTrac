@@ -31,6 +31,7 @@
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
   import { useAllergenStore } from "@/store/allergen";
+  import NotAllowedError from "@/utils/errors/NotAllowedError";
 
   const route = useRoute();
   const authStore = useAuthStore();
@@ -44,17 +45,12 @@
   const isInitializing = ref<boolean>(true);
 
   onMounted(async () => {
-    // Force close loading screen after 10 seconds
-    setTimeout(() => {
-      isInitializing.value = false;
-    }, 10000);
-
     // Init network status
     const networkStatus = await Network.getStatus();
     await networkStore.updateNetworkStatus(networkStatus);
 
     // Listen for network connection change
-    await Network.addListener('networkStatusChange', status => {
+    Network.addListener('networkStatusChange', status => {
       networkStore.updateNetworkStatus(status);
     })
 
@@ -64,9 +60,13 @@
         await authStore.validateToken();
 
         // Get user allergens
-        await allergenStore.getAllergens();
+        if (authStore._isLoggedIn) {
+          await allergenStore.getAllergens();
+        }
       } catch (error) {
-        console.error(error)
+        if (error instanceof NotAllowedError) {
+          await authStore.removeBearerToken();
+        }
       }
     }
 

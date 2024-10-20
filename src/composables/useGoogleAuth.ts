@@ -1,6 +1,6 @@
 import { Capacitor } from "@capacitor/core";
-import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
-import { isPlatform } from "@ionic/vue";
+import { GoogleLoginResponse, SocialLogin } from "@capgo/capacitor-social-login";
+import { alertController } from "@ionic/vue";
 import { alertCircle } from "ionicons/icons";
 
 import { useRouter } from "vue-router";
@@ -16,27 +16,52 @@ export const useGoogleAuth = () => {
   const toast = useToastController();
 
   const initialize = async () => {
-    const webClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const mobileClientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
+    // const webClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    // const mobileClientId = isPlatform('ios') ? import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS : import.meta.env.VITE_GOOGLE_CLIENT_ID
 
-    await GoogleAuth.initialize({
-      clientId: isPlatform('desktop') ? webClientId : mobileClientId,
-      scopes: ['email', 'profile'],
-      grantOfflineAccess: true
+    await SocialLogin.initialize({
+      google: {
+        webClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        iOSClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID_IOS,
+      },
     });
   }
 
   const signIn =  async () => {
+    if (!Capacitor.isNativePlatform()) {
+      const alert = await alertController.create({
+        header: 'Not available',
+        message: 'Google login is not available in web platform.',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'confirm'
+          }
+        ]
+      });
+
+      await alert.present();
+
+      return;
+    }
+
     try {
-      const response = await GoogleAuth.signIn()
+      const res = await SocialLogin.login({
+        provider: 'google',
+        options: {
+          scopes: ['email', 'profile'],
+        },
+      });
+
+      const response = res.result as GoogleLoginResponse
 
       const data = JSON.stringify({
-        email: response.email,
-        first_name: response.givenName,
-        last_name: response.familyName,
+        email: response.profile.email,
+        first_name: response.profile.givenName,
+        last_name: response.profile.familyName,
         provider: 'google',
-        account_id: response.id,
-        id_token: response.authentication.idToken,
+        account_id: response.profile.id,
+        id_token: response.idToken,
         device_type: Capacitor.getPlatform()
       });
 
