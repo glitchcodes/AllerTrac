@@ -6,14 +6,13 @@
 
   // Get bookmarks
   await bookmarkStore.getBookmarks();
-
-  const meals = bookmarkStore._bookmarks.meals;
 </script>
 
 <template>
   <div>
-    <div v-if="meals && meals.length > 0" class="grid grid-cols-2 gap-4">
-      <template v-for="(meal, index) in meals" :key="index">
+    <div v-if="bookmarkStore._bookmarks.meals && bookmarkStore._bookmarks.meals.length > 0"
+         class="grid grid-cols-2 gap-4">
+      <template v-for="(meal, index) in bookmarkStore._bookmarks.meals" :key="index">
         <MealComponent :meal="meal.recipe" :links="meal._links"></MealComponent>
       </template>
     </div>
