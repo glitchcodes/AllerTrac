@@ -10,6 +10,8 @@
     IonSearchbar,
     IonTitle,
     IonToolbar,
+    IonRefresher,
+    IonRefresherContent,
     isPlatform,
     SearchbarCustomEvent
   } from "@ionic/vue";
@@ -67,6 +69,16 @@
     // Change component id to refresh it
     componentId.value = randomString(10);
   }
+
+  const handleRefresh = async (event: CustomEvent) => {
+    setTimeout(() => {
+      // Refresh bookmarks
+      componentId.value = randomString(10);
+
+      event.target!.complete();
+    }, 2000);
+
+  }
 </script>
 
 <template>
@@ -99,6 +111,9 @@
     </ion-header>
 
     <ion-content class="ion-padding" :fullscreen="true">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
 
       <div class="mb-4">
         <div class="flex items-center">
@@ -169,7 +184,7 @@
         </h1>
 
         <Suspense>
-          <MealBookmarks class="my-3" />
+          <MealBookmarks class="my-3" :key="componentId" />
 
           <template #fallback>
             <SkeletonMeal :length="4" class="my-3" />
