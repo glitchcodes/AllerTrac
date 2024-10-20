@@ -105,16 +105,6 @@
         </ion-buttons>
       </ion-toolbar>
       <!-- END Main Toolbar -->
-
-      <!-- Search bar -->
-      <ion-toolbar v-if="isPlatform('ios')">
-        <ion-searchbar :animated="true"
-                       :debounce="1000"
-                       :placeholder="randomMeal"
-                       :disabled="isSearchDisabled"
-                       @ionInput="handleSearchChange($event)" />
-      </ion-toolbar>
-      <!-- END Search bar -->
     </ion-header>
 
     <ion-content class="ion-padding" :fullscreen="true">
@@ -137,9 +127,10 @@
         </h1>
       </div>
 
-      <!-- Search bar ANDROID -->
-      <div v-if="!isPlatform('ios')" class="mb-4">
+      <!-- Search bar -->
+      <div class="mb-4">
         <ion-searchbar class="search-input"
+                       mode="md"
                        :animated="true"
                        :debounce="1000"
                        :placeholder="randomMeal"
