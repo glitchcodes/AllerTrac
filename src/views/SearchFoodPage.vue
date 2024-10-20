@@ -13,7 +13,8 @@
     IonRefresher,
     IonRefresherContent,
     isPlatform,
-    SearchbarCustomEvent
+    SearchbarCustomEvent,
+    RefresherCustomEvent
   } from "@ionic/vue";
   import { cafeOutline, ellipsisHorizontal, logIn } from "ionicons/icons";
 
@@ -32,7 +33,8 @@
   const { openUserMenu } = useMenuNav();
 
 
-  const componentId = ref<string>('');
+  const bookmarkKey = ref<string>('');
+  const searchKey = ref<string>('');
   const searchQuery = ref<string>('');
   const isSearching = ref<boolean>(false);
 
@@ -67,14 +69,19 @@
     searchQuery.value = query;
 
     // Change component id to refresh it
-    componentId.value = randomString(10);
+    searchKey.value = randomString(10);
   }
 
-  const handleRefresh = async (event: CustomEvent) => {
+  const handleRefresh = async (event: RefresherCustomEvent) => {
     setTimeout(() => {
       // Refresh bookmarks
-      componentId.value = randomString(10);
+      if (isSearching.value) {
+        searchKey.value = randomString(10);
+      } else {
+        bookmarkKey.value = randomString(10);
+      }
 
+      // Refresh
       event.target!.complete();
     }, 2000);
 
@@ -156,7 +163,7 @@
 
       <section v-if="isSearching">
         <Suspense :timeout="0">
-          <MealResults :key="componentId" :query="searchQuery" />
+          <MealResults :key="searchKey" :query="searchQuery" />
 
           <template #fallback>
             <SkeletonMeal :length="10" />
@@ -184,7 +191,7 @@
         </h1>
 
         <Suspense>
-          <MealBookmarks class="my-3" :key="componentId" />
+          <MealBookmarks class="my-3" :key="bookmarkKey" />
 
           <template #fallback>
             <SkeletonMeal :length="4" class="my-3" />
