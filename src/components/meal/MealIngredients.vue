@@ -1,7 +1,8 @@
 <script setup lang="ts">
+  import { IonIcon } from "@ionic/vue";
+  import { helpOutline } from "ionicons/icons";
+  import { capitalizeString } from "@/utils/helpers";
   import type { EdamamIngredient } from "@/types/Edamam";
-  import {capitalizeString} from "../../utils/helpers";
-  import {helpOutline} from "ionicons/icons";
 
   const props = defineProps<{
     ingredients: EdamamIngredient[]

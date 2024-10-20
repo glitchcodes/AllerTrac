@@ -10,9 +10,11 @@
     IonSearchbar,
     IonTitle,
     IonToolbar,
-    IonSkeletonText,
+    IonRefresher,
+    IonRefresherContent,
     isPlatform,
-    SearchbarCustomEvent
+    SearchbarCustomEvent,
+    RefresherCustomEvent
   } from "@ionic/vue";
   import { cafeOutline, ellipsisHorizontal, logIn } from "ionicons/icons";
 
@@ -23,14 +25,18 @@
 
   import WarningAlert from "@/components/alert/WarningAlert.vue";
   import MealResults from "@/components/meal/MealResults.vue";
+  import SkeletonMeal from "@/components/skeleton/SkeletonMeal.vue";
+  import MealBookmarks from "@/components/meal/MealBookmarks.vue";
 
   const authStore = useAuthStore();
   const networkStore = useNetworkStore();
   const { openUserMenu } = useMenuNav();
 
-  const componentId = ref<string>('');
+
+  const bookmarkKey = ref<string>('');
+  const searchKey = ref<string>('');
   const searchQuery = ref<string>('');
-  const hasSearchedOnce = ref<boolean>(false);
+  const isSearching = ref<boolean>(false);
 
   const randomMeal = computed(() => {
     const placeholders = [
@@ -56,19 +62,29 @@
   });
 
   const handleSearchChange = async (e: SearchbarCustomEvent) => {
-    // Hide the banner message after the first search
-    if (hasSearchedOnce.value === false) {
-      hasSearchedOnce.value = true;
-    }
-
     const query = e.detail.value as string;
 
-    if (query.length <= 1) return;
+    isSearching.value = query.length > 1;
 
     searchQuery.value = query;
 
     // Change component id to refresh it
-    componentId.value = randomString(10);
+    searchKey.value = randomString(10);
+  }
+
+  const handleRefresh = async (event: RefresherCustomEvent) => {
+    setTimeout(() => {
+      // Refresh bookmarks
+      if (isSearching.value) {
+        searchKey.value = randomString(10);
+      } else {
+        bookmarkKey.value = randomString(10);
+      }
+
+      // Refresh
+      event.target!.complete();
+    }, 2000);
+
   }
 </script>
 
@@ -89,19 +105,12 @@
         </ion-buttons>
       </ion-toolbar>
       <!-- END Main Toolbar -->
-
-      <!-- Search bar -->
-      <ion-toolbar v-if="isPlatform('ios')">
-        <ion-searchbar :animated="true"
-                       :debounce="1000"
-                       :placeholder="randomMeal"
-                       :disabled="isSearchDisabled"
-                       @ionInput="handleSearchChange($event)" />
-      </ion-toolbar>
-      <!-- END Search bar -->
     </ion-header>
 
     <ion-content class="ion-padding" :fullscreen="true">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
 
       <div class="mb-4">
         <div class="flex items-center">
@@ -118,9 +127,10 @@
         </h1>
       </div>
 
-      <!-- Search bar ANDROID -->
-      <div v-if="!isPlatform('ios')" class="mb-4">
+      <!-- Search bar -->
+      <div class="mb-4">
         <ion-searchbar class="search-input"
+                       mode="md"
                        :animated="true"
                        :debounce="1000"
                        :placeholder="randomMeal"
@@ -142,70 +152,43 @@
       </WarningAlert>
       <!-- END Warning: No connection -->
 
-      <div v-if="!hasSearchedOnce" class="bg-white rounded-2xl shadow-md w-full text-left mb-6 px-5 py-3">
-        <div class="flex justify-between items-center">
-          <div>
-            <h6 class="text-primary text-xl font-bold mb-3">
-              Know your meals!
-            </h6>
-            <h6 class="text-[12px]">
-              Please search for your meal to see its ingredients.
-            </h6>
-          </div>
+      <section v-if="isSearching">
+        <Suspense :timeout="0">
+          <MealResults :key="searchKey" :query="searchQuery" />
+
+          <template #fallback>
+            <SkeletonMeal :length="10" />
+          </template>
+        </Suspense>
+      </section>
+
+      <section v-else>
+        <div class="bg-white rounded-2xl shadow-md w-full text-left mb-6 px-5 py-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h6 class="text-primary text-xl font-bold mb-3">
+                Know your meals!
+              </h6>
+              <h6 class="text-[12px]">
+                Please search for your meal to see its ingredients.
+              </h6>
+            </div>
             <img class="w-[110px]" src="/images/searchpic.png" alt="search icon">
-        </div>
-      </div>
-
-      <Suspense :timeout="0">
-        <MealResults :key="componentId" :query="searchQuery" />
-
-        <template #fallback>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
-            <div class="bg-neutral-300 p-4 rounded-2xl min-h-60 relative">
-              <div class="absolute bottom-0 left-0 z-20 w-full p-4">
-                <h1 class="text-white font-bold">
-                  <ion-skeleton-text :animated="true" class="rounded" style="height: 1rem;" />
-                </h1>
-              </div>
-            </div>
           </div>
-        </template>
-      </Suspense>
+        </div>
+
+        <h1 class="text-lg font-bold">
+          Bookmarked Meals
+        </h1>
+
+        <Suspense>
+          <MealBookmarks class="my-3" :key="bookmarkKey" />
+
+          <template #fallback>
+            <SkeletonMeal :length="4" class="my-3" />
+          </template>
+        </Suspense>
+      </section>
 
     </ion-content>
   </ion-page>
