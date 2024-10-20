@@ -31,6 +31,7 @@
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
   import { useAllergenStore } from "@/store/allergen";
+  import NotAllowedError from "@/utils/errors/NotAllowedError";
 
   const route = useRoute();
   const authStore = useAuthStore();
@@ -54,11 +55,19 @@
     })
 
     if (networkStore._isConnected) {
-      // Validate user session
-      await authStore.validateToken();
+      try {
+        // Validate user session
+        await authStore.validateToken();
 
-      // Get user allergens
-      await allergenStore.getAllergens();
+        // Get user allergens
+        if (authStore._isLoggedIn) {
+          await allergenStore.getAllergens();
+        }
+      } catch (error) {
+        if (error instanceof NotAllowedError) {
+          await authStore.removeBearerToken();
+        }
+      }
     }
 
     isInitializing.value = false;

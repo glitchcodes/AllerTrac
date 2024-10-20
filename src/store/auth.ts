@@ -29,13 +29,25 @@ export const useAuthStore = defineStore('auth', () => {
     await Preferences.set({
       key: 'access_token',
       value: token
-    })
+    });
+
+    // Store in memory
+    bearerToken.value = token;
+
+    // Validate session
+    await validateToken()
   }
 
   const removeBearerToken = async () => {
     await Preferences.remove({
       key: 'access_token'
-    })
+    });
+
+    // Remove token from memory
+    bearerToken.value = "";
+
+    // Remove user state
+    user.value = null;
   }
 
   const validateToken = async () => {
@@ -50,7 +62,6 @@ export const useAuthStore = defineStore('auth', () => {
         throw new NotAllowedError(error.data)
       } else {
         throw new Error("Unknown error")
-
       }
     }
   }
