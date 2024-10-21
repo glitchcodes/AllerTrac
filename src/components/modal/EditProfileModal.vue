@@ -161,11 +161,11 @@
   <ion-content class="ion-padding">
     <ProfileCard :user="profile" class="mb-4"></ProfileCard>
 
-    <h5 class="text-lg font-bold mb-2">
-      Personal Information
-    </h5>
-
     <div class="bg-white rounded-md shadow-md ion-padding">
+      <h5 class="text-lg font-bold mb-1">
+        Personal Information
+      </h5>
+
       <ion-list lines="none">
         <ion-item class="ion-no-padding">
           <ion-input v-model="profile.first_name"
