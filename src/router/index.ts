@@ -119,11 +119,19 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'profile',
-        name: 'user-profile',
+        name: 'view-profile',
         meta: {
           requiresAuth: true
         },
         component: () => import('@/views/profile/ProfilePage.vue')
+      },
+      {
+        path: 'profile/edit',
+        name: 'edit-profile',
+        meta: {
+          requiresAuth: true
+        },
+        component: () => import('@/views/profile/EditProfilePage.vue')
       }
     ]
   },

@@ -1,15 +1,27 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import { IonAvatar } from "@ionic/vue";
+  import { IonAvatar, IonIcon } from "@ionic/vue";
+  import { brush } from "ionicons/icons";
   import type { User } from "@/types/User";
 
-  const props = defineProps<{
+  const emit = defineEmits<{
+    (e: 'openAvatarAction'): void
+  }>()
+
+  const props = withDefaults(defineProps<{
     user: User
-  }>();
+    editMode?: boolean
+  }>(),{
+    editMode: false
+  });
 
   const full_name = computed(() => {
     return `${props.user.first_name || 'John' } ${props.user.last_name || 'Doe' }`
   });
+
+  const avatar = computed(() => {
+    return props.user.avatar && props.user.avatar.length > 0 ? props.user.avatar : '/pfp.png';
+  })
 
   const friendlyDate = computed(() => {
     if (props.user.birthday.length === 0) return;
@@ -28,9 +40,14 @@
 <template>
   <div class="bg-white rounded-lg shadow p-4">
     <div class="flex items-center gap-3">
-      <ion-avatar>
-        <img src="/pfp.png" alt="Food" />
-      </ion-avatar>
+      <div class="relative" @click="emit('openAvatarAction')">
+        <ion-avatar>
+          <img :src="avatar" width="80" height="80" alt="Food" />
+        </ion-avatar>
+        <span v-if="props.editMode" class="bg-slate-200 rounded-full px-[6px] py-[6px] flex items-center absolute top-0 right-0">
+          <ion-icon aria-label="Edit profile picture" :icon="brush" class="text-[13px]"  />
+        </span>
+      </div>
       <div>
         <h6 class="font-bold">Welcome!</h6>
         <h2 class="text-xl text-primary font-bold mb-3">

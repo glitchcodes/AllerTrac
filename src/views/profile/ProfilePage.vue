@@ -14,17 +14,14 @@
     IonButtons,
     IonSpinner,
     isPlatform,
-    modalController,
     SegmentCustomEvent
   } from '@ionic/vue';
   import { createOutline, logOutOutline } from 'ionicons/icons';
-  import { StatusBar } from "@capacitor/status-bar";
   import { useRouter } from 'vue-router'
   import { useAuthStore } from "@/store/auth";
   import { useAlertController } from "@/composables/useAlertController";
 
   // Load immediately
-  import EditProfileModal from "@/components/modal/EditProfileModal.vue";
   import AllergensSegment from "@/components/profile/AllergensSegment.vue";
   import EmergencyContactsSegment from "@/components/profile/EmergencyContactsSegment.vue";
   import AlarmsSegment from "@/components/profile/AlarmsSegment.vue";
@@ -70,31 +67,6 @@
       ]
     })
   }
-
-  const openEditProfileModal = async () => {
-    const modal = await modalController.create({
-      component: EditProfileModal,
-      componentProps: {
-        user: JSON.parse(JSON.stringify(authStore._user))
-      }
-    });
-
-    await modal.present();
-
-    // Show status bar on present
-    if (isPlatform('android')) {
-      await StatusBar.setBackgroundColor({ color: '#ffffff' });
-    }
-
-    // Change status bar to transparent on dismiss
-    const dismissEvent = await modal.onWillDismiss();
-
-    if (dismissEvent.role == 'confirm' || dismissEvent.role == 'cancel') {
-      if (!isPlatform('android')) return;
-
-      await StatusBar.setBackgroundColor({ color: '#efeee9' });
-    }
-  }
 </script>
 
 <template>
@@ -102,7 +74,7 @@
     <ion-header>
       <ion-toolbar v-if="isPlatform('ios')">
         <ion-buttons slot="secondary">
-          <ion-button @click="openEditProfileModal">
+          <ion-button router-link="/pages/profile/edit" router-direction="forward">
             <ion-icon slot="icon-only" :icon="createOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -117,14 +89,17 @@
 
     <ion-content class="ion-padding" :fullscreen="true">
 
-      <div v-if="!isPlatform('ios')" class="flex justify-between mb-4">
-        <ion-button color="primary" shape="round" @click="openEditProfileModal">
-          <ion-icon :icon="createOutline"></ion-icon>
+      <nav v-if="!isPlatform('ios')" class="flex items-center justify-between mb-4">
+        <ion-button router-link="/pages/profile/edit" router-direction="forward">
+          <ion-icon slot="icon-only" :icon="createOutline"></ion-icon>
         </ion-button>
-        <ion-button color="primary" shape="round" @click="handleLogout">
-          <ion-icon :icon="logOutOutline"></ion-icon>
+        <p class="font-bold text-xl absolute left-1/2 transform -translate-x-1/2">
+          Profile
+        </p>
+        <ion-button @click="handleLogout">
+          <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
         </ion-button>
-      </div>
+      </nav>
 
       <ProfileCard :user="authStore._user!" class="mb-4" />
 

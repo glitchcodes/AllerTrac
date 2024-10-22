@@ -18,6 +18,10 @@ ion-icon.primary {
   color: var(--ion-color-primary);
 }
 
+ion-button:not(.button-round) {
+  --border-radius: 8px;
+}
+
 .text-primary {
   color: var(--ion-color-primary);
 }
