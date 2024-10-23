@@ -3,12 +3,17 @@ import { useRouter } from "vue-router";
 import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonIcon, popoverController } from "@ionic/vue";
 import { logOut } from "ionicons/icons";
 import type { User } from "@/types/User";
+import {computed} from "vue";
 
 const router = useRouter();
 
 const props = defineProps<{
   user: User
 }>();
+
+const avatar = computed(() => {
+  return props.user.avatar && props.user.avatar.length > 0 ? props.user.avatar : '/pfp.png';
+})
 
 const logoutUser = async () => {
   // Redirect to log out page
@@ -24,7 +29,7 @@ const logoutUser = async () => {
     <ion-list class="ion-no-padding">
       <ion-item>
         <ion-avatar aria-hidden="true" slot="start">
-          <img alt="" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+          <img alt="Profile Picture" :src="avatar" />
         </ion-avatar>
         <ion-label>
           <h3>{{ props.user.full_name }}</h3>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineAsyncComponent, ref, onMounted } from "vue";
+  import { defineAsyncComponent, ref, computed, onMounted } from "vue";
   import {
     IonPage,
     IonToolbar,
@@ -12,26 +12,40 @@
     IonButton,
     IonButtons,
     IonPopover,
+    IonProgressBar,
     modalController,
     loadingController,
     actionSheetController,
+    isPlatform,
     ActionSheetButton,
-    DatetimeCustomEvent,  isPlatform,
+    DatetimeCustomEvent,
   } from '@ionic/vue';
-  import { chevronBack, createOutline } from "ionicons/icons";
+  import { StatusBar } from "@capacitor/status-bar";
+  import { checkmarkCircleOutline, chevronBack, createOutline } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useAlertController } from "@/composables/useAlertController";
+  import { useToastController } from "@/composables/useToastController";
   import { useAvatarUploader } from "@/composables/useAvatarUploader";
-  import { formatToFriendlyDate, phoneMaskOptions } from "@/utils/helpers";
+  import { blobToBase64, formatToFriendlyDate, phoneMaskOptions } from "@/utils/helpers";
   import FetchError from "@/utils/errors/FetchError";
   import type { User } from "@/types/User"
+  import CropAvatarModal from "@/components/modal/CropAvatarModal.vue";
+
+  interface FormBody {
+    first_name: string
+    last_name: string
+    phone_number: string
+    birthday: string
+    avatar?: string
+  }
 
   // Stores
   const authStore = useAuthStore();
 
   // Composables
   const alertController = useAlertController();
+  const toastController = useToastController();
   const avatarUploader = useAvatarUploader();
 
   // Lazy-load components
@@ -45,6 +59,10 @@
 
   const inputErrors = ref<any>({});
 
+  const hasChanges = computed(() => {
+    return JSON.stringify(user.value) != JSON.stringify(originalUser.value)
+  })
+
   const fetchUserDetails = async () => {
     try {
       const response = await useFetchAPI({
@@ -52,7 +70,9 @@
         method: 'GET'
       });
 
-      user.value = originalUser.value = response.data.user;
+      user.value = response.data.user;
+      originalUser.value = JSON.parse(JSON.stringify(response.data.user)); // Return a new copy
+
       isLoading.value = false;
     } catch (error) {
       console.error(error);
@@ -80,17 +100,27 @@
 
     // Submit to the backend
     try {
-      const body = {
+      const body: FormBody = {
         first_name: user.value!.first_name,
         last_name: user.value!.last_name,
         phone_number: user.value!.phone_number,
-        birthday: user.value!.birthday
+        birthday: user.value!.birthday,
+      }
+
+      // Handle avatar upload
+      if (user.value!.avatar != originalUser.value?.avatar) {
+        if (user.value!.avatar.length > 0) {
+          const blob = await fetch(user.value!.avatar).then(r => r.blob());
+          body.avatar = await blobToBase64(blob) as string
+        } else {
+          body.avatar = '';
+        }
       }
 
       const response = await useFetchAPI({
         url: '/user/update-details',
         method: 'PATCH',
-        data: JSON.stringify(body)
+        data: body
       });
 
       // Update auth store
@@ -99,8 +129,14 @@
       // Dismiss loading modal
       await isSubmitting.dismiss();
 
-      // Close the edit modal
-      await modalController.dismiss(null, 'confirm')
+      // Show toast message
+      await toastController.presentToast({
+        message: 'Profile updated',
+        position: 'bottom',
+        positionAnchor: 'scan-food-button',
+        duration: 3000,
+        icon: checkmarkCircleOutline
+      });
     } catch (error) {
       if (error instanceof FetchError) {
         switch (error.data.code) {
@@ -111,7 +147,13 @@
             // Show another alert error
             await alertController.presentAlert({
               header: "Something went wrong",
-              message: error.data.message
+              message: error.data.message,
+              buttons: [
+                {
+                  text: "Ok",
+                  role: 'cancel'
+                }
+              ]
             })
         }
       }
@@ -172,16 +214,55 @@
     // Handle dismiss event
     const dismissEvent = await actionSheet.onWillDismiss();
 
-    if (dismissEvent.data === undefined) return;
+    if (dismissEvent.data !== undefined) {
+      await handleDismissEvent(dismissEvent.data.action);
+    }
+  }
 
-    let image;
+  const handleDismissEvent = async (action: string) => {
+    const isMobile = isPlatform('capacitor');
 
-    switch (dismissEvent.data.action) {
-      case 'upload-avatar':
-        image = await avatarUploader.pickImage();
-        console.log(image);
+    if (action === 'upload-avatar') {
+      const image = await avatarUploader.pickImage();
 
-        user.value!.avatar = image.webPath as string
+      // Open avatar cropper
+      const modal = await modalController.create({
+        component: CropAvatarModal,
+        componentProps: {
+          image: image.webPath
+        }
+      });
+
+      await modal.present()
+
+      // Change status bar color to white
+      if (isMobile) {
+        await StatusBar.setBackgroundColor({ color: '#ffffff' });
+      }
+
+      // Catch image through modal dismissal
+      const dismissEvent = await modal.onDidDismiss()
+
+      if (dismissEvent) {
+        // Revert status bar color
+        if (isMobile) {
+          await StatusBar.setBackgroundColor({ color: '#efeee9' });
+        }
+
+        if (dismissEvent.role === 'confirm') {
+          user.value!.avatar = dismissEvent.data.image;
+        }
+      }
+    }
+
+    if (action === 'remove-avatar') {
+      const blobUrl = user.value!.avatar;
+
+      // Reset avatar into empty string
+      user.value!.avatar = '';
+
+      // Revoke blob url
+      URL.revokeObjectURL(blobUrl);
     }
   }
 
@@ -304,7 +385,7 @@
           </div>
         </div>
 
-        <ion-button class="submit-btn" expand="block" @click="saveChanges">
+        <ion-button class="submit-btn" expand="block" :disabled="!hasChanges" @click="saveChanges">
           Save changes
         </ion-button>
       </template>

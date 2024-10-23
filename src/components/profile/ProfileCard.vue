@@ -42,7 +42,7 @@
     <div class="flex items-center gap-3">
       <div class="relative" @click="emit('openAvatarAction')">
         <ion-avatar>
-          <img :src="avatar" width="80" height="80" alt="Food" />
+          <img :src="avatar" width="80" height="80" alt="Profile Picture" />
         </ion-avatar>
         <span v-if="props.editMode" class="bg-slate-200 rounded-full px-[6px] py-[6px] flex items-center absolute top-0 right-0">
           <ion-icon aria-label="Edit profile picture" :icon="brush" class="text-[13px]"  />
