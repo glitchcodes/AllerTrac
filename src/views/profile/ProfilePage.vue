@@ -101,7 +101,7 @@
         </ion-button>
       </nav>
 
-      <ProfileCard :user="authStore._user!" class="mb-4" />
+      <ProfileCard v-if="authStore._isLoggedIn" :user="authStore._user!" class="mb-4" />
 
       <div class="bg-white overflow-hidden shadow rounded-lg" :class="{ 'p-2': isPlatform('ios') }">
         <ion-segment :value="currentSegment" color="primary" @ionChange="handleSegmentChange">
