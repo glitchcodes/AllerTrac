@@ -68,5 +68,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     bookmarks.value = payload.hits;
   }
 
-  return { _bookmarks, getBookmarks, create, remove }
+  const reset = () => {
+    bookmarks.value = [];
+    bookmarkURIs.value = [];
+  }
+
+  return { _bookmarks, getBookmarks, create, remove, reset }
 });

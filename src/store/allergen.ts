@@ -42,5 +42,9 @@ export const useAllergenStore = defineStore('allergen', () => {
     return response;
   }
 
-  return { _allergens, getAllergens, updateAllergens }
+  const reset = () => {
+    allergens.value = [];
+  }
+
+  return { _allergens, getAllergens, updateAllergens, reset }
 })

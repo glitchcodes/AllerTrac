@@ -3,10 +3,14 @@
   import { IonPage, IonContent, IonSpinner, IonButton, onIonViewDidEnter } from '@ionic/vue';
   import { useRouter } from "vue-router";
   import { useAuthStore } from "@/store/auth";
+  import { useAllergenStore } from "@/store/allergen";
+  import { useBookmarkStore } from "@/store/bookmark";
   import { useFetchAPI } from "@/composables/useFetchAPI";
 
   const router = useRouter();
-  const auth = useAuthStore();
+  const authStore = useAuthStore();
+  const allergenStore = useAllergenStore();
+  const bookmarkStore = useBookmarkStore();
   const hasErrors = ref<boolean>(false);
 
   onIonViewDidEnter(async () => {
@@ -23,7 +27,11 @@
       });
 
       // Remove access token from preferences
-      await auth.removeBearerToken()
+      await authStore.removeBearerToken()
+
+      // Remove cached allergen and bookmarks
+      allergenStore.reset();
+      bookmarkStore.reset();
 
       // Redirect to homepage
       await router.replace({ name: 'home' })
