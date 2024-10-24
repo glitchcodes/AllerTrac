@@ -67,11 +67,11 @@
           </h1>
         </div>
         <div v-if="!isPlatform('ios')">
-          <ion-button v-if="!authStore._isLoggedIn" router-link="/u/login" shape="round">
+          <ion-button v-if="!authStore._isLoggedIn" color="tertiary" router-link="/u/login" shape="round">
             <ion-icon slot="icon-only" aria-label="Login Button" :icon="logIn"></ion-icon>
           </ion-button>
 
-          <ion-button v-else shape="round" @click="openUserMenu">
+          <ion-button v-else shape="round" color="tertiary" @click="openUserMenu">
             <ion-icon slot="icon-only" aria-label="User Menu" :icon="menu"></ion-icon>
           </ion-button>
         </div>

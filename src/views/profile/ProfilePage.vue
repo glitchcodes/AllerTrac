@@ -90,13 +90,13 @@
     <ion-content class="ion-padding" :fullscreen="true">
 
       <nav v-if="!isPlatform('ios')" class="flex items-center justify-between mb-4">
-        <ion-button router-link="/pages/profile/edit" router-direction="forward">
+        <ion-button color="tertiary" shape="round" router-link="/pages/profile/edit" router-direction="forward">
           <ion-icon slot="icon-only" :icon="createOutline"></ion-icon>
         </ion-button>
         <p class="font-bold text-xl absolute left-1/2 transform -translate-x-1/2">
           Profile
         </p>
-        <ion-button @click="handleLogout">
+        <ion-button color="tertiary" shape="round" @click="handleLogout">
           <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
         </ion-button>
       </nav>

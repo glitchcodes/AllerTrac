@@ -307,7 +307,7 @@
     <ion-content class="ion-padding">
 
       <nav v-if="!isPlatform('ios')" class="navbar flex items-center mb-4 gap-3 relative">
-        <ion-button router-link="/pages/profile" router-direction="back">
+        <ion-button color="tertiary" shape="round" router-link="/pages/profile" router-direction="back">
           <ion-icon slot="icon-only" :icon="chevronBack" />
         </ion-button>
         <p class="font-bold text-xl absolute left-1/2 transform -translate-x-1/2">

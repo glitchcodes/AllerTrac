@@ -34,6 +34,13 @@ http://ionicframework.com/docs/theming/ */
 :root {
     --ion-color-primary: #43727a;
     --ion-color-primary-rgb: 67, 114, 122;
+
+    --ion-color-tertiary: #ffffff;
+    --ion-color-tertiary-rgb: 255,255,255;
+    --ion-color-tertiary-contrast: #000000;
+    --ion-color-tertiary-contrast-rgb: 0,0,0;
+    --ion-color-tertiary-shade: #e0e0e0;
+    --ion-color-tertiary-tint: #ffffff;
 }
 
 html {

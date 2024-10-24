@@ -158,14 +158,14 @@
       <div class="flex-1"></div>
       <div class="flex gap-2">
 
-        <ion-button v-if="isBookmarked" shape="round" @click="handleRemoveBookmark">
+        <ion-button v-if="isBookmarked" color="tertiary" shape="round" @click="handleRemoveBookmark">
           <ion-icon slot="icon-only" class="bookmarked" :icon="bookmark" />
         </ion-button>
-        <ion-button v-else shape="round" @click="handleBookmarkMeal">
+        <ion-button v-else color="tertiary" shape="round" @click="handleBookmarkMeal">
           <ion-icon slot="icon-only" :icon="bookmarkOutline" />
         </ion-button>
 
-        <ion-button shape="round" @click="handleShareMeal">
+        <ion-button shape="round" color="tertiary" @click="handleShareMeal">
           <ion-icon slot="icon-only" :icon="shareOutline" />
         </ion-button>
       </div>
@@ -211,11 +211,6 @@
   .navbar {
     .title {
       background-color: #efeee9;
-    }
-
-    ion-button {
-      --background: #efeee9;
-      --color: black;
     }
   }
 
