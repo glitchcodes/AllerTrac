@@ -26,7 +26,7 @@
       await auth.removeBearerToken()
 
       // Redirect to homepage
-      await router.push({ name: 'home' })
+      await router.replace({ name: 'home' })
     } catch (error) {
       // Show error message
       hasErrors.value = true;

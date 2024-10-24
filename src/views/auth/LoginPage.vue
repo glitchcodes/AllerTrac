@@ -62,9 +62,9 @@
 
       // Redirect to welcome screen if the user hasn't completed onboarding
       if (redirectTo === 'onboarding') {
-        await router.push({ name: 'onboarding-welcome' })
+        await router.replace({ name: 'onboarding-welcome' })
       } else {
-        await router.push({ name: 'home' })
+        await router.replace({ name: 'home' })
       }
 
     } catch (error) {

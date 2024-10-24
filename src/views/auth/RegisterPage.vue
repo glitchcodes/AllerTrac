@@ -137,7 +137,7 @@
       const redirectTo = response.data.redirect_to
 
       if (redirectTo === 'onboarding') {
-        await router.push({ name: 'home' })
+        await router.replace({ name: 'home' })
       } else if (redirectTo === 'verification') {
         await router.push({ name: 'verify-registration', query: { i: response.data.identifier } })
       }
