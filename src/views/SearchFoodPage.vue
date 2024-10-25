@@ -177,17 +177,19 @@
           </div>
         </div>
 
-        <h1 class="text-lg font-bold">
-          Bookmarked Meals
-        </h1>
+        <div v-if="authStore._isLoggedIn">
+          <h1 class="text-lg font-bold">
+            Bookmarked Meals
+          </h1>
 
-        <Suspense>
-          <MealBookmarks class="my-3" :key="bookmarkKey" />
+          <Suspense>
+            <MealBookmarks class="my-3" :key="bookmarkKey" />
 
-          <template #fallback>
-            <SkeletonMeal :length="4" class="my-3" />
-          </template>
-        </Suspense>
+            <template #fallback>
+              <SkeletonMeal :length="4" class="my-3" />
+            </template>
+          </Suspense>
+        </div>
       </section>
 
     </ion-content>
