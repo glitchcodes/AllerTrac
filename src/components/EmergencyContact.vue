@@ -2,8 +2,7 @@
   import {
     IonRippleEffect,
     actionSheetController,
-    modalController,
-    loadingController
+    modalController
   } from "@ionic/vue";
   import { Clipboard } from "@capacitor/clipboard";
   import {
