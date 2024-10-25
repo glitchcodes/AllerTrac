@@ -27,11 +27,16 @@
     (e: 'delete', id: number): void
   }>()
 
-  const props = defineProps<{
-    contact: EmergencyContact
-  }>();
+  const props = withDefaults(defineProps<{
+    contact: EmergencyContact,
+    canEdit?: boolean
+  }>(), {
+    canEdit: true
+  });
 
   const openActionSheet = async () => {
+    if (!props.canEdit) return;
+
     const actionSheet = await actionSheetController.create({
       header: "Actions",
       buttons: [
@@ -152,7 +157,7 @@
 
 <template>
   <div class="bg-neutral-100 rounded-xl px-6 py-4 border-2 shadow w-full ion-activatable ripple-parent" @click="openActionSheet">
-    <ion-ripple-effect></ion-ripple-effect>
+    <ion-ripple-effect v-if="canEdit"></ion-ripple-effect>
     <h2 class="text-2xl text-primary font-bold mb-2">
       {{ props.contact.full_name || "John Doe" }}
     </h2>

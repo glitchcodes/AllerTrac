@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { reactive } from "vue";
+import {reactive, ref} from "vue";
   import { arrowBack, save } from "ionicons/icons";
   import {
     IonHeader,
@@ -25,6 +25,7 @@
 
   import { phoneMaskOptions } from "@/utils/helpers";
   import type { EmergencyContact } from "@/types/EmergencyContact";
+import FetchError from "@/utils/errors/FetchError";
 
   const contactStore = useContactStore();
   const alertController = useAlertController();
@@ -35,29 +36,25 @@
 
   const form = reactive<EmergencyContact>(props.user);
 
-  const inputErrors = reactive<any>({
-    full_name: {},
-    relationship: {},
-    phone_number: {},
-    email: {}
-  });
+  const inputErrors = ref<any>({});
 
   // ion-input only show errors in one line, leading to undesired display of errors
   // As a workaround, show only return one error
   const getErrorMessage = (type: string) => {
+    const errors = inputErrors.value;
     switch (type) {
       case "full_name":
-        if (!inputErrors.full_name || inputErrors.full_name.length === null) return "";
-        return inputErrors.full_name[0]
+        if (!errors.full_name || errors.full_name.length === null) return "";
+        return errors.full_name[0]
       case "relationship":
-        if (!inputErrors.relationship || inputErrors.relationship.length === null) return "";
-        return inputErrors.relationship[0]
+        if (!errors.relationship || errors.relationship.length === null) return "";
+        return errors.relationship[0]
       case "phone_number":
-        if (!inputErrors.phone_number || inputErrors.phone_number.length === null) return "";
-        return inputErrors.phone_number[0]
+        if (!errors.phone_number || errors.phone_number.length === null) return "";
+        return errors.phone_number[0]
       case "email":
-        if (!inputErrors.email || inputErrors.email.length === null) return "";
-        return inputErrors.email[0]
+        if (!errors.email || errors.email.length === null) return "";
+        return errors.email[0]
     }
   }
 
@@ -82,8 +79,20 @@
       // Dismiss the modal
       await modalController.dismiss(null, 'confirm')
     } catch (error) {
-      console.log(error)
-
+      // Dismiss loading modal
+      if (error instanceof FetchError) {
+        switch (error.data.code) {
+          case "INPUT_INVALID":
+            inputErrors.value = error.data.errors;
+            break;
+          default:
+            // Show another alert error
+            await alertController.presentAlert({
+              header: "Something went wrong",
+              message: error.data.message
+            })
+        }
+      }
       // Dismiss the loading modal
       await isSubmitting.dismiss()
     }
@@ -137,46 +146,48 @@
 
   <ion-content class="ion-padding">
 
-    <EmergencyContactComponent :contact="form" />
-
-    <h5 class="text-lg font-bold mt-5">
-      Contact Information
-    </h5>
+    <EmergencyContactComponent :contact="form" :can-edit="false" />
 
     <div class="bg-white rounded-md shadow-md ion-padding my-4">
-      <ion-list lines="none">
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.full_name"
-                     label="Full name"
-                     label-placement="fixed"
-                     placeholder="John Doe"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.full_name.length > 0 }"
-                     :error-text="getErrorMessage('full_name')"
-                     @ionInput="() => inputErrors.full_name = ''">
-          </ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.phone_number"
-                     v-maskito="phoneMaskOptions"
-                     label="Phone"
-                     label-placement="fixed"
-                     placeholder="09XX XXX XXXX"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.phone_number.length > 0 }"
-                     :error-text="getErrorMessage('phone_number')"
-                     @ionInput="() => inputErrors.phone_number = ''">
-          </ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.email"
-                     label="Email"
-                     label-placement="fixed"
-                     placeholder="email@domain.com"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.email.length > 0 }"
-                     :error-text="getErrorMessage('email')"
-                     @ionInput="() => inputErrors.email = ''">
-          </ion-input>
-        </ion-item>
-      </ion-list>
+      <h5 class="text-lg font-bold mb-4">
+        Contact Information
+      </h5>
+
+      <div class="flex flex-col gap-4">
+        <ion-input v-model="form.full_name"
+                   mode="md"
+                   label="Full name"
+                   label-placement="floating"
+                   fill="outline"
+                   placeholder="John Doe"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.full_name }"
+                   :error-text="getErrorMessage('full_name')"
+                   @ionInput="() => inputErrors.full_name = ''">
+        </ion-input>
+
+        <ion-input v-model="form.phone_number"
+                   v-maskito="phoneMaskOptions"
+                   mode="md"
+                   label="Phone"
+                   label-placement="floating"
+                   fill="outline"
+                   placeholder="09XX XXX XXXX"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
+                   :error-text="getErrorMessage('phone_number')"
+                   @ionInput="() => inputErrors.phone_number = ''">
+        </ion-input>
+
+        <ion-input v-model="form.email"
+                   label="Email"
+                   label-placement="floating"
+                   mode="md"
+                   fill="outline"
+                   placeholder="email@domain.com"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.email }"
+                   :error-text="getErrorMessage('email')"
+                   @ionInput="() => inputErrors.email = ''">
+        </ion-input>
+      </div>
     </div>
 
     <div class="bg-white rounded-md shadow-md ion-padding mt-5">
@@ -216,16 +227,9 @@
   }
 
   ion-input {
-    --highlight-color-focused: var(--ion-color-primary);
-    &:deep(.input-bottom) {
-      padding-bottom: 5px;
-    }
-    &:deep(.label-text) {
-      color: var(--ion-color-primary);
-      //font-weight: bold;
-    }
-    &:not(.ion-invalid):deep(.input-wrapper) {
-      border-bottom: 1px solid rgba(0,0,0,0.3);
+    &.input-fill-outline:deep(.label-text-wrapper.sc-ion-input-md) {
+      -webkit-transform: translateY(65%) scale(1);
+      transform: translateY(65%) scale(1);
     }
   }
 

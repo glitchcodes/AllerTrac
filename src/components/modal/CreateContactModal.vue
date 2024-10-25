@@ -145,46 +145,48 @@
 
   <ion-content class="ion-padding">
 
-    <EmergencyContactComponent :contact="form" />
-
-    <h5 class="text-lg font-bold mt-5">
-      Contact Information
-    </h5>
+    <EmergencyContactComponent :contact="form" :can-edit="false" />
 
     <div class="bg-white rounded-md shadow-md ion-padding my-4">
-      <ion-list lines="none">
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.full_name"
-                     label="Full name"
-                     label-placement="fixed"
-                     placeholder="John Doe"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.full_name }"
-                     :error-text="getErrorMessage('full_name')"
-                     @ionInput="() => inputErrors.full_name = ''">
-          </ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.phone_number"
-                     v-maskito="phoneMaskOptions"
-                     label="Phone"
-                     label-placement="fixed"
-                     placeholder="09XX XXX XXXX"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
-                     :error-text="getErrorMessage('phone_number')"
-                     @ionInput="() => inputErrors.phone_number = ''">
-          </ion-input>
-        </ion-item>
-        <ion-item class="ion-no-padding">
-          <ion-input v-model="form.email"
-                     label="Email"
-                     label-placement="fixed"
-                     placeholder="email@domain.com"
-                     :class="{ 'ion-touched ion-invalid': inputErrors.email }"
-                     :error-text="getErrorMessage('email')"
-                     @ionInput="() => inputErrors.email = ''">
-          </ion-input>
-        </ion-item>
-      </ion-list>
+      <h5 class="text-lg font-bold mb-4">
+        Contact Information
+      </h5>
+
+      <div class="flex flex-col gap-4">
+        <ion-input v-model="form.full_name"
+                   mode="md"
+                   label="Full name"
+                   label-placement="floating"
+                   fill="outline"
+                   placeholder="John Doe"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.full_name }"
+                   :error-text="getErrorMessage('full_name')"
+                   @ionInput="() => inputErrors.full_name = ''">
+        </ion-input>
+
+        <ion-input v-model="form.phone_number"
+                   v-maskito="phoneMaskOptions"
+                   mode="md"
+                   label="Phone"
+                   label-placement="floating"
+                   fill="outline"
+                   placeholder="09XX XXX XXXX"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
+                   :error-text="getErrorMessage('phone_number')"
+                   @ionInput="() => inputErrors.phone_number = ''">
+        </ion-input>
+
+        <ion-input v-model="form.email"
+                   label="Email"
+                   label-placement="floating"
+                   mode="md"
+                   fill="outline"
+                   placeholder="email@domain.com"
+                   :class="{ 'ion-touched ion-invalid': inputErrors.email }"
+                   :error-text="getErrorMessage('email')"
+                   @ionInput="() => inputErrors.email = ''">
+        </ion-input>
+      </div>
     </div>
 
     <div class="bg-white rounded-md shadow-md ion-padding mt-5">
@@ -224,16 +226,9 @@
   }
 
   ion-input {
-    --highlight-color-focused: var(--ion-color-primary);
-    &:deep(.input-bottom) {
-      padding-bottom: 5px;
-    }
-    &:deep(.label-text) {
-      color: var(--ion-color-primary);
-      //font-weight: bold;
-    }
-    &:not(.ion-invalid):deep(.input-wrapper) {
-      border-bottom: 1px solid rgba(0,0,0,0.3);
+    &.input-fill-outline:deep(.label-text-wrapper.sc-ion-input-md) {
+      -webkit-transform: translateY(65%) scale(1);
+      transform: translateY(65%) scale(1);
     }
   }
 
