@@ -79,6 +79,7 @@
   <ion-page>
     <ion-content :fullscreen="true">
       <ScannerToast v-if="!isToastDismissed" @dismiss="updateToastStatus" />
+      <img class="camera-stencil" src="/images/camera-stencil.png" alt="Camera Stencil" />
       <div id="camera-preview"></div>
     </ion-content>
   </ion-page>
@@ -95,7 +96,17 @@
     width: 100%;
     height: 100%;
     position: absolute;
+    z-index: 998;
+  }
+
+  .camera-stencil {
+    position: absolute;
     z-index: 999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 3rem;
   }
 
   .camera-notice {
