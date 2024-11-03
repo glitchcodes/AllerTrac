@@ -22,7 +22,11 @@ const errorMessages: { [key: string]: any } = {
 export const useFetchAPI = async (options: HttpOptions): Promise<HttpResponse> => {
   // Inject the baseURL into the options
   const apiEndpoint = import.meta.env.VITE_API_BASEURL + '/' + import.meta.env.VITE_API_VERSION;
-  options.url = apiEndpoint.concat(options.url);
+
+  // Do not concat baseURL if it starts with https or http
+  if (!/^https?:\/\/(.*)/.test(options.url)) {
+    options.url = apiEndpoint.concat(options.url);
+  }
 
   const authStore = useAuthStore();
   const { bearerToken } = storeToRefs(authStore);
