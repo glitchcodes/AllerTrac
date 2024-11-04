@@ -2,7 +2,6 @@
   import { ref, computed } from "vue";
   import { vIntersectionObserver } from "@vueuse/components";
   import { useScannerStore } from "@/store/useScannerStore";
-  import { useAllergenStore } from "@/store/allergen";
   import {
     IonPage,
     IonContent,
@@ -10,11 +9,8 @@
     IonTitle,
     IonProgressBar,
     IonItem,
-    IonLabel,
     IonAccordionGroup,
     IonAccordion,
-    IonChip,
-    IonIcon,
     onIonViewWillLeave,
     onIonViewWillEnter,
     isPlatform
@@ -22,13 +18,13 @@
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { Capacitor } from "@capacitor/core";
   import { StatusBar } from "@capacitor/status-bar";
-  import { alertCircleOutline } from "ionicons/icons";
 
   import WarningAlert from "@/components/alert/WarningAlert.vue";
   import InfoAlert from "@/components/alert/InfoAlert.vue";
+  import ScannedItemHeader from "@/components/scanner/ScannedItemHeader.vue";
+  import ScannedItemContent from "@/components/scanner/ScannedItemContent.vue";
 
   const scannerStore = useScannerStore();
-  const allergenStore = useAllergenStore();
 
   const isFetching = ref(true);
   const isToolbarVisible = ref(false);
@@ -49,7 +45,7 @@
       // const response = await useFetchAPI({
       //   url: 'http://localhost:8100/dummy.json',
       //   method: 'GET'
-      // })
+      // });
 
       const response = await useFetchAPI({
         url: '/meal/scan',
@@ -91,21 +87,6 @@
     scannerStore.resetCapturedImage();
   });
 
-  const confidenceChipLevel = (value: number) => {
-    const confidence = value * 100;
-    let chipClass: string
-
-    if (confidence > 90) {
-      chipClass = 'success';
-    } else if (confidence > 70) {
-      chipClass = 'warning';
-    } else {
-      chipClass = 'danger';
-    }
-
-    return chipClass;
-  }
-
   const onIntersection = async ([{ isIntersecting }]: IntersectionObserverEntry[]) => {
     isToolbarVisible.value = !isIntersecting;
 
@@ -143,25 +124,6 @@
     
     return array;
   });
-
-  const isAllergic = (allergen: string) => {
-    const allergens = allergenStore._allergens;
-
-    return allergens.some(item => item.name.includes(allergen));
-  }
-
-  const showDangerIcon = (allergens: any[]) => {
-    const detected: string[] = [];
-    const userAllergens = allergenStore._allergens;
-    
-    allergens.forEach(allergens => {
-      if (userAllergens.some(item => item.name.includes(allergens.name))) {
-        detected.push(allergens)
-      }
-    })
-    
-    return detected;
-  }
 
 </script>
 
@@ -217,37 +179,10 @@
             <ion-accordion-group ref="accordionGroup" :multiple="true">
               <ion-accordion v-for="(item, index) in ingredients" :value="'food-' + index" :key="'food-' + index">
                 <ion-item slot="header" color="light">
-                  <ion-label>
-                    <div class="flex items-center gap-3">
-                      <ion-chip :color="confidenceChipLevel(item.food[0].confidence)" class="shadow">
-                        <small>
-                          {{ (item.food[0].confidence * 100).toFixed(2) }}%
-                        </small>
-                      </ion-chip>
-                      <h3 class="flex-1">
-                        {{ item.food[0].food_info.display_name }}
-                      </h3>
-                      <ion-icon v-if="showDangerIcon(item.food[0].food_info.allergens).length > 0"
-                                :icon="alertCircleOutline"
-                                color="danger" />
-                    </div>
-                  </ion-label>
+                  <ScannedItemHeader :food="item.food[0]" />
                 </ion-item>
                 <div class="ion-padding" slot="content">
-                  <div v-if="item.food[0].food_info.allergens && item.food[0].food_info.allergens.length > 0">
-                    <p class="text-sm mb-2">
-                      This food may contain the following:
-                    </p>
-
-                    <ion-chip v-for="(allergen, index) in item.food[0].food_info.allergens"
-                              :key="index" :color="isAllergic(allergen.name) ? 'danger' : 'primary'">
-                      <ion-icon v-if="isAllergic(allergen.name)" :icon="alertCircleOutline"></ion-icon>
-                      <ion-label>{{ allergen.name }}</ion-label>
-                    </ion-chip>
-                  </div>
-                  <p v-else class="text-sm">
-                    No allergens were found for this ingredient
-                  </p>
+                  <ScannedItemContent :food="item.food[0]" />
                 </div>
               </ion-accordion>
             </ion-accordion-group>
