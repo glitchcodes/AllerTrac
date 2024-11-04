@@ -182,7 +182,7 @@
                   <ScannedItemHeader :food="item.food[0]" />
                 </ion-item>
                 <div class="ion-padding" slot="content">
-                  <ScannedItemContent :food="item.food[0]" />
+                  <ScannedItemContent :foods="item.food" />
                 </div>
               </ion-accordion>
             </ion-accordion-group>
