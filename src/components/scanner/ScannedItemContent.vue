@@ -93,11 +93,13 @@
       This ingredient may contain the following:
     </p>
 
-    <ion-chip v-for="(allergen, index) in allergens"
-              :key="index" :color="isAllergic(allergen.name) ? 'danger' : 'primary'">
-      <ion-icon v-if="isAllergic(allergen.name)" :icon="alertCircleOutline"></ion-icon>
-      <ion-label>{{ allergen.name }}</ion-label>
-    </ion-chip>
+    <div class="flex gap-2">
+      <ion-chip v-for="(allergen, index) in allergens"
+                :key="index" :color="isAllergic(allergen.name) ? 'danger' : 'primary'">
+        <ion-icon v-if="isAllergic(allergen.name)" :icon="alertCircleOutline"></ion-icon>
+        <ion-label>{{ allergen.name }}</ion-label>
+      </ion-chip>
+    </div>
   </div>
   <InfoAlert v-else class="text-sm">
     No allergens were found for this ingredient
