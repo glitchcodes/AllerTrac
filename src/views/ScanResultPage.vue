@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, computed } from "vue";
+  import { useRouter } from "vue-router";
   import { vIntersectionObserver } from "@vueuse/components";
   import { useScannerStore } from "@/store/useScannerStore";
   import {
@@ -13,6 +14,7 @@
     IonAccordion,
     onIonViewWillLeave,
     onIonViewWillEnter,
+    onIonViewDidEnter,
     isPlatform
   } from "@ionic/vue";
   import { useFetchAPI } from "@/composables/useFetchAPI";
@@ -24,6 +26,7 @@
   import ScannedItemHeader from "@/components/scanner/ScannedItemHeader.vue";
   import ScannedItemContent from "@/components/scanner/ScannedItemContent.vue";
 
+  const router = useRouter();
   const scannerStore = useScannerStore();
 
   const isFetching = ref(true);
@@ -81,6 +84,15 @@
       }
     }
   });
+
+  onIonViewDidEnter(() => {
+    capturedImage.value = scannerStore.capturedImageBlob;
+
+    if (isFetching.value && !capturedImage.value) {
+      // Redirect to home page
+      router.replace('/pages/home')
+    }
+  })
 
   onIonViewWillLeave(() => {
     // imageURL.value = "";
