@@ -92,6 +92,7 @@
         '/u/password/verify',
         '/u/password/reset',
         '/pages/scan-food',
+        '/pages/scan-results',
         '/logout'
     ]
 

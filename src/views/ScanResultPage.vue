@@ -1,55 +1,150 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { ref, computed } from "vue";
+  import { useRouter } from "vue-router";
+  import { vIntersectionObserver } from "@vueuse/components";
   import { useScannerStore } from "@/store/useScannerStore";
-  import { IonPage, IonContent, IonProgressBar, IonList, IonItem, IonLabel, onIonViewWillLeave, onIonViewWillEnter } from "@ionic/vue";
-  import { useFoodVisorAPI } from "@/composables/useFoodVisorAPI";
-  import {useFetch} from "@vueuse/core";
+  import {
+    IonPage,
+    IonContent,
+    IonToolbar,
+    IonTitle,
+    IonProgressBar,
+    IonItem,
+    IonAccordionGroup,
+    IonAccordion,
+    onIonViewWillLeave,
+    onIonViewWillEnter,
+    onIonViewDidEnter,
+    isPlatform
+  } from "@ionic/vue";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
+  import { Capacitor } from "@capacitor/core";
+  import { StatusBar } from "@capacitor/status-bar";
 
+  import WarningAlert from "@/components/alert/WarningAlert.vue";
+  import InfoAlert from "@/components/alert/InfoAlert.vue";
+  import ScannedItemHeader from "@/components/scanner/ScannedItemHeader.vue";
+  import ScannedItemContent from "@/components/scanner/ScannedItemContent.vue";
+
+  const router = useRouter();
   const scannerStore = useScannerStore();
+
+  const isFetching = ref(true);
+  const isToolbarVisible = ref(false);
 
   const imageURL = ref("");
   const capturedImage = ref();
 
-  const payload = new FormData()
-  payload.append('scopes[]', 'multiple_items');
-  payload.append('scopes[]', 'position');
+  const ingredients = ref();
 
-  // const { isFetching, error, data, execute } = useFetch("/dummy.json").get().json()
+  const scanImage = async () => {
+    try {
+      isFetching.value = true;
 
-  const { isFetching, error, data, execute } = useFoodVisorAPI(
-      'https://proxy.cors.sh/https://vision.foodvisor.io/api/1.0/en/analysis/',
-      {
-      beforeFetch({ options }) {
-        options.headers = {
-          ...options.headers,
-        }
-      },
-      immediate: false
-    }).post(payload).json();
+      const body = {
+        image: scannerStore.capturedImage
+      }
 
-  onIonViewWillEnter(() => {
+      // const response = await useFetchAPI({
+      //   url: 'http://localhost:8100/dummy.json',
+      //   method: 'GET'
+      // });
+
+      const response = await useFetchAPI({
+        url: '/meal/scan',
+        method: 'POST',
+        data: body
+      });
+
+      if (response.status === 200) {
+        ingredients.value = response.data.payload.items;
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      isFetching.value = false;
+    }
+  }
+
+  onIonViewWillEnter(async () => {
     capturedImage.value = scannerStore.capturedImageBlob;
-    payload.append('image', capturedImage.value);
+    imageURL.value = scannerStore.capturedImage;
 
     // Analyze the image through FoodVisor
     if (capturedImage.value) {
-      execute();
+      await scanImage()
+    }
 
-      if (data.value) {
-        imageURL.value = scannerStore.capturedImage;
-        console.log(scannerStore.capturedImage);
+    // Make the status bar transparent
+    const isAndroid = isPlatform('android');
+
+    if (Capacitor.isNativePlatform()) {
+      if (isAndroid) {
+        await StatusBar.setOverlaysWebView({ overlay: true });
       }
+    }
+  });
+
+  onIonViewDidEnter(() => {
+    capturedImage.value = scannerStore.capturedImageBlob;
+
+    if (isFetching.value && !capturedImage.value) {
+      // Redirect to home page
+      router.replace('/pages/home')
     }
   })
 
   onIonViewWillLeave(() => {
-    imageURL.value = "";
+    // imageURL.value = "";
     scannerStore.resetCapturedImage();
-  })
+  });
+
+  const onIntersection = async ([{ isIntersecting }]: IntersectionObserverEntry[]) => {
+    isToolbarVisible.value = !isIntersecting;
+
+    if (isIntersecting) {
+      await StatusBar.setOverlaysWebView({ overlay: true });
+    } else {
+      await StatusBar.setOverlaysWebView({ overlay: false });
+      await StatusBar.setBackgroundColor({ color: '#ffffff' })
+    }
+  }
+
+  // Generate colors for annotation
+  const getRandomColor = (): string => {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  const annotationColors = computed(() => {
+    const array = [];
+    
+    for (let i = 0; i < ingredients.value.length; i++) {
+      const color = getRandomColor();
+      const rgbaColor = (color: string, alpha: number): string =>
+          color.replace('rgb', 'rgba').replace(')', `, ${alpha})`);
+
+      array.push({
+        borderColor: rgbaColor(color, 0.4),
+        backgroundColor: rgbaColor(color, 0.2),
+        textBgColor: rgbaColor(color, 0.5)
+      });
+    }
+    
+    return array;
+  });
+
 </script>
 
 <template>
   <ion-page>
+    <ion-toolbar v-if="!isFetching && isToolbarVisible">
+      <ion-title>Identifiable Foods</ion-title>
+    </ion-toolbar>
+
     <ion-content>
       <div v-if="isFetching" class="flex items-center justify-center h-full">
         <div class="w-1/4">
@@ -58,25 +153,57 @@
         </div>
       </div>
 
-      <div v-if="!isFetching && data" class="">
-        <img :src="imageURL" />
+      <div v-if="!isFetching" class="">
+        <div class="relative">
+          <img :src="imageURL" alt="Captured Food" />
 
-        <div class="bg-primary p-5">
-          <h5 class="text-2xl font-bold">
-            Identifiable Food
-          </h5>
+          <div v-if="ingredients && ingredients.length > 0">
+            <div v-for="(item, index) in ingredients"
+                 :key="'item-' + index"
+                 class="absolute border-[4px] rounded-xl flex flex-col items-center justify-center"
+                 :style="{
+                 height: `${item.position.height * 100}%`,
+                 width: `${item.position.width * 100}%`,
+                 top: `${item.position.y * 100}%`,
+                 left: `${item.position.x * 100}%`,
+                 borderColor: annotationColors[index].borderColor,
+                 backgroundColor: annotationColors[index].backgroundColor
+               }">
+              <p class="font-bold text-white px-2 py-1 rounded-md" :style="{ backgroundColor: annotationColors[index].textBgColor }">
+                {{ item.food[0].food_info.display_name }}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div class="py-5" v-for="item in data.items">
-          <h5 class="font-bold px-4">Ingredient 1</h5>
-          <ion-list>
-            <ion-item v-for="food in item.food">
-              <ion-label>
-                <p>{{ food.food_info.display_name }}</p>
-                <p>{{ food.confidence * 100 }}%</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
+        <div class="bg-secondary p-2 -mt-3 rounded-xl relative">
+          <div class="bg-primary ion-padding rounded-lg" v-intersection-observer="onIntersection">
+            <h5 class="text-2xl font-bold">
+              Identifiable Foods
+            </h5>
+          </div>
+
+          <div v-if="ingredients && ingredients.length > 0">
+            <WarningAlert class="my-4">
+              These results may not be accurate. Always double-check for correct information.
+            </WarningAlert>
+
+            <ion-accordion-group ref="accordionGroup" :multiple="true">
+              <ion-accordion v-for="(item, index) in ingredients" :value="'food-' + index" :key="'food-' + index">
+                <ion-item slot="header" color="light">
+                  <ScannedItemHeader :food="item.food[0]" />
+                </ion-item>
+                <div class="ion-padding" slot="content">
+                  <ScannedItemContent :foods="item.food" />
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
+          </div>
+
+          <InfoAlert v-else class="my-4">
+            There were no ingredients found on the image. Make sure the image is very clear and is in clear light for
+            proper detection
+          </InfoAlert>
         </div>
 
       </div>
@@ -86,5 +213,23 @@
 </template>
 
 <style scoped lang="scss">
+  ion-accordion {
+    border-radius: 8px;
+    margin-bottom: 1rem;
 
+    &:deep(ion-chip) {
+      margin: auto 0;
+    }
+  }
+
+  .canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%
+  }
 </style>
