@@ -19,5 +19,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom'
-  }
+  },
+  css: {
+    preprocessorOptions: {
+      sass: {
+        api: 'modern-compiler',
+      },
+    },
+  },
 })
