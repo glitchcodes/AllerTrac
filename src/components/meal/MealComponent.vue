@@ -15,7 +15,7 @@
   }>();
 
   const openMealModal = async () => {
-    const isAndroid = Capacitor.isNativePlatform && isPlatform('android');
+    const isAndroid = Capacitor.isNativePlatform() && isPlatform('android');
 
     // Show animation
     isClicked.value = true;
@@ -46,7 +46,7 @@
 
     if (dismissEvent) {
       // Revert status bar color
-      if (isMobile) {
+      if (isAndroid) {
         await StatusBar.setBackgroundColor({ color: '#efeee9' });
       }
     }
