@@ -15,6 +15,7 @@
   } from '@ionic/vue';
   import { camera, home, fastFood, person } from 'ionicons/icons';
   import { Emitter } from "mitt";
+  import {Keyboard} from "@capacitor/keyboard";
 
   type Events = {
     cameraStatusChanged: boolean,
@@ -26,6 +27,7 @@
   const emitter: Emitter<Events> = inject('emitter')!;
 
   const isCameraActive = ref(false);
+  const isFabHidden = ref(false);
 
   onMounted(() => {
     emitter.on('cameraStatusChanged', (e: boolean) => {
@@ -36,6 +38,18 @@
   onBeforeUnmount(() => {
     emitter.off('cameraStatusChanged')
   });
+
+  // Keyboard events
+  // Hide fab button when the keyboard is shown
+  Keyboard.addListener('keyboardWillShow', () => {
+    isFabHidden.value = true;
+  })
+
+  Keyboard.addListener('keyboardWillHide', () => {
+    setTimeout(() => {
+      isFabHidden.value = false;
+    }, 100)
+  })
 
   const fabBottomStyle = computed(() => {
     if (Capacitor.isNativePlatform() && isPlatform('ios')) {
@@ -93,7 +107,7 @@
 
     <ion-fab slot="fixed" vertical="bottom" horizontal="center">
       <ion-fab-button id="scan-food-button"
-                      :class="{ active: isCameraActive }"
+                      :class="{ active: isCameraActive, hidden: isFabHidden }"
                       :style="{ bottom: fabBottomStyle }"
                       @click="handleCameraClick">
         <ion-icon aria-hidden="true" :icon="camera" />
