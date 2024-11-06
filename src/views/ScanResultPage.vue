@@ -2,7 +2,7 @@
   import { ref, computed } from "vue";
   import { useRouter } from "vue-router";
   import { vIntersectionObserver } from "@vueuse/components";
-  import { useScannerStore } from "@/store/useScannerStore";
+  import { useScannerStore } from "@/store/scanner";
   import {
     IonPage,
     IonContent,

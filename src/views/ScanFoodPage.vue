@@ -13,7 +13,7 @@
   } from "@capacitor-community/camera-preview";
   import { flashOutline, flashOffOutline, alertCircleOutline } from "ionicons/icons";
   import { useToastController } from "@/composables/useToastController";
-  import { useScannerStore } from "@/store/useScannerStore";
+  import { useScannerStore } from "@/store/scanner";
   import { Emitter } from "mitt";
   import ScannerToast from "@/components/ScannerToast.vue";
 
