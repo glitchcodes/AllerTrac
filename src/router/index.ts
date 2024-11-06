@@ -97,14 +97,17 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'scan-food',
+        name: 'scan-food',
         component: ScanFoodPage
       },
       {
         path: 'scan-results',
+        name: 'scan-results',
         component: ScanResultPage
       },
       {
         path: 'search',
+        name: 'meal-search',
         component: SearchFoodPage
       },
       {
