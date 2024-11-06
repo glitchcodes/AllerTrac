@@ -70,13 +70,13 @@
 <!--          <ion-label>Food</ion-label>-->
         </ion-tab-button>
       </ion-tab-bar>
-
-      <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-        <ion-fab-button id="scan-food-button" :class="{ active: isCameraActive }" @click="handleCameraClick">
-          <ion-icon aria-hidden="true" :icon="camera" />
-        </ion-fab-button>
-      </ion-fab>
     </ion-tabs>
+
+    <ion-fab slot="fixed" vertical="bottom" horizontal="center">
+      <ion-fab-button id="scan-food-button" :class="{ active: isCameraActive }" @click="handleCameraClick">
+        <ion-icon aria-hidden="true" :icon="camera" />
+      </ion-fab-button>
+    </ion-fab>
   </ion-page>
 </template>
 
