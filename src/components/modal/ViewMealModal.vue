@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from "vue";
+  import { ref, computed, onMounted } from "vue";
   import {
     IonContent,
     IonButton,
@@ -14,7 +14,9 @@
     SegmentCustomEvent,
     useBackButton
   } from "@ionic/vue";
+  import { Capacitor } from "@capacitor/core";
   import { Share } from "@capacitor/share";
+  import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
   import {
     alertCircle,
     arrowBack,
@@ -39,6 +41,12 @@
     meal: EdamamRecipe,
     links: EdamamLinks
   }>();
+
+  const statusBarHeight = ref();
+
+  onMounted(async () => {
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height
+  })
 
   const isBookmarked = computed(() => {
     return bookmarkStore._bookmarks.URIs.some(uri => uri.uri === props.meal.uri);
@@ -151,7 +159,8 @@
 
 <template>
   <ion-content class="ion-padding">
-    <nav class="navbar flex items-center mb-4">
+    <nav class="navbar flex items-center mb-4"
+         :style="{ marginTop: Capacitor.isNativePlatform() && isPlatform('ios') ? statusBarHeight + 'px' : '0' }">
       <ion-button shape="round" @click="dismissModal">
         <ion-icon slot="icon-only" :icon="arrowBack" />
       </ion-button>

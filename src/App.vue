@@ -23,6 +23,7 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from "vue";
   import { IonApp, IonRouterOutlet, IonProgressBar, isPlatform } from '@ionic/vue';
+  import { Capacitor } from "@capacitor/core";
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
   import { Network } from "@capacitor/network";
@@ -104,7 +105,7 @@
     const isWhitelistedPage = whitelistedPages.includes(newRoute);
     const isDarkStatusBar = darkStatusBarPages.includes(newRoute);
 
-    if (isPlatform('hybrid')) {
+    if (Capacitor.isNativePlatform() && isPlatform('android')) {
       const settings = {
         style: isDarkStatusBar ? Style.Dark : Style.Light,
         overlay: isAndroid ? isWhitelistedPage : false

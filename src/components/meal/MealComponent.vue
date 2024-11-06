@@ -5,6 +5,7 @@
   import ViewMealModal from "@/components/modal/ViewMealModal.vue";
 
   import type {EdamamLinks, EdamamRecipe} from "@/types/Edamam";
+  import {Capacitor} from "@capacitor/core";
 
   const isClicked = ref<boolean>(false);
 
@@ -14,7 +15,7 @@
   }>();
 
   const openMealModal = async () => {
-    const isMobile = isPlatform('capacitor');
+    const isAndroid = Capacitor.isNativePlatform && isPlatform('android');
 
     // Show animation
     isClicked.value = true;
@@ -24,7 +25,7 @@
     }, 300);
 
     // Change status bar color to white
-    if (isMobile) {
+    if (isAndroid) {
       await StatusBar.setBackgroundColor({ color: '#ffffff' });
     }
 

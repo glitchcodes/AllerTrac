@@ -1,7 +1,18 @@
 <script setup lang="ts">
   import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
   import { useRoute, useRouter } from "vue-router";
-  import { IonTabBar, IonTabButton, IonTabs, IonFab, IonFabButton, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
+  import { Capacitor } from "@capacitor/core";
+  import {
+    IonTabBar,
+    IonTabButton,
+    IonTabs,
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    IonPage,
+    IonRouterOutlet,
+    isPlatform
+  } from '@ionic/vue';
   import { camera, home, fastFood, person } from 'ionicons/icons';
   import { Emitter } from "mitt";
 
@@ -24,11 +35,19 @@
 
   onBeforeUnmount(() => {
     emitter.off('cameraStatusChanged')
+  });
+
+  const fabBottomStyle = computed(() => {
+    if (Capacitor.isNativePlatform() && isPlatform('ios')) {
+      return '2.3rem';
+    }
+
+    return '10px';
   })
 
   const currentPage = computed(() => {
     return route.path
-  })
+  });
 
   const handleCameraClick = () => {
     // Navigate to scan food page
@@ -73,7 +92,10 @@
     </ion-tabs>
 
     <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-      <ion-fab-button id="scan-food-button" :class="{ active: isCameraActive }" @click="handleCameraClick">
+      <ion-fab-button id="scan-food-button"
+                      :class="{ active: isCameraActive }"
+                      :style="{ bottom: fabBottomStyle }"
+                      @click="handleCameraClick">
         <ion-icon aria-hidden="true" :icon="camera" />
       </ion-fab-button>
     </ion-fab>
@@ -114,6 +136,5 @@
 
   #scan-food-button {
     position: relative;
-    bottom: 10px;
   }
 </style>

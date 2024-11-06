@@ -4,6 +4,7 @@
   import { IonContent, IonPage, IonButton, IonIcon, onIonViewDidEnter, onIonViewWillLeave, isPlatform } from "@ionic/vue";
   import { Capacitor } from "@capacitor/core";
   import { Preferences } from "@capacitor/preferences";
+  import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
   import {
     CameraPreview,
     CameraPreviewFlashMode,
@@ -24,8 +25,14 @@
   const toastController = useToastController();
   const router = useRouter();
   const scannerStore = useScannerStore();
+
+  const statusBarHeight = ref();
+
+  onMounted(async () => {
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height
+  })
+
   const flashMode = ref<CameraPreviewFlashMode>('off');
-  // const supportedFlashModes = ref<CameraPreviewFlashMode[]>([]);
 
   const isToastDismissed = ref(false);
 
@@ -114,12 +121,17 @@
 
 <template>
   <ion-page>
-    <ion-content :fullscreen="true">
-      <ScannerToast v-if="!isToastDismissed" @dismiss="updateToastStatus" />
+    <ion-content class="relative" :fullscreen="true">
+      <div :style="{ marginTop: Capacitor.isNativePlatform() && isPlatform('ios') ? statusBarHeight + 'px' : '0' }">
+        <ScannerToast v-if="!isToastDismissed" @dismiss="updateToastStatus" />
+      </div>
       <img class="camera-stencil" src="/images/camera-stencil.png" alt="Camera Stencil" />
       <div id="camera-preview"></div>
 
-      <div class="absolute z-[1001] bottom-[80px] right-[20px]">
+      <div class="absolute z-[1001] bottom-[80px] right-[20px]"
+           :class="{
+              '!bottom-[100px]': Capacitor.isNativePlatform() && isPlatform('ios')
+           }">
         <ion-button v-if="flashMode === 'off'" shape="round" color="tertiary" @click="setFlashMode('on')">
           <ion-icon slot="icon-only" :icon="flashOffOutline" aria-label="Flash off" />
         </ion-button>
