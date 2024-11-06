@@ -10,7 +10,7 @@
     CameraPreviewOptions,
     CameraPreviewPictureOptions
   } from "@capacitor-community/camera-preview";
-  import { flashOutline, flashOffOutline } from "ionicons/icons";
+  import { flashOutline, flashOffOutline, alertCircleOutline } from "ionicons/icons";
   import { useToastController } from "@/composables/useToastController";
   import { useScannerStore } from "@/store/useScannerStore";
   import { Emitter } from "mitt";
@@ -38,20 +38,21 @@
       supportedFlashModes = flashModes.result;
     }
 
-    if (supportedFlashModes.includes(mode)) {
-      flashMode.value = mode;
-      await CameraPreview.setFlashMode({
-        flashMode: flashMode.value
-      });
+    if (!supportedFlashModes.includes(mode)) {
+      console.error('Unsupported flash mode');
 
-      return;
+      return toastController.presentToast({
+        message: 'Unsupported flash mode',
+        position: 'top',
+        icon: alertCircleOutline,
+        duration: 3000
+      });
     }
 
-    console.error('Unsupported flash mode');
-    return toastController.presentToast({
-      message: 'Unsupported flash mode',
-      duration: 3000
-    })
+    flashMode.value = mode;
+    await CameraPreview.setFlashMode({
+      flashMode: flashMode.value
+    });
   }
 
   const checkToastStatus = async () => {
