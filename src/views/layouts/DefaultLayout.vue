@@ -41,15 +41,17 @@
 
   // Keyboard events
   // Hide fab button when the keyboard is shown
-  Keyboard.addListener('keyboardWillShow', () => {
-    isFabHidden.value = true;
-  })
+  if (Capacitor.isNativePlatform()) {
+    Keyboard.addListener('keyboardWillShow', () => {
+      isFabHidden.value = true;
+    })
 
-  Keyboard.addListener('keyboardWillHide', () => {
-    setTimeout(() => {
-      isFabHidden.value = false;
-    }, 100)
-  })
+    Keyboard.addListener('keyboardWillHide', () => {
+      setTimeout(() => {
+        isFabHidden.value = false;
+      }, 100)
+    });
+  }
 
   const fabBottomStyle = computed(() => {
     if (Capacitor.isNativePlatform() && isPlatform('ios')) {
