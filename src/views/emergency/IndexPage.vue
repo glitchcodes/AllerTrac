@@ -102,7 +102,7 @@
 
           <div class="border-t-[1px] border-gray-300 w-1/2 my-5" :key="'border'"></div>
 
-          <ion-button shape="round" :key="'button'">
+          <ion-button shape="round" :key="'button'" router-link="/pages/emergency/hospitals" router-direction="forward" >
             Locate nearby hospitals
           </ion-button>
         </transition-group>
