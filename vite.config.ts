@@ -11,7 +11,7 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => ['capacitor-google-map'].includes(tag)
+          isCustomElement: (tag) => ['capacitor-google-map', 'ion-drawer'].includes(tag)
         }
       }
     }),

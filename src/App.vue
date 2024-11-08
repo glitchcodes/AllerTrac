@@ -94,7 +94,7 @@
         '/u/password/reset',
         '/pages/scan-food',
         '/pages/scan-results',
-        '/pages/locator',
+        '/pages/emergency/hospitals',
         '/logout'
     ]
 
