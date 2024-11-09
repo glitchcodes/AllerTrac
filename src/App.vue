@@ -94,6 +94,7 @@
         '/u/password/reset',
         '/pages/scan-food',
         '/pages/scan-results',
+        '/pages/emergency/hospitals',
         '/logout'
     ]
 
@@ -114,10 +115,7 @@
       await StatusBar.setBackgroundColor({ color: '#efeee9' });
       await StatusBar.setStyle({ style: settings.style })
 
-
-      if (isAndroid) {
-        await StatusBar.setOverlaysWebView({ overlay: settings.overlay })
-      }
+      await StatusBar.setOverlaysWebView({ overlay: settings.overlay })
 
       if (!isWhitelistedPage) {
         await StatusBar.show();

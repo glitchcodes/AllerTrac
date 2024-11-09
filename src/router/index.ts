@@ -116,6 +116,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/emergency/IndexPage.vue')
       },
       {
+        path: 'emergency/hospitals',
+        name: 'emergency-locator',
+        component: () => import('@/views/emergency/LocatorPage.vue')
+      },
+      {
         path: 'alarm',
         name: 'user-alarms',
         component: () => import('@/views/profile/AlarmPage.vue')

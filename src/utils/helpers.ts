@@ -1,3 +1,5 @@
+import {LatLng} from "@capacitor/google-maps/dist/typings/definitions";
+
 export const phoneMaskOptions = {
   mask: ['0', '9', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/],
   elementPredicate: (el: HTMLIonInputElement) => {
@@ -61,4 +63,62 @@ export const blobToBase64 = (blob: Blob) => {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
+}
+
+export const buildAddressString = (addressComponents: { longText: string, shortText: string, types: string[] }[]) => {
+  const addressMap = {
+    street_number: '',
+    route: '',
+    locality: '',
+    administrative_area_level_1: '',
+    country: '',
+    postal_code: ''
+  };
+
+  // Populate the addressMap with the relevant address component values
+  addressComponents.forEach(component => {
+    if (component.types.includes('street_number')) {
+      addressMap.street_number = component.longText;
+    }
+    if (component.types.includes('route')) {
+      addressMap.route = component.longText;
+    }
+    if (component.types.includes('locality')) {
+      addressMap.locality = component.longText;
+    }
+    if (component.types.includes('administrative_area_level_1')) {
+      addressMap.administrative_area_level_1 = component.shortText;
+    }
+  });
+
+  // Construct the address string
+  return [
+    `${addressMap.street_number} ${addressMap.route}`.trim(),
+    addressMap.locality,
+    addressMap.administrative_area_level_1
+  ].filter(Boolean).join(', ');
+}
+
+/**
+ * Calculate distance between two points
+ *
+ * Uses Haversine formula
+ * https://mapsplatform.google.com/resources/blog/how-calculate-distances-map-maps-javascript-api/
+ *
+ * @param pos1
+ * @param pos2
+ */
+export const calculateDistance = (pos1: LatLng, pos2: LatLng) => {
+  const R = 3958.8; // Radius of the Earth in miles
+  const rlat1 = pos1.lat * (Math.PI/180); // Convert degrees to radians
+  const rlat2 = pos2.lat * (Math.PI/180); // Convert degrees to radians
+  const difflat = rlat2-rlat1; // Radian difference (latitudes)
+  const difflon = (pos2.lng - pos1.lng) * (Math.PI/180); // Radian difference (longitudes)
+
+  const d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat / 2) * Math.sin(difflat / 2) + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(difflon / 2) * Math.sin(difflon / 2)));
+
+  // Convert miles to km
+  const km = d * 1.609;
+
+  return km.toFixed(2);
 }
