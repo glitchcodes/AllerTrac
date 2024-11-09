@@ -150,7 +150,10 @@
     await drawer.value.present()
 
     // Move the camera into current position
-    await moveCameraToCurrentPosition()
+    await moveCamera({
+      lat: currentPosition.value.lat,
+      lng: currentPosition.value.lng,
+    }, 15);
 
     // await openSheetModal();
     await dismissLoading();
@@ -185,13 +188,13 @@
   }
 
   // Move the camera into the current position
-  const moveCameraToCurrentPosition = async () => {
+  const moveCamera = async (coords: LatLng, zoom: number) => {
     await map.setCamera({
       coordinate: {
-        lat: currentPosition.value!.lat,
-        lng: currentPosition.value!.lng
+        lat: coords.lat,
+        lng: coords.lng
       },
-      zoom: 15,
+      zoom: zoom,
       animate: true
     })
   }
@@ -292,21 +295,22 @@
             </ion-content>
           </ion-popover>
 
-          <ion-list v-if="hospitals.length > 0" lines="none">
+          <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
             <ion-item v-for="hospital in hospitals"
                       :key="hospital.id"
                       color="light"
                       class="rounded-lg shadow mb-3"
                       button
+                      @click="async () => await moveCamera({ lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }, 18)"
             >
               <ion-icon slot="start" icon="/icons/building-office.svg" aria-label="Navigate Icon" />
               <ion-label>
                 <h2 class="font-bold">
                   {{ hospital.Eg.displayName }}
                 </h2>
-                <small>
+                <p class="text-xs leading-tight !text-black/75">
                   {{ buildAddressString(hospital.Eg.addressComponents) }}
-                </small>
+                </p>
               </ion-label>
               <ion-badge slot="end">
                 {{ calculateDistance(currentPosition!, { lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }) }}km
