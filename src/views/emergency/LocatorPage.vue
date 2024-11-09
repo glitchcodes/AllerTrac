@@ -109,7 +109,7 @@
 
     // Instantiate cupertino pane
     drawer.value = new CupertinoPane('ion-drawer', {
-      parentElement: '#hospital-locator',
+      // parentElement: '#hospital-locator',
       buttonDestroy: false,
       bottomOffset: 56,
       touchMoveStopPropagation: true,
@@ -200,16 +200,19 @@
   }
 
   // Remove markers
-  const removeMarkers = async () => {
+  const removeMarkers = () => {
     if (markers.value.length > 0) {
-      await map.removeMarkers(markers.value);
+      markers.value.forEach(async (marker) => {
+        await map.removeMarker(marker)
+      })
+
       markers.value = [];
     }
   }
 
   const locateHospitals = async () => {
     // Remove any markers on the map
-    await removeMarkers();
+    removeMarkers();
 
     // Convert distance (km) to meters
     const radius = searchDistance.value * 1000;
@@ -242,6 +245,8 @@
       markers.value.push(markerId);
     }
 
+    // console.log(markers.value)
+
     return places;
   }
 </script>
@@ -267,58 +272,60 @@
     <ion-content>
       <capacitor-google-map ref="mapRef"></capacitor-google-map>
 
-      <ion-drawer class="hospital-drawer">
-        <div class="ion-padding">
+      <div>
+        <ion-drawer class="hospital-drawer">
+          <div class="ion-padding">
 
-          <div class="flex items-center mb-6">
-            <h1 class="text-2xl font-bold flex-1">
-              Nearby Hospitals
-            </h1>
-            <ion-button shape="round" color="tertiary" id="search-options">
-              <ion-icon slot="icon-only" :icon="optionsOutline" aria-label="Options" />
-            </ion-button>
-          </div>
+            <div class="flex items-center mb-6">
+              <h1 class="text-2xl font-bold flex-1">
+                Nearby Hospitals
+              </h1>
+              <ion-button shape="round" color="tertiary" id="search-options">
+                <ion-icon slot="icon-only" :icon="optionsOutline" aria-label="Options" />
+              </ion-button>
+            </div>
 
-          <ion-popover trigger="search-options" trigger-action="click">
-            <ion-content class="ion-padding ">
-              <p class="mb-3">
-                Search distance
-              </p>
-              <ion-radio-group :value="searchDistance" @ionChange="handleDistanceChange">
-                <ion-item lines="none" color="light" class="rounded-lg shadow mb-3">
-                  <ion-radio :value="5" justify="space-between">5km</ion-radio>
-                </ion-item>
-                <ion-item lines="none" color="light" class="rounded-lg shadow">
-                  <ion-radio :value="10" justify="space-between">10km</ion-radio>
-                </ion-item>
-              </ion-radio-group>
-            </ion-content>
-          </ion-popover>
-
-          <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
-            <ion-item v-for="hospital in hospitals"
-                      :key="hospital.id"
-                      color="light"
-                      class="rounded-lg shadow mb-3"
-                      button
-                      @click="async () => await moveCamera({ lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }, 18)"
-            >
-              <ion-icon slot="start" icon="/icons/building-office.svg" aria-label="Navigate Icon" />
-              <ion-label>
-                <h2 class="font-bold">
-                  {{ hospital.Eg.displayName }}
-                </h2>
-                <p class="text-xs leading-tight !text-black/75">
-                  {{ buildAddressString(hospital.Eg.addressComponents) }}
+            <ion-popover trigger="search-options" trigger-action="click">
+              <ion-content class="ion-padding ">
+                <p class="mb-3">
+                  Search distance
                 </p>
-              </ion-label>
-              <ion-badge slot="end">
-                {{ calculateDistance(currentPosition!, { lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }) }}km
-              </ion-badge>
-            </ion-item>
-          </ion-list>
-        </div>
-      </ion-drawer>
+                <ion-radio-group :value="searchDistance" @ionChange="handleDistanceChange">
+                  <ion-item lines="none" color="light" class="rounded-lg shadow mb-3">
+                    <ion-radio :value="5" justify="space-between">5km</ion-radio>
+                  </ion-item>
+                  <ion-item lines="none" color="light" class="rounded-lg shadow">
+                    <ion-radio :value="10" justify="space-between">10km</ion-radio>
+                  </ion-item>
+                </ion-radio-group>
+              </ion-content>
+            </ion-popover>
+
+            <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
+              <ion-item v-for="hospital in hospitals"
+                        :key="hospital.id"
+                        color="light"
+                        class="rounded-lg shadow mb-3"
+                        button
+                        @click="async () => await moveCamera({ lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }, 18)"
+              >
+                <ion-icon slot="start" icon="/icons/building-office.svg" aria-label="Navigate Icon" />
+                <ion-label>
+                  <h2 class="font-bold">
+                    {{ hospital.Eg.displayName }}
+                  </h2>
+                  <p class="text-xs leading-tight !text-black/75">
+                    {{ buildAddressString(hospital.Eg.addressComponents) }}
+                  </p>
+                </ion-label>
+                <ion-badge slot="end">
+                  {{ calculateDistance(currentPosition!, { lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }) }}km
+                </ion-badge>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-drawer>
+      </div>
     </ion-content>
   </ion-page>
 </template>
