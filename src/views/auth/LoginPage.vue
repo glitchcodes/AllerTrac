@@ -106,8 +106,10 @@
           icon: alertCircle
         })
       } else {
+        console.error(error)
+
         await toast.presentToast({
-          message: 'Error: ' + error,
+          message: (error as Error).message,
           duration: 5000,
           icon: alertCircle
         })

@@ -17,6 +17,7 @@
   import { alertCircle, arrowBack, key, mailOutline } from "ionicons/icons";
   import { OverlayEventDetail } from '@ionic/core/components';
   import { StatusBar, Style } from "@capacitor/status-bar";
+  import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
   import { useRouter } from "vue-router";
   import { useToastController } from "@/composables/useToastController";
   import { useGoogleAuth } from "@/composables/useGoogleAuth";
@@ -33,9 +34,13 @@
   const auth = useAuthStore();
   const googleAuth = useGoogleAuth()
 
+  const statusBarHeight = ref<number>(0);
+
   // Initialize Google Auth
-  onMounted(() => {
-    googleAuth.initialize()
+  onMounted(async () => {
+    await googleAuth.initialize();
+
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height
   })
 
   // States
@@ -183,8 +188,10 @@
           icon: alertCircle
         })
       } else {
+        console.error(error)
+
         await toast.presentToast({
-          message: 'Error: ' + error,
+          message: (error as Error).message,
           duration: 5000,
           icon: alertCircle
         })
@@ -215,99 +222,96 @@
 
 <template>
   <ion-page>
-    <ion-content>
+    <ion-content class="ion-padding">
+      <div class="flex flex-col items-center justify-center gap-4" :style="{ marginTop: `${statusBarHeight}px` }">
+        <LogoComponent />
 
-      <div class="h-full px-4">
-        <div class="flex flex-col h-full items-center justify-center gap-4">
-          <LogoComponent />
+        <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 
-          <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
+          <h5 class="text-primary text-2xl font-bold text-center">
+            Sign Up
+          </h5>
 
-            <h5 class="text-primary text-2xl font-bold text-center">
-              Sign Up
-            </h5>
+          <form class="mt-8 mb-10" @submit.prevent="submitForm">
+            <div class="flex flex-col gap-4 text-left">
+              <!-- Email Address -->
+              <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email" :errors="inputErrors.email">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="mailOutline" />
+                </template>
+              </InputComponent>
+              <!-- END Email Address -->
 
-            <form class="mt-8 mb-10" @submit.prevent="submitForm">
-              <div class="flex flex-col gap-4 text-left">
-                <!-- Email Address -->
-                <InputComponent v-model="email" placeholder="Email Address" type="email" data-cy="email" :errors="inputErrors.email">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="mailOutline" />
-                  </template>
-                </InputComponent>
-                <!-- END Email Address -->
+              <!-- Password -->
+              <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password" :errors="inputErrors.password">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="key" />
+                </template>
+              </InputComponent>
+              <!-- END Password -->
 
-                <!-- Password -->
-                <InputComponent v-model="password" placeholder="Password" type="password" data-cy="password" :errors="inputErrors.password">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="key" />
-                  </template>
-                </InputComponent>
-                <!-- END Password -->
+              <!-- Password -->
+              <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" data-cy="confirm-password" :errors="inputErrors.password_confirmation">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="key" />
+                </template>
+              </InputComponent>
+              <!-- END Password -->
 
-                <!-- Password -->
-                <InputComponent v-model="confirmPassword" placeholder="Confirm password" type="password" data-cy="confirm-password" :errors="inputErrors.password_confirmation">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="key" />
-                  </template>
-                </InputComponent>
-                <!-- END Password -->
+              <ion-checkbox v-model="tosAgreed" label-placement="end" justify="start" data-cy="tos-checkbox">
+                <p class="ion-text-wrap">
+                  I agree to AllerTrac's <a @click="$event.stopPropagation()" id="open-tos-modal">Terms & Conditions</a>
+                </p>
+              </ion-checkbox>
 
-                <ion-checkbox v-model="tosAgreed" label-placement="end" justify="start" data-cy="tos-checkbox">
-                  <p class="ion-text-wrap">
-                    I agree to AllerTrac's <a @click="$event.stopPropagation()" id="open-tos-modal">Terms & Conditions</a>
-                  </p>
-                </ion-checkbox>
+              <ion-checkbox v-model="privacyAgreed" label-placement="end" justify="start" data-cy="privacy-checkbox">
+                <p class="ion-text-wrap">
+                  I agree to AllerTrac's <a id="open-privacy-modal" @click.stop>Privacy Policy</a>
+                </p>
+              </ion-checkbox>
+            </div>
 
-                <ion-checkbox v-model="privacyAgreed" label-placement="end" justify="start" data-cy="privacy-checkbox">
-                  <p class="ion-text-wrap">
-                    I agree to AllerTrac's <a id="open-privacy-modal" @click.stop>Privacy Policy</a>
-                  </p>
-                </ion-checkbox>
-              </div>
+            <ion-button v-if="!isSubmitting" class="mt-4" expand="block" shape="round" type="submit" data-cy="submit">
+              Sign up
+            </ion-button>
 
-              <ion-button v-if="!isSubmitting" class="mt-4" expand="block" shape="round" type="submit" data-cy="submit">
-                Sign up
-              </ion-button>
-
-              <ion-button v-if="isSubmitting" class="mt-4" expand="block" shape="round" disabled>
+            <ion-button v-if="isSubmitting" class="mt-4" expand="block" shape="round" disabled>
                 <span class="mr-2">
                   Please wait...
                 </span>
-                <ion-spinner name="circular"></ion-spinner>
-              </ion-button>
+              <ion-spinner name="circular"></ion-spinner>
+            </ion-button>
 
-            </form>
+          </form>
 
-            <!-- OAuth Providers -->
-            <div class="border-t-[1px] border-gray-300"></div>
+          <!-- OAuth Providers -->
+          <div class="border-t-[1px] border-gray-300"></div>
 
-            <p class="inline-block bg-white relative text-center left-1/2 -top-[13px] -translate-x-1/2 px-2">
-              Or login with
-            </p>
+          <p class="inline-block bg-white relative text-center left-1/2 -top-[13px] -translate-x-1/2 px-2">
+            Or login with
+          </p>
 
-            <div class="mt-4 mb-6">
-              <ion-button v-if="!isLoggingInWithGoogle" class="oauth" expand="block" shape="round" fill="outline" @click="handleGoogleAuth">
-                <img src="/icons/google-logo.svg" alt="Google Logo" />
-                <span class="ml-3">
+          <div class="mt-4 mb-6">
+            <ion-button v-if="!isLoggingInWithGoogle" class="oauth" expand="block" shape="round" fill="outline" @click="handleGoogleAuth">
+              <img src="/icons/google-logo.svg" alt="Google Logo" />
+              <span class="ml-3">
                   Continue with Google
                 </span>
-              </ion-button>
+            </ion-button>
 
-              <ion-button v-else class="oauth" expand="block" shape="round" fill="outline" disabled>
-                <img src="/icons/google-logo.svg" alt="Google Logo" />
-                <span class="ml-3 mr-2">
+            <ion-button v-else class="oauth" expand="block" shape="round" fill="outline" disabled>
+              <img src="/icons/google-logo.svg" alt="Google Logo" />
+              <span class="ml-3 mr-2">
                   Logging into Google...
                 </span>
-                <ion-spinner name="circular"></ion-spinner>
-              </ion-button>
-            </div>
-            <!-- END OAuth Providers -->
-
-            <p class="text-center">
-              Already have an account? <router-link :to="{ name: 'login' }" class="font-bold hover:underline">Sign In</router-link>
-            </p>
+              <ion-spinner name="circular"></ion-spinner>
+            </ion-button>
           </div>
+          <!-- END OAuth Providers -->
+
+          <p class="text-center">
+            Already have an account? <router-link :to="{ name: 'login' }" class="font-bold hover:underline">Sign In</router-link>
+          </p>
         </div>
       </div>
 

@@ -83,70 +83,68 @@
 
 <template>
   <ion-page>
-    <ion-content>
-      <div class="h-full px-4">
-        <div class="flex flex-col h-full items-center justify-center gap-4">
-          <!-- <LogoComponent /> -->
+    <ion-content class="ion-padding">
+      <div class="flex flex-col items-center justify-center gap-4">
+        <!-- <LogoComponent /> -->
 
-          <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
+        <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 
-            <h5 class="text-primary text-2xl font-bold text-center">
-              Welcome to AllerTrac!
-            </h5>
+          <h5 class="text-primary text-2xl font-bold text-center">
+            Welcome to AllerTrac!
+          </h5>
 
-            <div class="my-8">
-              <img class="w-[220px]" src="/images/onboarding-welcome-1.png" alt="Dialogue Box" />
-              <img class="w-[160px] ml-auto" src="/images/onboarding-welcome-2.png" alt="Dialogue Box" />
+          <div class="my-8">
+            <img class="w-[220px]" src="/images/onboarding-welcome-1.png" alt="Dialogue Box" />
+            <img class="w-[160px] ml-auto" src="/images/onboarding-welcome-2.png" alt="Dialogue Box" />
+          </div>
+
+          <form @submit.prevent="submitForm">
+            <div class="flex flex-col gap-4 text-left mb-6">
+              <!-- First name -->
+              <TextInput v-model="first_name" placeholder="First name" type="text" :errors="inputErrors.first_name">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="person" />
+                </template>
+              </TextInput>
+              <!-- END First name -->
+
+              <!-- Last name -->
+              <TextInput v-model="last_name" placeholder="Last name" type="text" :errors="inputErrors.last_name">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="person" />
+                </template>
+              </TextInput>
+              <!-- END Last name -->
+
+              <!-- Phone number -->
+              <TextInput v-model="phone_number" placeholder="Phone number" type="text" :errors="inputErrors.last_name">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="call" />
+                </template>
+              </TextInput>
+              <!-- END Last name -->
+
+              <!-- Birthday -->
+              <DatePickerInput v-model="birthday" placeholder="Birthday" :errors="inputErrors.birthday">
+                <template v-slot:icon>
+                  <ion-icon aria-hidden="true" :icon="today" />
+                </template>
+              </DatePickerInput>
+              <!-- END Birthday -->
             </div>
 
-            <form @submit.prevent="submitForm">
-              <div class="flex flex-col gap-4 text-left mb-6">
-                <!-- First name -->
-                <TextInput v-model="first_name" placeholder="First name" type="text" :errors="inputErrors.first_name">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="person" />
-                  </template>
-                </TextInput>
-                <!-- END First name -->
+            <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit" data-cy="submit">
+              Next
+            </ion-button>
 
-                <!-- Last name -->
-                <TextInput v-model="last_name" placeholder="Last name" type="text" :errors="inputErrors.last_name">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="person" />
-                  </template>
-                </TextInput>
-                <!-- END Last name -->
-
-                <!-- Phone number -->
-                <TextInput v-model="phone_number" placeholder="Phone number" type="text" :errors="inputErrors.last_name">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="call" />
-                  </template>
-                </TextInput>
-                <!-- END Last name -->
-
-                <!-- Birthday -->
-                <DatePickerInput v-model="birthday" placeholder="Birthday" :errors="inputErrors.birthday">
-                  <template v-slot:icon>
-                    <ion-icon aria-hidden="true" :icon="today" />
-                  </template>
-                </DatePickerInput>
-                <!-- END Birthday -->
-              </div>
-
-              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit" data-cy="submit">
-                Next
-              </ion-button>
-
-              <ion-button v-if="isSubmitting" expand="block" shape="round" disabled>
+            <ion-button v-if="isSubmitting" expand="block" shape="round" disabled>
                 <span class="mr-2">
                   Please wait...
                 </span>
-                <ion-spinner name="circular"></ion-spinner>
-              </ion-button>
-            </form>
+              <ion-spinner name="circular"></ion-spinner>
+            </ion-button>
+          </form>
 
-          </div>
         </div>
       </div>
     </ion-content>
