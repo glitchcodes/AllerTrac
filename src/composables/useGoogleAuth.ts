@@ -58,9 +58,8 @@ export const useGoogleAuth = () => {
       email: response.profile.email,
       first_name: response.profile.givenName,
       last_name: response.profile.familyName,
+      access_token: response.accessToken!.token,
       provider: 'google',
-      account_id: response.profile.id,
-      id_token: response.idToken,
       device_type: Capacitor.getPlatform()
     });
   }
