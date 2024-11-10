@@ -157,9 +157,9 @@
     isLoggingInWithGoogle.value = true;
 
     // Sign in with Google
-    const data = await googleAuth.signIn();
-
     try {
+      const data = await googleAuth.signIn();
+
       const result = await useFetchAPI({
         url: '/auth/login-oauth',
         method: 'POST',
@@ -183,7 +183,11 @@
           icon: alertCircle
         })
       } else {
-        console.error(error);
+        await toast.presentToast({
+          message: 'Error: ' + error,
+          duration: 5000,
+          icon: alertCircle
+        })
       }
     }
 
