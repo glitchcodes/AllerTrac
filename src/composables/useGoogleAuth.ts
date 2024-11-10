@@ -1,6 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { GoogleLoginOnlineResponse, SocialLogin } from "@capgo/capacitor-social-login";
-import { alertController } from "@ionic/vue";
+// import { alertController } from "@ionic/vue";
 
 export const useGoogleAuth = () => {
   const initialize = async () => {
