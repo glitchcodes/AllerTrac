@@ -16,27 +16,27 @@ export const useGoogleAuth = () => {
   }
 
   const signIn =  async () => {
-    if (!Capacitor.isNativePlatform()) {
-      const alert = await alertController.create({
-        header: 'Not available',
-        message: 'Google login is not available in web platform.',
-        buttons: [
-          {
-            text: 'OK',
-            role: 'confirm'
-          }
-        ]
-      });
-
-      await alert.present();
-
-      throw new Error('Not implemented');
-    }
+    // if (!Capacitor.isNativePlatform()) {
+    //   const alert = await alertController.create({
+    //     header: 'Not available',
+    //     message: 'Google login is not available in web platform.',
+    //     buttons: [
+    //       {
+    //         text: 'OK',
+    //         role: 'confirm'
+    //       }
+    //     ]
+    //   });
+    //
+    //   await alert.present();
+    //
+    //   throw new Error('Not implemented');
+    // }
 
     const res = await SocialLogin.login({
       provider: 'google',
       options: {
-        scopes: ['email', 'profile'],
+        // scopes: ['email', 'profile'],
       },
     });
 
