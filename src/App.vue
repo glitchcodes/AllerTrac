@@ -39,10 +39,6 @@
   const networkStore = useNetworkStore();
   const allergenStore = useAllergenStore();
 
-/*  const injectSafeAreaVariables = () => {
-    SafeAreaController.injectCSSVariables();
-  };*/
-
   const isInitializing = ref<boolean>(true);
 
   onMounted(async () => {
@@ -92,6 +88,9 @@
         '/u/password/forget',
         '/u/password/verify',
         '/u/password/reset',
+        '/o/welcome',
+        '/o/allergies',
+        '/o/congrats',
         '/pages/scan-food',
         '/pages/scan-results',
         '/pages/emergency/hospitals',

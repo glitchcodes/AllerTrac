@@ -1,6 +1,7 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { ref, onMounted } from "vue";
   import { IonContent, IonPage, IonButton } from "@ionic/vue";
+  import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
   import { useRouter } from "vue-router";
   import { useAllergenForm } from "@/composables/useAllergenForm";
   import AllergenSelector from "@/components/AllergenSelector.vue";
@@ -11,6 +12,11 @@
   const { updateAllergens } = useAllergenForm()
 
   const allergens = ref<Allergen[]>();
+  const statusBarHeight = ref<number>(0);
+
+  onMounted(async () => {
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height;
+  })
 
   const handleSubmitForm = async () => {
     try {
@@ -30,7 +36,7 @@
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <div class="flex flex-col items-center justify-center gap-4">
+      <div class="flex flex-col items-center justify-center gap-4"  :style="{ marginTop: `${statusBarHeight}px` }">
         <!-- <LogoComponent /> -->
 
         <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">

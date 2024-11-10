@@ -4,11 +4,14 @@
 
   import { IonPage, IonContent, IonIcon, IonButton, IonSpinner } from '@ionic/vue';
   import { person, call, today, alertCircle } from "ionicons/icons";
-  import TextInput from "@/components/auth/input/TextInput.vue";
+  import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
 
-  import DatePickerInput from "@/components/auth/input/DatePickerInput.vue";
   import { useToastController } from "@/composables/useToastController";
   import { useFetchAPI } from "@/composables/useFetchAPI";
+
+  import TextInput from "@/components/auth/input/TextInput.vue";
+  import DatePickerInput from "@/components/auth/input/DatePickerInput.vue";
+
   import FetchError from "@/utils/errors/FetchError";
 
   const router = useRouter();
@@ -23,8 +26,12 @@
   const phone_number = ref<string>('');
   const birthday = ref<string>('');
 
+  const statusBarHeight = ref<number>(0);
+
   // Get current user information
   onMounted(async () => {
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height;
+
     try {
       const response = await useFetchAPI({
         url: '/user/miniature',
@@ -84,7 +91,7 @@
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <div class="flex flex-col items-center justify-center gap-4">
+      <div class="flex flex-col items-center justify-center gap-4" :style="{ marginTop: `${statusBarHeight}px` }">
         <!-- <LogoComponent /> -->
 
         <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
