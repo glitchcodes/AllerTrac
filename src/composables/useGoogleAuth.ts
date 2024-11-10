@@ -1,6 +1,6 @@
 import { Capacitor } from "@capacitor/core";
-import { GoogleLoginResponse, SocialLogin } from "@capgo/capacitor-social-login";
-import { alertController } from "@ionic/vue";
+import { GoogleLoginOnlineResponse, SocialLogin } from "@capgo/capacitor-social-login";
+// import { alertController } from "@ionic/vue";
 
 export const useGoogleAuth = () => {
   const initialize = async () => {
@@ -16,36 +16,36 @@ export const useGoogleAuth = () => {
   }
 
   const signIn =  async () => {
-    if (!Capacitor.isNativePlatform()) {
-      const alert = await alertController.create({
-        header: 'Not available',
-        message: 'Google login is not available in web platform.',
-        buttons: [
-          {
-            text: 'OK',
-            role: 'confirm'
-          }
-        ]
-      });
-
-      await alert.present();
-
-      throw new Error('Not implemented');
-    }
+    // if (!Capacitor.isNativePlatform()) {
+    //   const alert = await alertController.create({
+    //     header: 'Not available',
+    //     message: 'Google login is not available in web platform.',
+    //     buttons: [
+    //       {
+    //         text: 'OK',
+    //         role: 'confirm'
+    //       }
+    //     ]
+    //   });
+    //
+    //   await alert.present();
+    //
+    //   throw new Error('Not implemented');
+    // }
 
     const res = await SocialLogin.login({
       provider: 'google',
       options: {
-        scopes: ['email', 'profile'],
+        // scopes: ['email', 'profile'],
       },
     });
 
-    const response = res.result as GoogleLoginResponse
+    const response = res.result as GoogleLoginOnlineResponse
 
     return JSON.stringify({
-      email: response.profile.email,
-      first_name: response.profile.givenName,
-      last_name: response.profile.familyName,
+      email: response.profile?.email,
+      first_name: response.profile?.givenName,
+      last_name: response.profile?.familyName,
       access_token: response.accessToken!.token,
       provider: 'google',
       device_type: Capacitor.getPlatform()
