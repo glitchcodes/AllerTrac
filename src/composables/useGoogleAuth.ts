@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { GoogleLoginResponse, SocialLogin } from "@capgo/capacitor-social-login";
+import { GoogleLoginOnlineResponse, SocialLogin } from "@capgo/capacitor-social-login";
 import { alertController } from "@ionic/vue";
 
 export const useGoogleAuth = () => {
@@ -40,12 +40,12 @@ export const useGoogleAuth = () => {
       },
     });
 
-    const response = res.result as GoogleLoginResponse
+    const response = res.result as GoogleLoginOnlineResponse
 
     return JSON.stringify({
-      email: response.profile.email,
-      first_name: response.profile.givenName,
-      last_name: response.profile.familyName,
+      email: response.profile?.email,
+      first_name: response.profile?.givenName,
+      last_name: response.profile?.familyName,
       access_token: response.accessToken!.token,
       provider: 'google',
       device_type: Capacitor.getPlatform()
