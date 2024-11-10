@@ -13,11 +13,20 @@
     IonTitle,
     IonButtons,
     IonSpinner,
+    IonPopover,
+    IonListHeader,
+    IonList,
+    IonItem,
     isPlatform,
-    SegmentCustomEvent
+    SegmentCustomEvent, useIonRouter
   } from '@ionic/vue';
-  import { createOutline, logOutOutline } from 'ionicons/icons';
-  import { useRouter } from 'vue-router'
+  import {
+    createOutline,
+    ellipsisHorizontal,
+    keyOutline,
+    logOut,
+    menu
+  } from 'ionicons/icons';
   import { useAuthStore } from "@/store/auth";
   import { useAlertController } from "@/composables/useAlertController";
 
@@ -29,9 +38,12 @@
   // Lazy-load
   const ProfileCard = defineAsyncComponent(() => import("@/components/profile/ProfileCard.vue"));
 
-  const router = useRouter();
+  const ionRouter = useIonRouter();
   const authStore = useAuthStore();
   const alertController = useAlertController();
+
+  const isMenuOpen = ref<boolean>(false);
+  const popoverEvent = ref<Event|null>();
 
   const segments: any = {
     AllergensSegment,
@@ -47,6 +59,18 @@
     }
   }
 
+  const openMenu = (e: Event) => {
+    isMenuOpen.value = true;
+    popoverEvent.value = e;
+  }
+
+  const navigateToPage = (url: string) => {
+    ionRouter.navigate(url, 'forward', 'push');
+
+    isMenuOpen.value = false;
+    popoverEvent.value = null;
+  }
+
   const handleLogout = async () => {
     // Show alert to confirm changes
     await alertController.presentAlert({
@@ -60,12 +84,15 @@
         {
           text: 'Yes',
           role: 'confirm',
-          handler: async () => {
-            await router.push({ name: 'logout' })
+          handler: () => {
+            ionRouter.navigate('/logout', 'root', 'replace')
           }
         },
       ]
     })
+
+    isMenuOpen.value = false;
+    popoverEvent.value = null;
   }
 </script>
 
@@ -73,14 +100,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar v-if="isPlatform('ios')">
-        <ion-buttons slot="secondary">
-          <ion-button router-link="/pages/profile/edit" router-direction="forward">
-            <ion-icon slot="icon-only" :icon="createOutline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
         <ion-buttons slot="primary">
-          <ion-button @click="handleLogout">
-            <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
+          <ion-button @click="openMenu($event)">
+            <ion-icon slot="icon-only" :icon="ellipsisHorizontal"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Profile</ion-title>
@@ -89,15 +111,13 @@
 
     <ion-content class="ion-padding" :fullscreen="true">
 
-      <nav v-if="!isPlatform('ios')" class="flex items-center justify-between mb-4">
-        <ion-button color="tertiary" shape="round" router-link="/pages/profile/edit" router-direction="forward">
-          <ion-icon slot="icon-only" :icon="createOutline"></ion-icon>
-        </ion-button>
+      <nav v-if="!isPlatform('ios')" class="flex items-center flex-end mb-4">
         <p class="font-bold text-xl absolute left-1/2 transform -translate-x-1/2">
           Profile
         </p>
-        <ion-button color="tertiary" shape="round" @click="handleLogout">
-          <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
+
+        <ion-button color="tertiary" shape="round" @click="openMenu($event)">
+          <ion-icon slot="icon-only" :icon="menu"></ion-icon>
         </ion-button>
       </nav>
 
@@ -135,10 +155,47 @@
         </keep-alive>
       </transition>
 
+      <ion-popover
+          :is-open="isMenuOpen"
+          :event="popoverEvent"
+          class="user-options"
+          @didDismiss="isMenuOpen = false"
+      >
+        <ion-content>
+          <ion-list class="ion-no-padding">
+            <ion-list-header>
+              <ion-label>Profile</ion-label>
+            </ion-list-header>
+            <ion-item button @click="navigateToPage('/pages/profile/edit')">
+              <ion-icon aria-hidden="true" :icon="createOutline" slot="start"></ion-icon>
+              <ion-label>Edit Profile</ion-label>
+            </ion-item>
+            <ion-item button @click="navigateToPage('/pages/profile/security')">
+              <ion-icon aria-hidden="true" :icon="keyOutline" slot="start"></ion-icon>
+              <ion-label>Security</ion-label>
+            </ion-item>
+          </ion-list>
+
+          <ion-list class="ion-no-padding">
+            <ion-list-header>
+              <ion-label>Actions</ion-label>
+            </ion-list-header>
+            <ion-item button @click="handleLogout">
+              <ion-icon aria-hidden="true" :icon="logOut" slot="start"></ion-icon>
+              <ion-label>Logout</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ion-popover>
     </ion-content>
   </ion-page>
 </template>
 
 <style scoped>
-
+  ion-popover.user-options {
+    --min-width: 250px;
+    ion-content {
+      --ion-background-color: white;
+    }
+  }
 </style>

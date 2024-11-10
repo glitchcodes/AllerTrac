@@ -1,13 +1,11 @@
-import { Capacitor } from "@capacitor/core";
-import { GoogleLoginResponse, SocialLogin } from "@capgo/capacitor-social-login";
-import { alertController } from "@ionic/vue";
-import { alertCircle } from "ionicons/icons";
+import {Capacitor} from "@capacitor/core";
+import {GoogleLoginResponse, SocialLogin} from "@capgo/capacitor-social-login";
+import {alertController} from "@ionic/vue";
+import {alertCircle} from "ionicons/icons";
 
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/store/auth";
-import { useToastController } from "@/composables/useToastController";
-
-import { useFetchAPI } from "@/composables/useFetchAPI";
+import {useRouter} from "vue-router";
+import {useAuthStore} from "@/store/auth";
+import {useToastController} from "@/composables/useToastController";
 import FetchError from "@/utils/errors/FetchError";
 
 export const useGoogleAuth = () => {
@@ -42,55 +40,29 @@ export const useGoogleAuth = () => {
 
       await alert.present();
 
-      return;
+      throw new Error('Not implemented');
     }
 
-    try {
-      const res = await SocialLogin.login({
-        provider: 'google',
-        options: {
-          scopes: ['email', 'profile'],
-        },
-      });
+    const res = await SocialLogin.login({
+      provider: 'google',
+      options: {
+        scopes: ['email', 'profile'],
+      },
+    });
 
-      const response = res.result as GoogleLoginResponse
+    const response = res.result as GoogleLoginResponse
 
-      const data = JSON.stringify({
-        email: response.profile.email,
-        first_name: response.profile.givenName,
-        last_name: response.profile.familyName,
-        provider: 'google',
-        account_id: response.profile.id,
-        id_token: response.idToken,
-        device_type: Capacitor.getPlatform()
-      });
+    console.log(response)
 
-      const result = await useFetchAPI({
-        url: '/auth/login-oauth',
-        method: 'POST',
-        data: data
-      });
-
-      // Set bearer token
-      await auth.setBearerToken(result.data.token);
-
-      // Redirect to welcome screen if the user hasn't completed onboarding
-      if (result.data.redirect_to === 'onboarding') {
-        await router.push({ name: 'onboarding-welcome' })
-      } else {
-        await router.push({ name: 'home' })
-      }
-    } catch (error) {
-      if (error instanceof FetchError) {
-        await toast.presentToast({
-          message: 'Error: ' + error.data.message,
-          duration: 5000,
-          icon: alertCircle
-        })
-      } else {
-        console.error(error);
-      }
-    }
+    return JSON.stringify({
+      email: response.profile.email,
+      first_name: response.profile.givenName,
+      last_name: response.profile.familyName,
+      provider: 'google',
+      account_id: response.profile.id,
+      id_token: response.idToken,
+      device_type: Capacitor.getPlatform()
+    });
   }
 
   return { initialize, signIn }

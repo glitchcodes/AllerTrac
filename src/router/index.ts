@@ -140,6 +140,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true
         },
         component: () => import('@/views/profile/EditProfilePage.vue')
+      },
+      {
+        path: 'profile/security',
+        name: 'oauth-profile',
+        meta: {
+          requiresAuth: true
+        },
+        component: () => import('@/views/profile/SecurityPage.vue')
       }
     ]
   },
