@@ -14,9 +14,9 @@ export const useAuthStore = defineStore('auth', () => {
   const bearerToken = ref<string | null>();
 
   const _isLoggedIn = computed(() => {
-    if (!bearerToken.value) return false;
+    if (!bearerToken.value || !user.value) return false;
 
-    return bearerToken.value.length > 0;
+    return bearerToken.value.length > 0 && user.value;
   })
   const _user = computed(() => user.value)
 

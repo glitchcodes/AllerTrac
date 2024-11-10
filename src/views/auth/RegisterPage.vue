@@ -21,6 +21,7 @@
   import { useToastController } from "@/composables/useToastController";
   import { useGoogleAuth } from "@/composables/useGoogleAuth";
   import { useFetchAPI } from "@/composables/useFetchAPI";
+  import { useAuthStore } from "@/store/auth";
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import InputComponent from "@/components/auth/input/TextInput.vue";
@@ -28,6 +29,8 @@
 
   const router = useRouter();
   const toast = useToastController();
+
+  const auth = useAuthStore();
   const googleAuth = useGoogleAuth()
 
   // Initialize Google Auth
@@ -154,7 +157,39 @@
     isLoggingInWithGoogle.value = true;
 
     // Sign in with Google
-    await googleAuth.signIn()
+    try {
+      const data = await googleAuth.signIn();
+
+      const result = await useFetchAPI({
+        url: '/auth/login-oauth',
+        method: 'POST',
+        data: data
+      });
+
+      // Set bearer token
+      await auth.setBearerToken(result.data.token);
+
+      // Redirect to welcome screen if the user hasn't completed onboarding
+      if (result.data.redirect_to === 'onboarding') {
+        await router.push({ name: 'onboarding-welcome' })
+      } else {
+        await router.push({ name: 'home' })
+      }
+    } catch (error) {
+      if (error instanceof FetchError) {
+        await toast.presentToast({
+          message: 'Error: ' + error.data.message,
+          duration: 5000,
+          icon: alertCircle
+        })
+      } else {
+        await toast.presentToast({
+          message: 'Error: ' + error,
+          duration: 5000,
+          icon: alertCircle
+        })
+      }
+    }
 
     // Hide loading indicator
     isLoggingInWithGoogle.value = false;

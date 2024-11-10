@@ -80,7 +80,39 @@
     isLoggingInWithGoogle.value = true;
 
     // Sign in with Google
-    await googleAuth.signIn()
+    try {
+      const data = await googleAuth.signIn();
+
+      const result = await useFetchAPI({
+        url: '/auth/login-oauth',
+        method: 'POST',
+        data: data
+      });
+
+      // Set bearer token
+      await auth.setBearerToken(result.data.token);
+
+      // Redirect to welcome screen if the user hasn't completed onboarding
+      if (result.data.redirect_to === 'onboarding') {
+        await router.push({ name: 'onboarding-welcome' })
+      } else {
+        await router.push({ name: 'home' })
+      }
+    } catch (error) {
+      if (error instanceof FetchError) {
+        await toast.presentToast({
+          message: 'Error: ' + error.data.message,
+          duration: 5000,
+          icon: alertCircle
+        })
+      } else {
+        await toast.presentToast({
+          message: 'Error: ' + error,
+          duration: 5000,
+          icon: alertCircle
+        })
+      }
+    }
 
     // Hide loading indicator
     isLoggingInWithGoogle.value = false;
