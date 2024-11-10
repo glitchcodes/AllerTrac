@@ -29,39 +29,37 @@
 
 <template>
   <ion-page>
-    <ion-content>
-      <div class="h-full px-4">
-        <div class="flex flex-col h-full items-center justify-center gap-4">
-          <!-- <LogoComponent /> -->
+    <ion-content class="ion-padding">
+      <div class="flex flex-col items-center justify-center gap-4">
+        <!-- <LogoComponent /> -->
 
-          <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
+        <div class="bg-secondary rounded-2xl shadow-xl p-6 w-full">
 
-            <h5 class="text-primary text-2xl font-bold text-center">
-              Allergy can be troublesome
-            </h5>
+          <h5 class="text-primary text-2xl font-bold text-center">
+            Allergy can be troublesome
+          </h5>
 
-            <p class="mt-4 text-center">
-              Ready to play detective with AllerTrac? Time to pick out the sneaky allergens hiding in your meals from the list below!
-            </p>
+          <p class="mt-4 text-center">
+            Ready to play detective with AllerTrac? Time to pick out the sneaky allergens hiding in your meals from the list below!
+          </p>
 
-            <img class="w-[120px] mx-auto my-4" src="/images/onboarding-allergens-1.png" alt="Food Bowl"/>
+          <img class="w-[120px] mx-auto my-4" src="/images/onboarding-allergens-1.png" alt="Food Bowl"/>
 
-            <Suspense>
-              <AllergenSelector v-model="allergens" />
+          <Suspense>
+            <AllergenSelector v-model="allergens" />
 
-              <template #fallback>
-                <SkeletonAllergens />
-              </template>
-            </Suspense>
+            <template #fallback>
+              <SkeletonAllergens />
+            </template>
+          </Suspense>
 
-            <div class="flex mt-6">
-              <ion-button router-link="/o/welcome" router-direction="back" fill="outline" shape="round" class="w-full">
-                Back
-              </ion-button>
-              <ion-button shape="round" class="w-full" @click="handleSubmitForm">
-                Next
-              </ion-button>
-            </div>
+          <div class="flex mt-6">
+            <ion-button router-link="/o/welcome" router-direction="back" fill="outline" shape="round" class="w-full">
+              Back
+            </ion-button>
+            <ion-button shape="round" class="w-full" @click="handleSubmitForm">
+              Next
+            </ion-button>
           </div>
         </div>
       </div>
