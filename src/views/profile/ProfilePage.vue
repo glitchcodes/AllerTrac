@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineAsyncComponent, ref } from "vue";
+  import { ref } from "vue";
   import {
     IonButton,
     IonIcon,
@@ -18,7 +18,8 @@
     IonList,
     IonItem,
     isPlatform,
-    SegmentCustomEvent, useIonRouter
+    SegmentCustomEvent,
+    useIonRouter
   } from '@ionic/vue';
   import {
     createOutline,
@@ -27,6 +28,7 @@
     logOut,
     menu
   } from 'ionicons/icons';
+  import ProfileCard from "@/components/profile/ProfileCard.vue";
   import { useAuthStore } from "@/store/auth";
   import { useAlertController } from "@/composables/useAlertController";
 
@@ -34,9 +36,6 @@
   import AllergensSegment from "@/components/profile/AllergensSegment.vue";
   import EmergencyContactsSegment from "@/components/profile/EmergencyContactsSegment.vue";
   import AlarmsSegment from "@/components/profile/AlarmsSegment.vue";
-
-  // Lazy-load
-  const ProfileCard = defineAsyncComponent(() => import("@/components/profile/ProfileCard.vue"));
 
   const ionRouter = useIonRouter();
   const authStore = useAuthStore();
@@ -121,7 +120,9 @@
         </ion-button>
       </nav>
 
-      <ProfileCard v-if="authStore._isLoggedIn" :user="authStore._user!" class="mb-4" />
+      <template v-if="authStore._isLoggedIn">
+        <ProfileCard :user="authStore._user!" class="mb-4"></ProfileCard>
+      </template>
 
       <div class="bg-white overflow-hidden shadow rounded-lg" :class="{ 'p-2': isPlatform('ios') }">
         <ion-segment :value="currentSegment" color="primary" @ionChange="handleSegmentChange">
