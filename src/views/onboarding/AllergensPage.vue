@@ -3,13 +3,13 @@
   import { IonContent, IonPage, IonButton } from "@ionic/vue";
   import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
   import { useRouter } from "vue-router";
-  import { useAllergenForm } from "@/composables/useAllergenForm";
+  import { useAllergenStore } from "@/store/allergen";
   import AllergenSelector from "@/components/AllergenSelector.vue";
   import SkeletonAllergens from "@/components/skeleton/SkeletonAllergens.vue";
   import type { Allergen } from "@/types/Allergen";
 
   const router = useRouter();
-  const { updateAllergens } = useAllergenForm()
+  const allergenStore = useAllergenStore();
 
   const allergens = ref<Allergen[]>();
   const statusBarHeight = ref<number>(0);
@@ -21,7 +21,7 @@
   const handleSubmitForm = async () => {
     try {
       // Update allergens
-      await updateAllergens(allergens.value)
+      await allergenStore.updateAllergens(allergens.value)
 
       // Redirect to final onboarding page
       await router.push({
