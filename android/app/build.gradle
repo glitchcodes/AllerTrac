@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
+def googleMapsAPIKey = System.getenv("MAPS_API_KEY");
+
 android {
     namespace "ust.capstone.allertrac"
     compileSdk rootProject.ext.compileSdkVersion
@@ -16,6 +18,7 @@ android {
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+        buildConfigField("String", "MAPS_API_KEY", "\"${googleMapsAPIKey}\"")
     }
     buildTypes {
         release {
@@ -44,6 +47,17 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+tasks.register('createSecretsPropertiesFile') {
+    doLast {
+        def secretsFile = file("secrets.properties")
+        if (!secretsFile.exists()) {
+            secretsFile.write("MAPS_API_KEY=${System.getenv('MAPS_API_KEY') ?: ''}")
+        }
+    }
+}
+
+preBuild.dependsOn(createSecretsPropertiesFile)
 
 secrets {
     propertiesFileName = "secrets.properties"
