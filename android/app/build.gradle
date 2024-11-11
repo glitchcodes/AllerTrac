@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
-def googleMapsAPIKey = System.getenv("MAPS_API_KEY");
+def googleMapsAPIKey = System.getenv("MAPS_API_KEY")
 
 android {
     namespace "ust.capstone.allertrac"
@@ -17,6 +17,9 @@ android {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+        buildFeatures {
+            buildConfig = true
         }
         buildConfigField("String", "MAPS_API_KEY", "\"${googleMapsAPIKey}\"")
     }
