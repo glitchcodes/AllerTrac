@@ -14,11 +14,11 @@ import { addSharp, alarm } from "ionicons/icons";
           Alarms
         </h6>
 
-        <ion-button v-if="isPlatform('ios')" fill="outline">
+        <ion-button v-if="isPlatform('ios')" fill="outline" router-link="/pages/alarms/create" router-direction="forward">
           <ion-icon slot="icon-only" aria-label="Save" :icon="addSharp"></ion-icon>
         </ion-button>
 
-        <ion-button v-else fill="outline" shape="round">
+        <ion-button v-else fill="outline" shape="round" router-link="/pages/alarms/create" router-direction="forward">
           <ion-icon slot="start" aria-label="Save" :icon="addSharp"></ion-icon>
           <span>New</span>
         </ion-button>

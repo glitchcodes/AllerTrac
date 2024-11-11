@@ -148,6 +148,11 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true
         },
         component: () => import('@/views/profile/SecurityPage.vue')
+      },
+      {
+        path: '/pages/alarms/create',
+        name: 'alarms-create',
+        component: () => import('@/views/alarm/CreateAlarmPage.vue')
       }
     ]
   },
