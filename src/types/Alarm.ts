@@ -9,6 +9,7 @@ export type AlarmProp = {
   }
   repeatWeekly: boolean
   weekdays: Weekday[]
+  sound: string
 }
 
 export type Alarm = AlarmProp & {

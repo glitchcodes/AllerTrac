@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { reactive, onMounted } from "vue";
+  import { reactive, onMounted, computed } from "vue";
   import {
     DatetimeCustomEvent,
     IonButton,
@@ -19,26 +19,36 @@
     isPlatform,
     useIonRouter
   } from "@ionic/vue";
+  import { useRoute } from "vue-router";
   import { useAlarmStore } from "@/store/alarm";
   import { chevronBack, closeCircleOutline, save } from "ionicons/icons";
   import { Weekday } from "@capacitor/local-notifications";
   import { useToastController } from "@/composables/useToastController";
   import type { AlarmProp } from "@/types/Alarm";
 
+  const route = useRoute();
   const ionRouter = useIonRouter();
   const alarmStore = useAlarmStore();
   const toastController = useToastController();
 
+  const routeAlarmId = parseInt(<string> route.params.id);
+  const alarm = alarmStore.getAlarm(routeAlarmId);
+
+  // Redirect to alarm page
+  if (alarm === null) {
+    ionRouter.navigate('/pages/profile', 'back', 'pop');
+  }
+
   const form = reactive<AlarmProp>({
-    title: '',
-    message: '',
+    title: alarm!.title,
+    message: alarm!.message,
     time: {
-      hour: 0,
-      minute: 0
+      hour: alarm!.time.hour,
+      minute: alarm!.time.minute
     },
-    repeatWeekly: false,
-    weekdays: [],
-    sound: 'default_notification.wav'
+    repeatWeekly: alarm!.repeatWeekly,
+    weekdays: alarm!.weekdays,
+    sound: alarm!.sound
   });
 
   type FormErrors = {
@@ -57,6 +67,14 @@
 
     form.time.hour = date.getHours();
     form.time.minute = date.getMinutes();
+  });
+
+  const ionTime = computed(() => {
+    const d = new Date();
+
+    d.setHours(alarm!.time.hour - d.getTimezoneOffset(), alarm!.time.minute - d.getTimezoneOffset());
+
+    return d.toISOString();
   })
 
   const getErrorMessage = (type: string) => {
@@ -101,9 +119,7 @@
 
     try {
       // Save alarm locally
-      const alarm = await alarmStore.addAlarm(form);
-      // Schedule immediately
-      await alarmStore.scheduleAlarm(alarm);
+      await alarmStore.editAlarm(routeAlarmId, form);
 
       ionRouter.navigate('/pages/profile', 'back', 'pop');
     } catch (error) {
@@ -156,6 +172,7 @@
           :prefer-wheel="true"
           size="cover"
           class="z-10"
+          :value="ionTime"
           @ionChange="handleTimeChange"
       >
       </ion-datetime>

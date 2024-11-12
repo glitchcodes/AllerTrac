@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { LocalNotifications } from "@capacitor/local-notifications";
+import {Channel, LocalNotifications} from "@capacitor/local-notifications";
 import { Preferences } from "@capacitor/preferences";
 
 import type { Alarm, AlarmProp } from "@/types/Alarm";
@@ -23,6 +23,10 @@ export const useAlarmStore = defineStore('alarms', () => {
 
   const generateNotificationId = () => Math.floor(Date.now() % 1000000);
 
+  const getAlarm = (alarmId: number) => {
+    return alarms.value.find(alarm => alarm.id === alarmId) || null;
+  };
+
   const addAlarm = async (alarm: AlarmProp) => {
     const newAlarm: Alarm = {
       id: Date.now(),
@@ -31,13 +35,12 @@ export const useAlarmStore = defineStore('alarms', () => {
       time: alarm.time,
       repeatWeekly: alarm.weekdays.length > 0,
       weekdays: alarm.weekdays,
+      sound: alarm.sound,
       isScheduled: false,
       notificationIds: []
     }
 
     alarms.value.push(newAlarm);
-
-    console.log(newAlarm);
 
     // Persist alarms to preferences
     await saveAlarms();
@@ -46,10 +49,27 @@ export const useAlarmStore = defineStore('alarms', () => {
   }
 
   const scheduleAlarm = async (alarm: Alarm) => {
+    // Get channels
+    const { channels } = await LocalNotifications.listChannels();
+
+    if (channels.find(ch => ch.id === 'alarms') === undefined) {
+      const alarmChannel: Channel = {
+        id: 'alarms',
+        name: 'Alarms',
+        sound: 'default_notification.wav',
+        vibration: true,
+        importance: 5,
+      }
+
+      await LocalNotifications.createChannel(alarmChannel);
+    }
+
+    // Schedule Notifications
     const baseNotification = {
       title: alarm.title,
       body: alarm.message,
-      // sound: 'beep.wav',
+      channelId: 'alarms',
+      sound: alarm.sound,
       extra: { alarmId: alarm.id }
     }
 
@@ -99,6 +119,24 @@ export const useAlarmStore = defineStore('alarms', () => {
     await saveAlarms()
   }
 
+  const editAlarm = async (alarmId: number, updatedAlarm: AlarmProp) => {
+    const alarm = alarms.value.find(a => a.id === alarmId);
+
+    if (alarm) {
+      // Cancel existing notifications if schedulled
+      if (alarm.isScheduled) {
+        await cancelAlarm(alarmId);
+      }
+
+      // Update alarm
+      Object.assign(alarm, updatedAlarm);
+
+      // Reschedule the alarm
+      await scheduleAlarm(alarm);
+      await saveAlarms()
+    }
+  }
+
   const cancelAlarm = async (alarmId: number) => {
     const alarm = alarms.value.find(a => a.id === alarmId);
     if (alarm && alarm.notificationIds.length > 0) {
@@ -132,5 +170,5 @@ export const useAlarmStore = defineStore('alarms', () => {
     })
   }
 
-  return { alarms, init, addAlarm, scheduleAlarm, cancelAlarm, deleteAlarm }
+  return { alarms, init, getAlarm, addAlarm, scheduleAlarm, editAlarm, cancelAlarm, deleteAlarm }
 })
