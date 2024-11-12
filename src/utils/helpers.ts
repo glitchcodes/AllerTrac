@@ -122,3 +122,9 @@ export const calculateDistance = (pos1: LatLng, pos2: LatLng) => {
 
   return km.toFixed(2);
 }
+
+export const randomInteger = (min: number, max: number): number => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

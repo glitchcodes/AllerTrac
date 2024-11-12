@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import {
-    IonRippleEffect,
-    actionSheetController,
-    modalController
-  } from "@ionic/vue";
+import {
+  IonRippleEffect,
+  actionSheetController,
+  modalController, isPlatform
+} from "@ionic/vue";
   import { Clipboard } from "@capacitor/clipboard";
   import {
     arrowBackOutline,
@@ -41,7 +41,7 @@
       buttons: [
         {
           text: 'Delete',
-          icon: trashOutline,
+          icon: !isPlatform('ios') ? trashOutline : undefined,
           role: 'destructive',
           data: {
             action: 'delete'
@@ -49,28 +49,28 @@
         },
         {
           text: 'Edit',
-          icon: createOutline,
+          icon: !isPlatform('ios') ? createOutline : undefined,
           data: {
             action: 'edit'
           }
         },
         {
           text: 'Copy phone number',
-          icon: copyOutline,
+          icon: !isPlatform('ios') ? copyOutline : undefined,
           data: {
             action: 'copy-phone-number'
           }
         },
         {
           text: 'Copy email address',
-          icon: copyOutline,
+          icon: !isPlatform('ios') ? copyOutline : undefined,
           data: {
             action: 'copy-email-address'
           }
         },
         {
           text: 'Cancel',
-          icon: arrowBackOutline,
+          icon: !isPlatform('ios') ? arrowBackOutline : undefined,
           role: 'cancel'
         }
       ]

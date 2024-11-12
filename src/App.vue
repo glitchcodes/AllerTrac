@@ -24,6 +24,7 @@
   import { ref, onMounted, watch } from "vue";
   import { IonApp, IonRouterOutlet, IonProgressBar, isPlatform } from '@ionic/vue';
   import { Capacitor } from "@capacitor/core";
+  import { App } from "@capacitor/app";
   import { StatusBar, Style } from "@capacitor/status-bar";
   import { NativeAudio } from "@capacitor-community/native-audio";
   import { Network } from "@capacitor/network";
@@ -31,12 +32,16 @@
   import { useRoute } from "vue-router";
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
+  import { useNotificationStore } from "@/store/notification";
+  import { useAlarmStore } from "@/store/alarm";
   import { useAllergenStore } from "@/store/allergen";
   import NotAllowedError from "@/utils/errors/NotAllowedError";
 
   const route = useRoute();
   const authStore = useAuthStore();
   const networkStore = useNetworkStore();
+  const notificationStore = useNotificationStore();
+  const alarmStore = useAlarmStore()
   const allergenStore = useAllergenStore();
 
   const isInitializing = ref<boolean>(true);
@@ -45,6 +50,27 @@
     // Init network status
     const networkStatus = await Network.getStatus();
     await networkStore.updateNetworkStatus(networkStatus);
+
+    // Init alarms
+    // TODO: Move into background runner
+    await alarmStore.init()
+
+    // Check permission for notifications
+    if (Capacitor.isNativePlatform() && isPlatform('android')) {
+      await notificationStore.checkPermissions();
+      await notificationStore.checkExactAlarmPermission();
+
+      if (notificationStore.permissionStatus === 'prompt' || notificationStore.permissionStatus === 'prompt-with-rationale') {
+        await notificationStore.requestPermissions()
+      }
+    }
+
+    // Listen for app state changes
+    App.addListener('appStateChange', () => {
+      if (Capacitor.isNativePlatform() && isPlatform('android')) {
+        notificationStore.checkExactAlarmPermission()
+      }
+    })
 
     // Listen for network connection change
     Network.addListener('networkStatusChange', status => {
