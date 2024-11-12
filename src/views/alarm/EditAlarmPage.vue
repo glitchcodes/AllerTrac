@@ -161,7 +161,7 @@
       <div v-if="!isPlatform('ios')" class="ion-padding">
         <nav class="navbar mb-4 py-2 relative">
           <p class="font-bold text-xl text-center">
-            Create Alarm
+            Edit Alarm
           </p>
         </nav>
       </div>
