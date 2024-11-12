@@ -11,15 +11,15 @@ const config: CapacitorConfig = {
     Keyboard: {
       resizeOnFullScreen: true
     },
-    GoogleAuth: {
-      scopes: [
-        'email',
-        'profile'
-      ],
-      clientId: process.env.VITE_GOOGLE_CLIENT_ID,
-      androidClientId: process.env.VITE_GOOGLE_CLIENT_ID_ANDROID,
-      iosClientId: process.env.VITE_GOOGLE_CLIENT_ID_IOS,
-    }
+    // GoogleAuth: {
+    //   scopes: [
+    //     'email',
+    //     'profile'
+    //   ],
+    //   clientId: process.env.VITE_GOOGLE_CLIENT_ID,
+    //   androidClientId: process.env.VITE_GOOGLE_CLIENT_ID_ANDROID,
+    //   iosClientId: process.env.VITE_GOOGLE_CLIENT_ID_IOS,
+    // }
   }
 };
 

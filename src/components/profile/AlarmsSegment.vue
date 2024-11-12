@@ -1,7 +1,34 @@
 <script setup lang="ts">
-import { IonIcon, IonButton, IonRippleEffect, isPlatform } from "@ionic/vue";
-import { addSharp, alarm } from "ionicons/icons";
-  import InfoAlert from "@/components/alert/InfoAlert.vue";
+  import { IonIcon, IonButton, IonRippleEffect, IonToggle, isPlatform, ToggleCustomEvent} from "@ionic/vue";
+  import { addSharp, alarm } from "ionicons/icons";
+  import { Capacitor } from "@capacitor/core";
+
+  import { useNotificationStore } from "@/store/notification";
+  import { useAlarmStore } from "@/store/alarm";
+
+  import AlertMessage from "@/components/AlertMessage.vue";
+  import type { Alarm } from "@/types/Alarm";
+
+  const notificationStore = useNotificationStore();
+  const alarmStore = useAlarmStore();
+
+  const formatTo12Hour = (hour: number, minute: number): string => {
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const adjustedHour = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+    const formattedMinute = minute < 10 ? `0${minute}` : minute; // Add leading zero if needed
+
+    return `${adjustedHour}:${formattedMinute} ${period}`;
+  }
+
+  const toggleAlarm = (e: ToggleCustomEvent, alarm: Alarm) => {
+    if (alarm.isScheduled) {
+      alarmStore.cancelAlarm(alarm.id);
+      alarm.isScheduled = false;
+    } else {
+      alarmStore.scheduleAlarm(alarm);
+      alarm.isScheduled = true;
+    }
+  }
 </script>
 
 <template>
@@ -26,34 +53,37 @@ import { addSharp, alarm } from "ionicons/icons";
 
     </div>
 
-    <InfoAlert class="my-4">
+    <AlertMessage v-if="notificationStore.permissionStatus !== 'granted' && Capacitor.isNativePlatform()" type="danger" class="my-4">
+      We need permissions to send you notifications/reminders.
+
+      <ion-button slot="end" size="small" color="secondary" @click="notificationStore.requestPermissions()">
+        Fix
+      </ion-button>
+    </AlertMessage>
+
+    <AlertMessage v-else-if="notificationStore.exactAlarmStatus !== 'granted' && Capacitor.isNativePlatform()" type="warning" class="my-4">
+      Alarms may not be sent on time due to Android 12's alarm permission policies.
+
+      <ion-button slot="end" size="small" color="secondary" @click="notificationStore.openExactAlarmSettings()">
+        Fix
+      </ion-button>
+    </AlertMessage>
+
+    <AlertMessage v-else type="info" class="my-4">
       Tap on an alarm to edit it
-    </InfoAlert>
+    </AlertMessage>
 
     <div class="flex flex-col gap-3">
-      <div class="flex items-center justify-between w-full ion-activatable ripple-parent">
+      <div v-for="alarm in alarmStore.alarms"
+           :key="alarm.id"
+           class="flex items-center justify-between w-full ion-activatable ripple-parent"
+      >
         <ion-ripple-effect></ion-ripple-effect>
         <div class="bg-neutral-100 rounded-2xl p-6 text-primary font-bold flex items-center w-full justify-between border-2 shadow-md">
           <h2 class="text-2xl text-primary font-bold">
-            9:00PM
+            {{ formatTo12Hour(alarm.time.hour, alarm.time.minute) }}
           </h2>
-          <label class="inline-flex relative items-center cursor-pointer">
-            <input type="checkbox" class="sr-only peer" />
-            <span class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between w-full ion-activatable ripple-parent overflow-hidden">
-        <ion-ripple-effect></ion-ripple-effect>
-        <div class="bg-neutral-100 rounded-2xl p-6 text-primary font-bold flex items-center w-full justify-between border-2 shadow-md">
-          <h2 class="text-2xl text-primary font-bold">
-            10:00PM
-          </h2>
-          <label class="inline-flex relative items-center cursor-pointer">
-            <input type="checkbox" class="sr-only peer" />
-            <span class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></span>
-          </label>
+          <ion-toggle :checked="alarm.isScheduled" @ionChange="toggleAlarm($event, alarm)"></ion-toggle>
         </div>
       </div>
     </div>

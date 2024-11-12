@@ -1,43 +1,121 @@
 <script setup lang="ts">
-  import { ref, reactive } from "vue";
+  import { reactive, onMounted } from "vue";
   import {
-    IonPage,
-    IonHeader,
-    IonContent,
-    IonToolbar,
-    IonTitle,
-    IonInput,
-    IonButtons,
+    DatetimeCustomEvent,
     IonButton,
-    IonIcon,
-    IonProgressBar,
+    IonButtons,
+    IonContent,
     IonDatetime,
-    IonList,
+    IonHeader,
+    IonIcon,
+    IonInput,
     IonItem,
+    IonList,
+    IonPage,
     IonSelect,
     IonSelectOption,
-    isPlatform
+    IonTitle,
+    IonToolbar,
+    isPlatform,
+    useIonRouter
   } from "@ionic/vue";
-  import { chevronBack, save } from "ionicons/icons";
+  import { useAlarmStore } from "@/store/alarm";
+  import { chevronBack, closeCircleOutline, save } from "ionicons/icons";
+  import { Weekday } from "@capacitor/local-notifications";
+  import { useToastController } from "@/composables/useToastController";
+  import type { AlarmProp } from "@/types/Alarm";
 
-  const form = reactive({
-    label: '',
-    repeatDays: [0,2],
-    sound: 'default'
+  const ionRouter = useIonRouter();
+  const alarmStore = useAlarmStore();
+  const toastController = useToastController();
+
+  const form = reactive<AlarmProp>({
+    title: '',
+    message: '',
+    time: {
+      hour: 0,
+      minute: 0
+    },
+    repeatWeekly: false,
+    weekdays: [],
+    // sound: 'default'
   });
 
-  const inputErrors = ref<any>({});
-
-  const getErrorMessage = (type: string) => {
-    const errors = inputErrors.value;
-    switch (type) {
-      case "label":
-        if (!errors.label || errors.label.length === null) return "";
-        return errors.label[0];
-    }
+  type FormErrors = {
+    title: string[]
+    message: string[]
   }
 
+  const formErrors = reactive<FormErrors>({
+    title: [],
+    message: [],
+  });
 
+  onMounted(() => {
+    // Get current hour and minute
+    const date = new Date();
+
+    form.time.hour = date.getHours();
+    form.time.minute = date.getMinutes();
+  })
+
+  const getErrorMessage = (type: string) => {
+    return formErrors[type as keyof FormErrors][0];
+  }
+
+  const handleTimeChange = (e: DatetimeCustomEvent) => {
+    const datetime = new Date(e.detail.value as string)
+
+    form.time.hour = datetime.getHours();
+    form.time.minute = datetime.getMinutes();
+  }
+
+  const saveChanges = async () => {
+    // Perform Validations
+    if (form.title.length === 0) {
+      formErrors.title.push('Required');
+    }
+    if (form.title.length > 30) {
+      formErrors.title.push('Maximum of 30 characters');
+    }
+    if (form.message.length === 0) {
+      formErrors.message.push('Required');
+    }
+    if (form.message.length > 50) {
+      formErrors.message.push('Maximum of 50 characters');
+    }
+
+    // If any of the fields on formErrors has items, show an error
+    if (formErrors.title.length > 0 || formErrors.message.length > 0) {
+      // Show error message or handle the error
+      await toastController.presentToast({
+        message: 'You have errors in your alarm',
+        icon: closeCircleOutline,
+        duration: 3000,
+        position: "bottom",
+        positionAnchor: 'food-scan-button'
+      })
+
+      return;
+    }
+
+    // Save alarm locally
+    try {
+      await alarmStore.addAlarm(form);
+
+      ionRouter.navigate('/pages/profile', 'back', 'pop');
+    } catch (error) {
+      console.error(error);
+
+      await toastController.presentToast({
+        message: 'Something went wrong while creating your alarm. Check the console for errors',
+        icon: closeCircleOutline,
+        duration: 3000,
+        position: "bottom",
+        positionAnchor: 'food-scan-button'
+      })
+    }
+  }
 </script>
 
 <template>
@@ -53,28 +131,32 @@
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="end">
-          <ion-button>
+          <ion-button @click="saveChanges">
             <ion-icon aria-label="Save" :icon="save" />
           </ion-button>
         </ion-buttons>
-        <ion-progress-bar type="indeterminate"></ion-progress-bar>
+<!--        <ion-progress-bar type="indeterminate"></ion-progress-bar>-->
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
       <div v-if="!isPlatform('ios')" class="ion-padding">
-        <nav class="navbar flex items-center mb-4 gap-3 relative">
-          <ion-button color="tertiary" shape="round" router-link="/pages/profile" router-direction="back">
-            <ion-icon slot="icon-only" :icon="chevronBack" />
-          </ion-button>
-          <p class="font-bold text-xl absolute left-1/2 transform -translate-x-1/2">
+        <nav class="navbar mb-4 py-2 relative">
+          <p class="font-bold text-xl text-center">
             Create Alarm
           </p>
         </nav>
       </div>
 
       <div class="border-[#efeee9] h-[1px] w-full border-b-[2px] relative -bottom-[1px] z-20" />
-      <ion-datetime presentation="time" :prefer-wheel="true" size="cover" class="z-10"></ion-datetime>
+      <ion-datetime
+          presentation="time"
+          :prefer-wheel="true"
+          size="cover"
+          class="z-10"
+          @ionChange="handleTimeChange"
+      >
+      </ion-datetime>
       <div class="border-[#efeee9] h-[1px] w-full border-t-[2px] relative -top-[1px] z-20" />
 
 
@@ -82,29 +164,56 @@
         <div class="bg-white rounded-lg" :class="{ 'py-1': isPlatform('ios') }">
           <ion-list :inset="true">
             <ion-item lines="none">
-              <ion-input v-model="form.label"
-                         label="Name"
+              <ion-input v-model="form.title"
+                         label="Title"
                          placeholder="Medication"
-                         :class="{ 'ion-touched ion-invalid': inputErrors.label }"
-                         :error-text="getErrorMessage('label')"
-                         @ionInput="() => inputErrors.label = ''">
+                         class="ion-text-right"
+                         :class="{ 'ion-touched ion-invalid': formErrors.title.length > 0 }"
+                         :error-text="getErrorMessage('title')"
+                         @ionInput="() => formErrors.title = []">
+              </ion-input>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-input v-model="form.message"
+                         label="Description"
+                         placeholder="e.g. Very important!"
+                         class="ion-text-right"
+                         :class="{ 'ion-touched ion-invalid': formErrors.message.length > 0 }"
+                         :error-text="getErrorMessage('message')"
+                         @ionInput="() => formErrors.message = []">
               </ion-input>
             </ion-item>
             <ion-item lines="none">
               <ion-select
+                  v-model="form.weekdays"
                   label="Repeat every"
                   aria-label="Repeat every"
+                  placeholder="None"
                   justify="space-between"
                   :multiple="true"
-                  :value="form.repeatDays"
+                  :value="form.weekdays"
               >
-                <ion-select-option :value="0">Sunday</ion-select-option>
-                <ion-select-option :value="1">Monday</ion-select-option>
-                <ion-select-option :value="2">Tuesday</ion-select-option>
-                <ion-select-option :value="3">Wednesday</ion-select-option>
-                <ion-select-option :value="4">Thursday</ion-select-option>
-                <ion-select-option :value="5">Friday</ion-select-option>
-                <ion-select-option :value="6">Saturday</ion-select-option>
+                <ion-select-option :value="Weekday.Sunday">
+                  Sunday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Monday">
+                  Monday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Tuesday">
+                  Tuesday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Wednesday">
+                  Wednesday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Thursday">
+                  Thursday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Friday">
+                  Friday
+                </ion-select-option>
+                <ion-select-option :value="Weekday.Saturday">
+                  Saturday
+                </ion-select-option>
               </ion-select>
             </ion-item>
             <ion-item lines="none">
@@ -114,11 +223,24 @@
                   justify="space-between"
                   :value="form.sound"
               >
-                <ion-select-option value="default">Default</ion-select-option>
-                <ion-select-option value="bird">Bird</ion-select-option>
+                <ion-select-option value="default">
+                  Default
+                </ion-select-option>
+                <ion-select-option value="bird">
+                  Bird
+                </ion-select-option>
               </ion-select>
             </ion-item>
           </ion-list>
+        </div>
+
+        <div v-if="!isPlatform('ios')" class="flex gap-2">
+          <ion-button fill="outline" class="flex-1" router-link="/pages/profile" router-direction="back">
+            Cancel
+          </ion-button>
+          <ion-button class="flex-1" @click="saveChanges">
+            Save
+          </ion-button>
         </div>
       </section>
     </ion-content>
