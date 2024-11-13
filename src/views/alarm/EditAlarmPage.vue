@@ -31,7 +31,7 @@
   const alarmStore = useAlarmStore();
   const toastController = useToastController();
 
-  const routeAlarmId = parseInt(<string> route.params.id);
+  const routeAlarmId = parseInt(route.params.id as string);
   const alarm = alarmStore.getAlarm(routeAlarmId);
 
   // Redirect to alarm page
