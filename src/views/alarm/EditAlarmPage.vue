@@ -141,7 +141,7 @@
     <ion-header v-if="isPlatform('ios')">
       <ion-toolbar>
         <ion-title>
-          Create Alarm
+          Edit Alarm
         </ion-title>
         <ion-buttons slot="start">
           <ion-button router-link="/pages/profile" router-direction="back">
