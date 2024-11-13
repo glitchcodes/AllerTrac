@@ -1,29 +1,36 @@
 <script setup lang="ts">
   import { ref, onBeforeMount, computed } from "vue";
   import { useRoute, useRouter } from "vue-router";
-  import { IonIcon, IonPage, IonContent, IonButton, IonSpinner } from '@ionic/vue';
-  import { arrowBack, informationCircle } from "ionicons/icons";
+  import {IonIcon, IonPage, IonContent, IonButton, IonSpinner, useIonRouter} from '@ionic/vue';
+  import {arrowBack, closeCircleOutline, informationCircle} from "ionicons/icons";
   import VOtpInput from "vue3-otp-input"
 
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useToastController } from "@/composables/useToastController";
+  import FetchError from "@/utils/errors/FetchError";
 
   const toast = useToastController();
 
   const route = useRoute();
   const router = useRouter();
+  const ionRouter = useIonRouter();
 
   // Check if an identifier exists on the query params
   // If not, redirect to login page
   onBeforeMount(() => {
     if (!route.query.i) {
-      router.push({ name: 'login' })
+      ionRouter.navigate('/u/login', 'root', 'replace');
     }
   });
 
   const identifier = computed(() => {
     const encoded = route.query.i as string;
+
+    if (!encoded) {
+      return { prefix: '', type: '', id: '', full_identifier: '' }
+    }
+
     const decoded = atob(encoded);
 
     const i = decoded.split(':')
@@ -51,24 +58,48 @@
     }
 
     try {
-      const response = await useFetchAPI({
-        url: '/auth/verify-account',
-        method: 'PATCH',
-        data: JSON.stringify(body)
-      })
-
-      await toast.presentToast({
-        message: response.data.message,
-        duration: 3000,
-        icon: informationCircle
-      })
-
-      await router.push({ name: 'login' });
+      if (identifier.value.type === 'email-verification') {
+        await verifyAccount(body);
+      } else if (identifier.value.type === 'forget-password') {
+        await forgotPassword(body);
+      }
     } catch (error) {
-      handleErrors('verify', error);
+      await handleErrors('verify', error);
+    } finally {
+      isSubmitting.value = false;
     }
+  }
 
-    isSubmitting.value = false;
+  const verifyAccount = async (body: { identifier: string, code: string }) => {
+    const response = await useFetchAPI({
+      url: '/auth/verify-account',
+      method: 'PATCH',
+      data: JSON.stringify(body)
+    })
+
+    await toast.presentToast({
+      message: response.data.message,
+      duration: 3000,
+      icon: informationCircle
+    })
+
+    ionRouter.navigate('/u/login', 'forward', 'replace');
+  }
+
+  const forgotPassword = async (body: { identifier: string, code: string }) => {
+    const response = await useFetchAPI({
+      url: '/auth/verify-password-request',
+      method: 'PATCH',
+      data: JSON.stringify(body)
+    })
+
+    await toast.presentToast({
+      message: response.data.message,
+      duration: 3000,
+      icon: informationCircle
+    })
+
+    await router.push({ name: 'reset-password', query: { t: response.data.ticket } });
   }
 
   const resendOTP = async () => {
@@ -92,19 +123,40 @@
         icon: informationCircle
       })
     } catch (error) {
-      handleErrors('resend', error)
+      await handleErrors('resend', error)
     }
 
     isResending.value = false
   }
 
-  const handleErrors = (type: string, error: any) => {
+  const handleErrors = async (type: string, error: any) => {
     switch (type) {
       case 'verify':
-        // TODO: Handle errors
+        if (error instanceof FetchError) {
+          await toast.presentToast({
+            message: error.data.message,
+            duration: 3000,
+            icon: closeCircleOutline
+          });
+        } else {
+          await toast.presentToast({
+            message: 'Something went wrong while trying to verify your code.',
+            duration: 3000,
+            icon: closeCircleOutline
+          });
+        }
+
+        console.error(error);
+
         break;
       case 'resend':
-        // TODO: Handle errors
+        await toast.presentToast({
+          message: 'Something went wrong while trying to resend your verification code',
+          duration: 3000,
+          icon: closeCircleOutline
+        });
+
+        console.error(error);
         break;
       default:
         throw new Error("No error to be handled");
