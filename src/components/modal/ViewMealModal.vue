@@ -208,7 +208,7 @@
         <component :is="segments[currentSegment]" v-bind="currentProperties"></component>
       </transition>
 
-
+      <img src="/images/edamam-badge-white.svg" alt="Edamam Attribution" class="w-auto mt-4" />
     </div>
   </ion-content>
 </template>

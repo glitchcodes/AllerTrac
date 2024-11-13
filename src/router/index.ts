@@ -158,6 +158,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/pages/alarms/:id',
         name: 'alarms-edit',
         component: () => import('@/views/alarm/EditAlarmPage.vue')
+      },
+      {
+        path: '/pages/attributions',
+        name: 'attributions',
+        component: () => import('@/views/AttributionPage.vue')
       }
     ]
   },

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonIcon, popoverController } from "@ionic/vue";
-import { logOut } from "ionicons/icons";
+import { computed } from "vue";
+import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonIcon, popoverController, useIonRouter } from "@ionic/vue";
+import { logOut, sparklesOutline } from "ionicons/icons";
 import type { User } from "@/types/User";
-import {computed} from "vue";
 
-const router = useRouter();
+const ionRouter = useIonRouter();
 
 const props = defineProps<{
   user: User
@@ -13,11 +12,17 @@ const props = defineProps<{
 
 const avatar = computed(() => {
   return props.user.avatar && props.user.avatar.length > 0 ? props.user.avatar : '/pfp.png';
-})
+});
+
+const navigateToPage = (url: string) => {
+  ionRouter.navigate(url, 'forward', 'push');
+
+  popoverController.dismiss()
+}
 
 const logoutUser = async () => {
   // Redirect to log out page
-  await router.push({ name: 'logout' });
+  ionRouter.navigate('/logout', 'root', 'replace');
 
   // Dismiss the popover
   await popoverController.dismiss()
@@ -35,6 +40,10 @@ const logoutUser = async () => {
           <h3>{{ props.user.full_name }}</h3>
           <p>{{ props.user.email }}</p>
         </ion-label>
+      </ion-item>
+      <ion-item button @click="navigateToPage('/pages/attributions')">
+        <ion-icon aria-hidden="true" :icon="sparklesOutline" slot="start"></ion-icon>
+        <ion-label>Attributions</ion-label>
       </ion-item>
       <ion-item button @click="logoutUser">
         <ion-icon aria-hidden="true" :icon="logOut" slot="start"></ion-icon>
