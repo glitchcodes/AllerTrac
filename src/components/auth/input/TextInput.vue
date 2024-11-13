@@ -4,12 +4,15 @@
 
   type InputTypeAttribute = "text" | "password" | "email" | "number" | "search" | "tel" | "url"
 
-  const props = defineProps<{
+  const props = withDefaults(defineProps<{
     placeholder: string,
     type: InputTypeAttribute,
+    disabled?: boolean
     dataCy?: string
     errors?: Array<string>
-  }>()
+  }>(), {
+    disabled: false
+  })
 
   const model = defineModel();
 
@@ -33,6 +36,7 @@
                  :data-cy="dataCy"
                  :placeholder="props.placeholder"
                  :type="props.type"
+                 :disabled="props.disabled"
                  :value="modelValue"
                  @ionInput="updateModel">
         <ion-input-password-toggle v-if="type === 'password'" slot="end"></ion-input-password-toggle>

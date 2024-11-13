@@ -1,20 +1,65 @@
 <script setup lang="ts">
   import { ref } from "vue";
 
-  import { IonIcon, IonPage, IonContent, IonButton, useIonRouter } from '@ionic/vue';
-  import { arrowBack, mailOutline } from "ionicons/icons";
-
+  import { IonIcon, IonPage, IonContent, IonButton, IonSpinner } from '@ionic/vue';
+  import { arrowBack, closeCircleOutline, informationCircleOutline, mailOutline } from "ionicons/icons";
+  import { useRouter } from "vue-router";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
+  import { useToastController } from "@/composables/useToastController";
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import InputComponent from "@/components/auth/input/TextInput.vue";
+  import FetchError from "@/utils/errors/FetchError";
 
-  const ionRouter = useIonRouter();
+  const router = useRouter()
+  const toastController = useToastController();
+
   const email = ref<string>('');
+  const isSubmitting = ref<boolean>(false);
 
   const submitResetRequest = async () => {
     if (email.value.length <= 0) return;
 
-    // TODO: Implement password reset request
-    ionRouter.push({ name: 'verify-password-reset' })
+    isSubmitting.value = true;
+
+    try {
+      const response = await useFetchAPI({
+        url: '/auth/forgot-password',
+        method: 'POST',
+        data: JSON.stringify({
+          email: email.value
+        })
+      });
+
+      email.value = "";
+
+      await router.push({ name: 'verify-registration', query: { i: response.data.identifier } });
+    } catch (error) {
+      if (error instanceof FetchError) {
+        if (error.data.code === 'INPUT_INVALID') {
+          await toastController.presentToast({
+            message: 'We will send a password request to this email if it exists in our system',
+            duration: 3000,
+            icon: informationCircleOutline,
+          });
+        } else {
+          await toastController.presentToast({
+            message: error.data.message,
+            duration: 3000,
+            icon: closeCircleOutline,
+          });
+        }
+      } else {
+        console.error(error);
+
+        await toastController.presentToast({
+          message: 'Something went wrong',
+          duration: 3000,
+          icon: closeCircleOutline,
+        });
+      }
+    } finally {
+      isSubmitting.value = false;
+    }
   }
 </script>
 
@@ -48,8 +93,13 @@
                 <!-- END Email Address -->
               </div>
 
-              <ion-button expand="block" shape="round" type="submit">
+              <ion-button v-if="!isSubmitting" expand="block" shape="round" type="submit">
                 Confirm
+              </ion-button>
+
+              <ion-button v-else expand="block" shape="round" type="submit" disabled>
+                <ion-spinner class="mr-2"></ion-spinner>
+                Confirming...
               </ion-button>
             </form>
 
