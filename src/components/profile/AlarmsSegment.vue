@@ -65,10 +65,12 @@ import {
 
     const dismissEvent = await actionSheet.onDidDismiss();
 
-    if (dismissEvent.data.action === 'delete') {
-      await showDeleteAlert(alarm)
-    } else if (dismissEvent.data.action === 'edit') {
-      ionRouter.navigate(`/pages/alarms/${alarm.id}`, 'forward', 'push');
+    if (dismissEvent && dismissEvent.data) {
+      if (dismissEvent.data.action === 'delete') {
+        await showDeleteAlert(alarm)
+      } else if (dismissEvent.data.action === 'edit') {
+        ionRouter.navigate(`/pages/alarms/${alarm.id}`, 'forward', 'push');
+      }
     }
   }
 
