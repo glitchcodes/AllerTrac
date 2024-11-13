@@ -342,6 +342,10 @@
     --background: transparent !important;
   }
 
+  ion-list {
+    background-color: transparent;
+  }
+
   ion-icon.location-on {
     color: #FEEC37;
   }
