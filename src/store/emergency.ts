@@ -53,7 +53,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
     const audio = await NativeAudio.isPlaying({ assetId: 'emergency-alert' });
 
     if (audio.isPlaying) {
-      await NativeAudio.stop({
+      NativeAudio.pause({
         assetId: 'emergency-alert'
       })
     }
@@ -63,7 +63,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
     if (!authStore._isLoggedIn) return;
 
     try {
-      const response = await useFetchAPI({
+      await useFetchAPI({
         url: '/contacts/send',
         method: 'POST',
       });
