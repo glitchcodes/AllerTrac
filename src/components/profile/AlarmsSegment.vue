@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import {
-  IonIcon,
-  IonButton,
-  IonRippleEffect,
-  IonToggle,
-  isPlatform,
-  alertController,
-  actionSheetController,
-  useIonRouter,
-  ToggleCustomEvent,
-} from "@ionic/vue";
+  import { computed } from "vue";
+  import {
+    IonIcon,
+    IonButton,
+    IonRippleEffect,
+    IonToggle,
+    isPlatform,
+    alertController,
+    actionSheetController,
+    useIonRouter,
+    ToggleCustomEvent,
+  } from "@ionic/vue";
   import { addSharp, alarm, arrowBackOutline, createOutline, trashOutline } from "ionicons/icons";
   import { Capacitor } from "@capacitor/core";
 
@@ -22,6 +23,10 @@ import {
   const ionRouter = useIonRouter();
   const notificationStore = useNotificationStore();
   const alarmStore = useAlarmStore();
+
+  const isAndroid = computed(() => {
+    return Capacitor.isNativePlatform() && isPlatform('android');
+  })
 
   const formatTo12Hour = (hour: number, minute: number): string => {
     const period = hour >= 12 ? 'PM' : 'AM';
@@ -137,7 +142,7 @@ import {
       </ion-button>
     </AlertMessage>
 
-    <AlertMessage v-else-if="notificationStore.exactAlarmStatus !== 'granted' && Capacitor.isNativePlatform()" type="warning" class="mt-4">
+    <AlertMessage v-else-if="notificationStore.exactAlarmStatus !== 'granted' && isAndroid" type="warning" class="mt-4">
       Alarms may not be sent on time due to Android 12's alarm permission policies.
 
       <ion-button slot="end" size="small" color="secondary" @click="notificationStore.openExactAlarmSettings()">

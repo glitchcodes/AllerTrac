@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
-import {Channel, LocalNotifications} from "@capacitor/local-notifications";
+import { computed, ref } from "vue";
+import { Channel, LocalNotifications } from "@capacitor/local-notifications";
+import { isPlatform } from "@ionic/vue";
+import { Capacitor } from "@capacitor/core";
 import { Preferences } from "@capacitor/preferences";
 
 import type { Alarm, AlarmProp } from "@/types/Alarm";
@@ -8,6 +10,10 @@ import type { Alarm, AlarmProp } from "@/types/Alarm";
 export const useAlarmStore = defineStore('alarms', () => {
   const alarms = ref<Alarm[]>([]);
   const ALARM_STORAGE_KEY = 'alarms';
+
+  const isAndroid = computed(() => {
+    return Capacitor.isNativePlatform() && isPlatform('android');
+  })
 
   const loadAlarms = async () => {
     const { value } = await Preferences.get({ key: ALARM_STORAGE_KEY });
@@ -49,26 +55,28 @@ export const useAlarmStore = defineStore('alarms', () => {
   }
 
   const scheduleAlarm = async (alarm: Alarm) => {
-    // Get channels
-    const { channels } = await LocalNotifications.listChannels();
+    // Get channels - Only available for Android
+    if (isAndroid.value) {
+      const { channels } = await LocalNotifications.listChannels();
 
-    if (channels.find(ch => ch.id === 'alarms') === undefined) {
-      const alarmChannel: Channel = {
-        id: 'alarms',
-        name: 'Alarms',
-        sound: 'default_notification.wav',
-        vibration: true,
-        importance: 5,
+      if (channels.find(ch => ch.id === 'alarms') === undefined) {
+        const alarmChannel: Channel = {
+          id: 'alarms',
+          name: 'Alarms',
+          sound: 'default_notification.wav',
+          vibration: true,
+          importance: 5,
+        }
+
+        await LocalNotifications.createChannel(alarmChannel);
       }
-
-      await LocalNotifications.createChannel(alarmChannel);
     }
 
     // Schedule Notifications
     const baseNotification = {
       title: alarm.title,
       body: alarm.message,
-      channelId: 'alarms',
+      channelId: isAndroid.value ? 'alarms' : null,
       sound: alarm.sound,
       extra: { alarmId: alarm.id }
     }
