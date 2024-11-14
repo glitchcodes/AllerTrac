@@ -45,6 +45,7 @@
 
   const isSubmitting = ref<boolean>(false);
   const isResending = ref<boolean>(false);
+  const resendTimer = ref<number>(0);
 
   const otpInput = ref<InstanceType<typeof VOtpInput> | null>(null);
   const otp = ref("");
@@ -117,6 +118,15 @@
         data: JSON.stringify(body)
       });
 
+      // Start 30 second timer
+      resendTimer.value = 30;
+      const countdown = setInterval(() => {
+        resendTimer.value--;
+        if (resendTimer.value === 0) {
+          clearInterval(countdown);
+        }
+      }, 1000);
+
       await toast.presentToast({
         message: 'Verification code sent',
         duration: 3000,
@@ -150,11 +160,29 @@
 
         break;
       case 'resend':
-        await toast.presentToast({
-          message: 'Something went wrong while trying to resend your verification code',
-          duration: 3000,
-          icon: closeCircleOutline
-        });
+        if (error instanceof FetchError) {
+          switch (error.statusCode) {
+            case 429:
+              await toast.presentToast({
+                message: 'Please wait for the timer before you can resend your verification code',
+                duration: 3000,
+                icon: closeCircleOutline
+              });
+              break;
+            default:
+              await toast.presentToast({
+                message: error.data.message,
+                duration: 3000,
+                icon: closeCircleOutline
+              });
+          }
+        } else {
+          await toast.presentToast({
+            message: 'Something went wrong while trying to resend your verification code',
+            duration: 3000,
+            icon: closeCircleOutline
+          });
+        }
 
         console.error(error);
         break;
@@ -194,11 +222,12 @@
 
               <div class="flex gap-1 justify-center items-center mb-10">
                 <p class="mr-1">Didn't receive a code?</p>
-                <p :class="{ 'text-gray-500': isResending, 'text-primary': !isResending }"
+                <p :class="{ 'text-gray-500': isResending || resendTimer > 0, 'text-primary': !isResending && resendTimer === 0 }"
                    class="font-bold hover:underline cursor-pointer"
-                      @click.prevent="resendOTP">
+                   @click.prevent="resendOTP" v-if="resendTimer === 0">
                   Resend
                 </p>
+                <p v-else class="text-gray-500 font-bold">{{ resendTimer }}s</p>
                 <ion-spinner v-if="isResending" class="resend" name="circular"></ion-spinner>
 
               </div>
