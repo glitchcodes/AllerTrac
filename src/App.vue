@@ -56,9 +56,12 @@
     await alarmStore.init()
 
     // Check permission for notifications
-    if (Capacitor.isNativePlatform() && isPlatform('android')) {
+    if (Capacitor.isNativePlatform()) {
       await notificationStore.checkPermissions();
-      await notificationStore.checkExactAlarmPermission();
+
+      if (isPlatform('android')) {
+        await notificationStore.checkExactAlarmPermission();
+      }
 
       if (notificationStore.permissionStatus === 'prompt' || notificationStore.permissionStatus === 'prompt-with-rationale') {
         await notificationStore.requestPermissions()
