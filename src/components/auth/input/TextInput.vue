@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed } from "vue";
   import { IonInput, IonInputPasswordToggle } from "@ionic/vue";
+  import { phoneMaskOptions } from "@/utils/helpers";
 
   type InputTypeAttribute = "text" | "password" | "email" | "number" | "search" | "tel" | "url"
 
@@ -32,7 +33,8 @@
            :class="{ 'bg-rose-400 text-white': isInvalid, 'bg-primary': !isInvalid }">
         <slot name="icon"></slot>
       </div>
-      <ion-input class="px-4 py-3"
+      <ion-input v-if="props.type !== 'tel'"
+                 class="px-4 py-3"
                  :data-cy="dataCy"
                  :placeholder="props.placeholder"
                  :type="props.type"
@@ -40,6 +42,16 @@
                  :value="modelValue"
                  @ionInput="updateModel">
         <ion-input-password-toggle v-if="type === 'password'" slot="end"></ion-input-password-toggle>
+      </ion-input>
+      <ion-input v-else
+                 v-maskito="phoneMaskOptions"
+                 class="px-4 py-3"
+                 :data-cy="dataCy"
+                 :placeholder="props.placeholder"
+                 :type="props.type"
+                 :disabled="props.disabled"
+                 :value="modelValue"
+                 @ionInput="updateModel">
       </ion-input>
     </div>
 

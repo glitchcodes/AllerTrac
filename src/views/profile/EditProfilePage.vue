@@ -353,7 +353,7 @@
                        label="Phone"
                        label-placement="floating"
                        fill="outline"
-                       placeholder="09XX XXX XXXX"
+                       placeholder="+639XX XXX XXXX"
                        :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
                        :error-text="getErrorMessage('phone_number')"
                        @ionInput="() => inputErrors.phone_number = ''">

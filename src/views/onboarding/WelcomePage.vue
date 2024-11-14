@@ -124,7 +124,7 @@
               <!-- END Last name -->
 
               <!-- Phone number -->
-              <TextInput v-model="phone_number" placeholder="Phone number" type="text" :errors="inputErrors.last_name">
+              <TextInput v-model="phone_number" placeholder="+63 XXX XXX XXXX" type="tel" :errors="inputErrors.phone_number">
                 <template v-slot:icon>
                   <ion-icon aria-hidden="true" :icon="call" />
                 </template>

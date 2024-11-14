@@ -1,7 +1,7 @@
 import {LatLng} from "@capacitor/google-maps/dist/typings/definitions";
 
 export const phoneMaskOptions = {
-  mask: ['0', '9', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/],
+  mask: ['+', '6', '3', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/],
   elementPredicate: (el: HTMLIonInputElement) => {
     return new Promise((resolve) => {
       requestAnimationFrame(async () => {

@@ -171,7 +171,7 @@ import FetchError from "@/utils/errors/FetchError";
                    label="Phone"
                    label-placement="floating"
                    fill="outline"
-                   placeholder="09XX XXX XXXX"
+                   placeholder="+639XXXXXXXXX"
                    :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
                    :error-text="getErrorMessage('phone_number')"
                    @ionInput="() => inputErrors.phone_number = ''">
