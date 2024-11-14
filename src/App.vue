@@ -35,6 +35,7 @@
   import { useNotificationStore } from "@/store/notification";
   import { useAlarmStore } from "@/store/alarm";
   import { useAllergenStore } from "@/store/allergen";
+  import { useEmergencyStore } from "@/store/emergency";
   import NotAllowedError from "@/utils/errors/NotAllowedError";
 
   const route = useRoute();
@@ -43,10 +44,19 @@
   const notificationStore = useNotificationStore();
   const alarmStore = useAlarmStore()
   const allergenStore = useAllergenStore();
+  const emergencyStore = useEmergencyStore();
 
   const isInitializing = ref<boolean>(true);
 
   onMounted(async () => {
+    // Preload alert sound
+    NativeAudio.preload({
+      assetId: 'emergency-alert',
+      assetPath: 'alert.wav',
+      audioChannelNum: 1,
+      isUrl: false
+    });
+
     // Init network status
     const networkStatus = await Network.getStatus();
     await networkStore.updateNetworkStatus(networkStatus);
@@ -71,9 +81,26 @@
     // Listen for app state changes
     App.addListener('appStateChange', () => {
       if (Capacitor.isNativePlatform() && isPlatform('android')) {
-        notificationStore.checkExactAlarmPermission()
+        notificationStore.checkExactAlarmPermission();
       }
+    });
+
+    App.addListener('resume', () => {
+      NativeAudio.preload({
+        assetId: 'emergency-alert',
+        assetPath: 'alert.wav',
+        audioChannelNum: 1,
+        isUrl: false
+      });
     })
+
+    App.addListener('pause', () => {
+      emergencyStore.deactivateAlert();
+
+      NativeAudio.unload({
+        assetId: 'emergency-alert'
+      })
+    });
 
     // Listen for network connection change
     Network.addListener('networkStatusChange', status => {
@@ -98,14 +125,6 @@
 
     isInitializing.value = false;
   });
-
-  // Preload alert sound
-  NativeAudio.preload({
-    assetId: 'emergency-alert',
-    assetPath: 'alert.wav',
-    audioChannelNum: 1,
-    isUrl: false
-  })
 
   watch(() => route.path, async (newRoute) => {
     const isAndroid = isPlatform('android');
