@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const _isLoggedIn = computed(() => {
     if (!bearerToken.value || !user.value) return false;
 
-    return bearerToken.value.length > 0 && user.value;
+    return bearerToken.value.length > 0 && Object.keys(user.value).length > 0;
   })
   const _user = computed(() => user.value)
 
