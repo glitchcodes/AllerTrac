@@ -23,9 +23,9 @@
       // Update allergens
       await allergenStore.updateAllergens(allergens.value)
 
-      // Redirect to final onboarding page
+      // Redirect to emergency contacts page
       await router.push({
-        name: 'onboarding-final'
+        name: 'onboarding-contacts'
       })
     } catch (error) {
       console.error(error)

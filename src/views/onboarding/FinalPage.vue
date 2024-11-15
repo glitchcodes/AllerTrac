@@ -55,7 +55,7 @@
           </div>
 
           <div class="flex mt-6">
-            <ion-button router-link="/o/allergies" router-direction="back" fill="outline" shape="round" class="w-full">
+            <ion-button router-link="/o/contacts" router-direction="back" fill="outline" shape="round" class="w-full">
               Back
             </ion-button>
             <ion-button router-link="/pages/home" router-direction="root" shape="round" class="w-full">
