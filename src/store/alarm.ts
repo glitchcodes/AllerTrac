@@ -4,27 +4,150 @@ import { Channel, LocalNotifications } from "@capacitor/local-notifications";
 import { isPlatform } from "@ionic/vue";
 import { Capacitor } from "@capacitor/core";
 import { Preferences } from "@capacitor/preferences";
+import { useFetchAPI } from "@/composables/useFetchAPI";
+import { useToastController } from "@/composables/useToastController";
 
 import type { Alarm, AlarmProp } from "@/types/Alarm";
+import {closeCircleOutline} from "ionicons/icons";
 
 export const useAlarmStore = defineStore('alarms', () => {
   const alarms = ref<Alarm[]>([]);
+  const alarmVersion = ref<Date>();
+
+  const isOutdated = ref(false);
+  const isSyncing = ref(false);
+
+  const ALARM_VERSION_KEY = 'alarm_version';
   const ALARM_STORAGE_KEY = 'alarms';
+
+  const toastController = useToastController();
 
   const isAndroid = computed(() => {
     return Capacitor.isNativePlatform() && isPlatform('android');
-  })
+  });
+
+  const checkAlarmVersion = async () => {
+    try {
+      isSyncing.value = true;
+
+      const response = await useFetchAPI({
+        url: '/user/alarms',
+        method: 'GET'
+      });
+
+      if (response.data && response.data.length === 0) {
+        isOutdated.value = true;
+      }
+
+      // Check if the cloud version is newer than local copy
+      isOutdated.value =  !(alarmVersion.value === undefined || (new Date(response.data.updated_at) >= alarmVersion.value));
+    } catch (error) {
+      console.log(error)
+
+      isOutdated.value = true;
+    } finally {
+      isSyncing.value = false;
+    }
+  }
+
+  const syncAlarms = async () => {
+    // Get old alarms
+    const { value } = await Preferences.get({ key: ALARM_STORAGE_KEY });
+    const oldAlarms = value;
+
+    try {
+      isSyncing.value = true;
+
+      const response = await useFetchAPI({
+        url: '/user/alarms',
+        method: 'GET'
+      });
+
+      if (response.status === 200) {
+        if (response.data && response.data.length === 0) {
+          await saveToCloud();
+          return;
+        }
+
+        const cloudAlarms = response.data.alarms;
+
+        // Check if the cloud version is newer than local copy
+        if (
+          alarmVersion.value === undefined || (new Date(response.data.updated_at) >= alarmVersion.value)
+        ) {
+          alarms.value = JSON.parse(cloudAlarms);
+          await saveAlarms();
+        } else {
+          await saveToCloud();
+        }
+      }
+    } catch (error) {
+      await toastController.presentToast({
+        message: `We can't sync your alarms. Please try again later`,
+        icon: closeCircleOutline,
+        duration: 3000,
+        position: 'bottom',
+        positionAnchor: 'scan-food-button'
+      });
+
+      console.error(error);
+      alarms.value = oldAlarms ? JSON.parse(JSON.parse(oldAlarms)) : [];
+    } finally {
+      isSyncing.value = false;
+    }
+  }
+
+  const saveToCloud = async () => {
+    try {
+      const response = await useFetchAPI({
+        url: '/user/alarms',
+        method: 'POST',
+        data: JSON.stringify({
+          alarms: `${JSON.stringify(alarms.value)}`
+        })
+      });
+
+      if (response.status === 200) {
+        // Set new version
+        await Preferences.set({
+          key: ALARM_VERSION_KEY,
+          value: response.data.updated_at
+        });
+
+        isOutdated.value = false;
+      }
+    } catch (error) {
+      throw new Error(`Can't save to cloud`);
+    }
+  }
 
   const loadAlarms = async () => {
-    const { value } = await Preferences.get({ key: ALARM_STORAGE_KEY });
-    alarms.value = value ? JSON.parse(value) : []
+    // Get alarm version
+    const version = await Preferences.get({ key: ALARM_VERSION_KEY });
+    alarmVersion.value = version.value ? new Date(version.value) : undefined
+
+    // Get alarms
+    const cloud = await Preferences.get({ key: ALARM_STORAGE_KEY });
+    alarms.value = cloud.value ? JSON.parse(cloud.value) : []
   }
 
   const saveAlarms = async () => {
+    // Store alarms
     await Preferences.set({
       key: ALARM_STORAGE_KEY,
       value: JSON.stringify(alarms.value)
-    })
+    });
+  }
+
+  const updateVersion = async () => {
+    alarmVersion.value = new Date()
+
+    await Preferences.set({
+      key: ALARM_VERSION_KEY,
+      value: alarmVersion.value.toISOString()
+    });
+
+    await checkAlarmVersion();
   }
 
   const generateNotificationId = () => Math.floor(Date.now() % 1000000);
@@ -47,6 +170,9 @@ export const useAlarmStore = defineStore('alarms', () => {
     }
 
     alarms.value.push(newAlarm);
+
+    // Store new version
+    await updateVersion()
 
     // Persist alarms to preferences
     await saveAlarms();
@@ -76,7 +202,7 @@ export const useAlarmStore = defineStore('alarms', () => {
     const baseNotification = {
       title: alarm.title,
       body: alarm.message,
-      channelId: isAndroid.value ? 'alarms' : null,
+      channelId: isAndroid.value ? 'alarms' : undefined,
       sound: alarm.sound,
       extra: { alarmId: alarm.id }
     }
@@ -141,6 +267,10 @@ export const useAlarmStore = defineStore('alarms', () => {
 
       // Reschedule the alarm
       await scheduleAlarm(alarm);
+
+      // Store new version
+      await updateVersion()
+
       await saveAlarms()
     }
   }
@@ -155,6 +285,10 @@ export const useAlarmStore = defineStore('alarms', () => {
 
       alarm.isScheduled = false;
       alarm.notificationIds = []; // Clear notification IDs
+
+      // Store new version
+      await updateVersion()
+
       await saveAlarms();
     }
   }
@@ -162,6 +296,9 @@ export const useAlarmStore = defineStore('alarms', () => {
   const deleteAlarm = async (alarmId: number) => {
     await cancelAlarm(alarmId);
     alarms.value = alarms.value.filter(a => a.id !== alarmId);
+
+    // Store new version
+    await updateVersion()
 
     await saveAlarms();
   }
@@ -178,5 +315,5 @@ export const useAlarmStore = defineStore('alarms', () => {
     })
   }
 
-  return { alarms, init, getAlarm, addAlarm, scheduleAlarm, editAlarm, cancelAlarm, deleteAlarm }
+  return { alarms, alarmVersion, isSyncing, isOutdated, checkAlarmVersion, init, syncAlarms, getAlarm, addAlarm, scheduleAlarm, editAlarm, cancelAlarm, deleteAlarm }
 })
