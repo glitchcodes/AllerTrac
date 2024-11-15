@@ -1,17 +1,32 @@
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { onMounted, computed, ref } from "vue";
   import {
+    IonContent,
     IonIcon,
     IonButton,
     IonRippleEffect,
     IonToggle,
+    IonPopover,
+    IonList,
+    IonItem,
+    IonLabel,
     isPlatform,
     alertController,
     actionSheetController,
     useIonRouter,
     ToggleCustomEvent,
   } from "@ionic/vue";
-  import { addSharp, alarm, arrowBackOutline, createOutline, trashOutline } from "ionicons/icons";
+  import {
+    addSharp,
+    alarm,
+    arrowBackOutline,
+    cloudDoneOutline,
+    cloudOfflineOutline,
+    createOutline,
+    ellipsisHorizontal,
+    syncOutline,
+    trashOutline
+  } from "ionicons/icons";
   import { Capacitor } from "@capacitor/core";
 
   import { useNotificationStore } from "@/store/notification";
@@ -26,6 +41,10 @@
 
   const isAndroid = computed(() => {
     return Capacitor.isNativePlatform() && isPlatform('android');
+  });
+
+  onMounted(async () => {
+    await alarmStore.checkAlarmVersion()
   })
 
   const formatTo12Hour = (hour: number, minute: number): string => {
@@ -110,6 +129,23 @@
       alarm.isScheduled = true;
     }
   }
+
+  const isMenuOpen = ref<boolean>(false);
+  const popoverEvent = ref<Event|null>();
+
+  const openMenu = (e: Event) => {
+    isMenuOpen.value = true;
+    popoverEvent.value = e;
+  }
+
+  const closeMenu = () => {
+    isMenuOpen.value = false;
+  }
+
+  const handleSyncAlarms = async () => {
+    isMenuOpen.value = false;
+    await alarmStore.syncAlarms()
+  }
 </script>
 
 <template>
@@ -122,14 +158,37 @@
           Alarms
         </h6>
 
-        <ion-button v-if="isPlatform('ios')" fill="outline" router-link="/pages/alarms/create" router-direction="forward">
-          <ion-icon slot="icon-only" aria-label="Save" :icon="addSharp"></ion-icon>
+        <ion-icon v-if="!alarmStore.isSyncing && !alarmStore.isOutdated" aria-label="Alarms updated" :icon="cloudDoneOutline" class="mr-2" />
+
+        <ion-icon v-if="!alarmStore.isSyncing && alarmStore.isOutdated" aria-label="Alarms updated" :icon="cloudOfflineOutline" class="mr-2" />
+
+        <ion-spinner v-if="alarmStore.isSyncing" class="size-4"></ion-spinner>
+
+
+
+        <ion-button fill="outline" @click="openMenu">
+          <ion-icon slot="icon-only" aria-label="Save" :icon="ellipsisHorizontal"></ion-icon>
         </ion-button>
 
-        <ion-button v-else fill="outline" shape="round" router-link="/pages/alarms/create" router-direction="forward">
-          <ion-icon slot="start" aria-label="Save" :icon="addSharp"></ion-icon>
-          <span>New</span>
-        </ion-button>
+        <ion-popover
+            :is-open="isMenuOpen"
+            :event="popoverEvent"
+            class="alarm-options"
+            @didDismiss="closeMenu"
+        >
+          <ion-content>
+            <ion-list class="ion-no-padding">
+              <ion-item button router-link="/pages/alarms/create" router-direction="forward" @click="closeMenu">
+                <ion-icon aria-hidden="true" :icon="addSharp" slot="start"></ion-icon>
+                <ion-label>New alarm</ion-label>
+              </ion-item>
+              <ion-item button @click="handleSyncAlarms">
+                <ion-icon aria-hidden="true" :icon="syncOutline" slot="start"></ion-icon>
+                <ion-label>Sync alarms</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ion-popover>
       </div>
 
     </div>
@@ -153,11 +212,11 @@
     <div class="flex flex-col gap-3 mt-4">
       <div v-for="alarm in alarmStore.alarms"
            :key="alarm.id"
-           class="flex items-center justify-between w-full ion-activatable ripple-parent"
+           class="flex items-center justify-between w-full ion-activatable ripple-parent overflow-hidden rounded-2xl"
            @click="showAlarmOptions(alarm)"
       >
         <ion-ripple-effect></ion-ripple-effect>
-        <div class="bg-neutral-100 rounded-2xl p-6 text-primary font-bold flex items-center w-full justify-between border-2 shadow-md">
+        <div class="bg-neutral-100 p-6 rounded-2xl text-primary font-bold flex items-center w-full justify-between border-2 shadow-md">
           <div>
             <h2 class="text-2xl text-primary font-bold">
               {{ formatTo12Hour(alarm.time.hour, alarm.time.minute) }}
@@ -172,13 +231,14 @@
         You have no alarms yet.
       </AlertMessage>
     </div>
-
-<!--    <div class="bg-primary rounded-2xl p-4 flex items-center justify-center">-->
-<!--      -->
-<!--    </div>-->
   </div>
 </template>
 
 <style scoped lang="scss">
-
+ion-popover.alarm-options {
+  --min-width: 220px;
+  ion-content {
+    --ion-background-color: white;
+  }
+}
 </style>
