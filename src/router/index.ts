@@ -125,7 +125,28 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true
         },
         component: () => import('@/views/profile/ProfilePage.vue')
+      },
+      {
+        path: '/facts',
+        name: 'facts',
+        component: () => import('@/views/facts/FactsListPage.vue')
+      },
+      {
+        path: '/facts/:id',
+        name: 'factsPage',
+        component: () => FactsPage
+      },
+      {
+        path: '/allergens',
+        name: 'allergens',
+        component: () => import('@/views/allergens/AllergensListPage.vue')
+      },
+      {
+        path: '/allergens/:id',
+        name: 'allergensPage',
+        component: () => AllergensPage
       }
+
     ]
   },
   {
