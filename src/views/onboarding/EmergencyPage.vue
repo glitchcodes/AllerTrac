@@ -154,8 +154,8 @@
           </div>
 
           <div class="flex mt-6">
-            <ion-button router-link="/o/allergies" router-direction="back" fill="outline" shape="round" class="w-full">
-              Back
+            <ion-button router-link="/o/congrats" router-direction="forward" fill="outline" shape="round" class="w-full">
+              Skip
             </ion-button>
             <ion-button shape="round" class="w-full" @click="handleSaveChanges">
               Next

@@ -7,4 +7,5 @@ export interface User {
   email: string
   phone_number: string
   birthday: string
+  is_onboarding: boolean
 }

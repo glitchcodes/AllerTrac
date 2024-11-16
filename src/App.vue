@@ -29,7 +29,7 @@
   import { NativeAudio } from "@capacitor-community/native-audio";
   import { Network } from "@capacitor/network";
 
-  import { useRoute } from "vue-router";
+  import { useRoute, useRouter } from "vue-router";
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
   import { useNotificationStore } from "@/store/notification";
@@ -37,8 +37,10 @@
   import { useAllergenStore } from "@/store/allergen";
   import { useEmergencyStore } from "@/store/emergency";
   import NotAllowedError from "@/utils/errors/NotAllowedError";
+  import type { User } from "@/types/User";
 
   const route = useRoute();
+  const router = useRouter();
   const authStore = useAuthStore();
   const networkStore = useNetworkStore();
   const notificationStore = useNotificationStore();
@@ -110,7 +112,21 @@
     if (networkStore._isConnected) {
       try {
         // Validate user session
-        await authStore.validateToken();
+        const response = await authStore.validateToken();
+        const user: User = response.data.user;
+
+        // Redirect user to onboarding if not yet done
+        if (
+            user.is_onboarding && !(
+                route.name === 'onboarding-welcome' ||
+                route.name === 'onboarding-allergens' ||
+                route.name === 'onboarding-contacts' ||
+                route.name === 'onboarding-final'
+            )
+        ) {
+          isInitializing.value = false;
+          return await router.replace({ name: 'onboarding-welcome' })
+        }
 
         // Get user allergens
         if (authStore._isLoggedIn) {

@@ -1,13 +1,38 @@
 <script setup lang="ts">
   import { onMounted, ref } from "vue";
-  import { IonButton, IonContent, IonPage } from "@ionic/vue";
+  import { IonButton, IonContent, IonPage, useIonRouter } from "@ionic/vue";
   import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
+  import { useFetchAPI } from "@/composables/useFetchAPI";
+  import { useToastController } from "@/composables/useToastController";
+  import { closeCircleOutline } from "ionicons/icons";
 
+  const ionRouter = useIonRouter();
+  const toastController = useToastController();
   const statusBarHeight = ref<number>(0);
 
   onMounted(async () => {
     statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height;
-  })
+  });
+
+  const handleCompleteOnboarding = async () => {
+    try {
+      await useFetchAPI({
+        url: '/user/complete-onboarding',
+        method: 'PATCH'
+      });
+
+      ionRouter.navigate('/pages/home', 'forward', 'replace');
+    } catch (error) {
+      await toastController.presentToast({
+        message: 'Something went wrong',
+        duration: 3000,
+        icon: closeCircleOutline,
+        position: 'bottom'
+      });
+
+      console.error(error);
+    }
+  }
 </script>
 
 <template>
@@ -58,7 +83,7 @@
             <ion-button router-link="/o/contacts" router-direction="back" fill="outline" shape="round" class="w-full">
               Back
             </ion-button>
-            <ion-button router-link="/pages/home" router-direction="root" shape="round" class="w-full">
+            <ion-button shape="round" class="w-full" @click="handleCompleteOnboarding">
               Next
             </ion-button>
           </div>

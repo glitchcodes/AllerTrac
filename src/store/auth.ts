@@ -56,6 +56,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Update the user state
       user.value = response.data.user;
+
+      return response;
     } catch (error) {
 
       if (error instanceof FetchError) {
