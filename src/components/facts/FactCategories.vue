@@ -6,7 +6,7 @@
   import type { FactCategory } from "@/types/FactCategory";
 
   const emit = defineEmits<{
-    (e: 'close'): void
+    (e: 'navigate', categoryId: number): void
   }>()
 
   const ionRouter = useIonRouter();
@@ -36,8 +36,7 @@
   });
 
   const navigateTo = (categoryId: number) => {
-    ionRouter.navigate(`/pages/category/${ categoryId }`, 'forward', 'push');
-    emit('close')
+    emit('navigate', categoryId)
   }
 </script>
 

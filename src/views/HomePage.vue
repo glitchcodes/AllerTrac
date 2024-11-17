@@ -9,7 +9,8 @@
     isPlatform,
     IonToolbar,
     IonButtons,
-    IonTitle
+    IonTitle,
+    useIonRouter
   } from '@ionic/vue';
   import { ellipsisHorizontal, fastFood, logIn,  menu } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
@@ -24,6 +25,7 @@
 
   const FactCategories = defineAsyncComponent(() => import('@/components/facts/FactCategories.vue'));
 
+  const ionRouter = useIonRouter()
   const authStore = useAuthStore();
   const { openUserMenu } = useMenuNav();
 
@@ -35,7 +37,9 @@
     drawer.value = new CupertinoPane('ion-drawer#fact-categories', {
       backdrop: true,
       bottomOffset: 48,
+      bottomClose: true,
       touchMoveStopPropagation: true,
+      ionContentScroll: true,
       breaks: {
         top: { // Topper point that pane can reach
           enabled: true, // Enable or disable breakpoint
@@ -61,6 +65,12 @@
       return "Good Evening!"
     }
   });
+
+  const navigateTo = async (categoryId: number) => {
+    await drawer.value.hide();
+
+    ionRouter.navigate(`/pages/category/${ categoryId }`, 'forward', 'push');
+  }
 </script>
 
 <template>
@@ -142,7 +152,7 @@
       </Suspense>
 
       <ion-drawer id="fact-categories">
-        <FactCategories v-if="isCategoriesMounted" @close="() => drawer.hide()" />
+        <FactCategories v-if="isCategoriesMounted" @navigate="navigateTo($event)" />
       </ion-drawer>
     </ion-content>
   </ion-page>
