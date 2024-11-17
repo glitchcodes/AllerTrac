@@ -79,3 +79,12 @@ a:hover {
 .cupertino-pane-wrapper .pane {
   z-index: 9999;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

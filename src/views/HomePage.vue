@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { ref, computed, onMounted, defineAsyncComponent } from "vue";
   import {
     IonPage,
     IonHeader,
@@ -15,14 +15,40 @@
   import { useAuthStore } from "@/store/auth";
   import { useMenuNav } from "@/composables/useMenuNav";
 
-  import FactCarousel from "@/components/FactCarousel.vue";
+  import { CupertinoPane } from "cupertino-pane";
+  import FactCarousel from "@/components/facts/FactCarousel.vue";
   import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
-  import FactCategorySlider from "@/components/FactCategorySlider.vue";
+  import FactCategorySlider from "@/components/facts/FactCategorySlider.vue";
   import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
   import WarningAlert from "@/components/alert/WarningAlert.vue";
 
+  const FactCategories = defineAsyncComponent(() => import('@/components/facts/FactCategories.vue'));
+
   const authStore = useAuthStore();
   const { openUserMenu } = useMenuNav();
+
+  // Drawer
+  const drawer = ref();
+  const isCategoriesMounted = ref<boolean>(false);
+
+  onMounted(() => {
+    drawer.value = new CupertinoPane('ion-drawer#fact-categories', {
+      backdrop: true,
+      bottomOffset: 48,
+      touchMoveStopPropagation: true,
+      breaks: {
+        top: { // Topper point that pane can reach
+          enabled: true, // Enable or disable breakpoint
+          height: window.screen.height - (135 * 0.35) - 54 - 100, // Pane breakpoint height
+          bounce: true // Bounce pane on transition
+        },
+      }
+    });
+
+    drawer.value.on('onDidPresent', () => {
+      isCategoriesMounted.value = true;
+    })
+  })
 
   const greetingMessage = computed(() => {
     const currentHour = new Date().getHours();
@@ -96,11 +122,11 @@
       </div>
 
       <div class="rounded-md flex justify-between mt-5">
-        <h5 class="font-bold mt-1 mx-[1px]">
+        <h5 class="font-bold">
           Here are some facts!
         </h5>
-        <h5 class="font-bold mt-1 hover:underline">
-          <router-link :to="{ name: 'register' }" class="font-bold hover:underline">See All </router-link>
+        <h5 class="text-primary font-bold" @click="() => drawer.present({ animate: true })">
+          See all
         </h5>
       </div>
 
@@ -116,13 +142,17 @@
         <FactCarousel />
 
         <template #fallback>
-          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x">
+          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x no-scrollbar">
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
         </template>
       </Suspense>
+
+      <ion-drawer id="fact-categories">
+        <FactCategories v-if="isCategoriesMounted" @close="() => drawer.hide()" />
+      </ion-drawer>
     </ion-content>
   </ion-page>
 </template>
