@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <div class="overflow-x-auto scroll-smooth flex flex-nowrap space-x-2">
+  <div class="overflow-x-auto scroll-smooth flex flex-nowrap space-x-2 no-scrollbar">
     <ion-chip v-for="category in categories" :key="category.id" :router-link="'/facts/' + category.id" class="overflow-visible">
       <ion-label class="text-nowrap text-white">{{ category.name }}</ion-label>
     </ion-chip>

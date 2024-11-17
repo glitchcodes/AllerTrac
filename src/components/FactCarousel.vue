@@ -19,7 +19,7 @@ try {
 </script>
 
 <template>
-  <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x">
+  <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x no-scrollbar">
     <template v-for="fact in facts" :key="fact.id">
       <Card :fact="fact" ></Card>
     </template>
