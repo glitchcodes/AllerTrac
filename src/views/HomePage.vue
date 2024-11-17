@@ -121,17 +121,8 @@
         </div>
       </div>
 
-      <div class="rounded-md flex justify-between mt-5">
-        <h5 class="font-bold">
-          Here are some facts!
-        </h5>
-        <h5 class="text-primary font-bold" @click="() => drawer.present({ animate: true })">
-          See all
-        </h5>
-      </div>
-
       <Suspense>
-        <FactCategorySlider class="mt-2 mb-4" />
+        <FactCategorySlider class="mt-2 mb-4" @open-drawer="() => drawer.present({ animate: true })" />
 
         <template #fallback>
           <SkeletonChipSlider class="mt-2 mb-4" />
