@@ -15,7 +15,7 @@
 
   try {
     const response = await useFetchAPI({
-      url: '/facts/category/random',
+      url: '/facts/category/all',
       method: 'GET'
     })
 
@@ -42,7 +42,7 @@
       </div>
 
       <div class="overflow-x-auto scroll-smooth flex flex-nowrap space-x-2 no-scrollbar">
-        <ion-chip v-for="category in categories" :key="category.id" :router-link="'/facts/' + category.id" class="overflow-visible m-0">
+        <ion-chip v-for="category in categories" :key="category.id" :router-link="'/pages/category/' + category.id" class="overflow-visible m-0">
           <ion-label class="text-nowrap text-white">{{ category.name }}</ion-label>
         </ion-chip>
       </div>

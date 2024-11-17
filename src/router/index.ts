@@ -155,19 +155,29 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/profile/SecurityPage.vue')
       },
       {
-        path: '/pages/alarms/create',
+        path: 'alarms/create',
         name: 'alarms-create',
         component: () => import('@/views/alarm/CreateAlarmPage.vue')
       },
       {
-        path: '/pages/alarms/:id',
+        path: 'alarms/:id',
         name: 'alarms-edit',
         component: () => import('@/views/alarm/EditAlarmPage.vue')
       },
       {
-        path: '/pages/attributions',
+        path: 'attributions',
         name: 'attributions',
         component: () => import('@/views/AttributionPage.vue')
+      },
+      {
+        path: 'category/:id',
+        name: 'fact-category',
+        component: () => import('@/views/facts/FactListPage.vue')
+      },
+      {
+        path: 'facts/:id',
+        name: 'fact-view',
+        component: () => import('@/views/facts/FactViewPage.vue')
       }
     ]
   },

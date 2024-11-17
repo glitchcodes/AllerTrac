@@ -36,7 +36,7 @@
   });
 
   const navigateTo = (categoryId: number) => {
-    ionRouter.navigate(`/facts/${ categoryId }`, 'forward', 'push');
+    ionRouter.navigate(`/pages/category/${ categoryId }`, 'forward', 'push');
     emit('close')
   }
 </script>
