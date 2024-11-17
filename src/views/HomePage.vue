@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { ref, computed, onMounted, defineAsyncComponent } from "vue";
   import {
     IonPage,
     IonHeader,
@@ -9,20 +9,50 @@
     isPlatform,
     IonToolbar,
     IonButtons,
-    IonTitle
+    IonTitle,
+    useIonRouter
   } from '@ionic/vue';
   import { ellipsisHorizontal, fastFood, logIn,  menu } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
   import { useMenuNav } from "@/composables/useMenuNav";
 
-  import FactCarousel from "@/components/FactCarousel.vue";
+  import { CupertinoPane } from "cupertino-pane";
+  import FactCarousel from "@/components/facts/FactCarousel.vue";
   import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
-  import FactCategorySlider from "@/components/FactCategorySlider.vue";
+  import FactCategorySlider from "@/components/facts/FactCategorySlider.vue";
   import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
   import WarningAlert from "@/components/alert/WarningAlert.vue";
 
+  const FactCategories = defineAsyncComponent(() => import('@/components/facts/FactCategories.vue'));
+
+  const ionRouter = useIonRouter()
   const authStore = useAuthStore();
   const { openUserMenu } = useMenuNav();
+
+  // Drawer
+  const drawer = ref();
+  const isCategoriesMounted = ref<boolean>(false);
+
+  onMounted(() => {
+    drawer.value = new CupertinoPane('ion-drawer#fact-categories', {
+      backdrop: true,
+      bottomOffset: 48,
+      bottomClose: true,
+      touchMoveStopPropagation: true,
+      ionContentScroll: true,
+      breaks: {
+        top: { // Topper point that pane can reach
+          enabled: true, // Enable or disable breakpoint
+          height: window.screen.height - (135 * 0.35) - 54 - 100, // Pane breakpoint height
+          bounce: true // Bounce pane on transition
+        },
+      }
+    });
+
+    drawer.value.on('onDidPresent', () => {
+      isCategoriesMounted.value = true;
+    })
+  })
 
   const greetingMessage = computed(() => {
     const currentHour = new Date().getHours();
@@ -35,6 +65,12 @@
       return "Good Evening!"
     }
   });
+
+  const navigateTo = async (categoryId: number) => {
+    await drawer.value.hide();
+
+    ionRouter.navigate(`/pages/category/${ categoryId }`, 'forward', 'push');
+  }
 </script>
 
 <template>
@@ -95,17 +131,8 @@
         </div>
       </div>
 
-      <div class="rounded-md flex justify-between mt-5">
-        <h5 class="font-bold mt-1 mx-[1px]">
-          Here are some facts!
-        </h5>
-        <h5 class="font-bold mt-1 hover:underline">
-          <router-link :to="{ name: 'register' }" class="font-bold hover:underline">See All </router-link>
-        </h5>
-      </div>
-
       <Suspense>
-        <FactCategorySlider class="mt-2 mb-4" />
+        <FactCategorySlider class="mt-2 mb-4" @open-drawer="() => drawer.present({ animate: true })" />
 
         <template #fallback>
           <SkeletonChipSlider class="mt-2 mb-4" />
@@ -116,13 +143,17 @@
         <FactCarousel />
 
         <template #fallback>
-          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x">
+          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x no-scrollbar">
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
         </template>
       </Suspense>
+
+      <ion-drawer id="fact-categories">
+        <FactCategories v-if="isCategoriesMounted" @navigate="navigateTo($event)" />
+      </ion-drawer>
     </ion-content>
   </ion-page>
 </template>

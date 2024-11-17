@@ -108,7 +108,7 @@
     await showLoading()
 
     // Instantiate cupertino pane
-    drawer.value = new CupertinoPane('ion-drawer', {
+    drawer.value = new CupertinoPane('ion-drawer#hospital-drawer', {
       // parentElement: '#hospital-locator',
       buttonDestroy: false,
       bottomOffset: 56,
@@ -273,7 +273,7 @@
       <capacitor-google-map ref="mapRef"></capacitor-google-map>
 
       <div>
-        <ion-drawer class="hospital-drawer">
+        <ion-drawer id="hospital-drawer">
           <div class="ion-padding">
 
             <div class="flex items-center mb-6">
@@ -350,7 +350,7 @@
     color: #FEEC37;
   }
 
-  ion-drawer.hospital-drawer {
+  ion-drawer#hospital-drawer {
     ion-content {
       --background: white!important;
     }
