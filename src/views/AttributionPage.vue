@@ -79,6 +79,18 @@
           <ion-item>
             <ion-label>
               <div>
+                Food Allergy Information
+              </div>
+              <ion-note>
+                <a href="https://foodallergy.org" target="_blank">
+                  foodallergy.org
+                </a>
+              </ion-note>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>
+              <div>
                 Notification (positive)
               </div>
               <ion-note>
