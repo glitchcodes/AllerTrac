@@ -1,25 +1,31 @@
 <script setup lang="ts">
-import {reactive, ref, watch} from "vue";
+import { reactive, ref, watch, onMounted } from "vue";
 import { IonButton } from "@ionic/vue";
 import { useNetworkStore } from "@/store/network";
 import { useFetchAPI } from "@/composables/useFetchAPI";
 import Card from "@/components/Card.vue";
-import type { Fact } from "@/types/Fact";
-import FetchError from "@/utils/errors/FetchError";
 import AlertMessage from "@/components/AlertMessage.vue";
 import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
+import FetchError from "@/utils/errors/FetchError";
+import type { Fact } from "@/types/Fact";
 
 const networkStore = useNetworkStore();
 
-const isFetching = ref<boolean>(true);
+const isFetching = ref<boolean>(false);
 const facts = ref<Fact[]>([]);
 const error = reactive({
   statusCode: 0,
   message: ''
 })
 
+onMounted(async () => {
+  if (networkStore._isConnected) {
+    await fetchFacts()
+  }
+})
+
 watch(() => networkStore._isConnected, async (isConnected) => {
-  if (isConnected && facts.value.length === 0) {
+  if (isConnected) {
     await fetchFacts()
   }
 }, { immediate: true })

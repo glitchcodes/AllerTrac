@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {reactive, ref, watch} from "vue";
+  import { reactive, ref, watch, onMounted } from "vue";
   import { IonChip, IonLabel } from "@ionic/vue";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useNetworkStore } from "@/store/network";
-  import type { FactCategory } from "@/types/FactCategory";
   import AlertMessage from "@/components/AlertMessage.vue";
-import FetchError from "@/utils/errors/FetchError";
-import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
+  import FetchError from "@/utils/errors/FetchError";
+  import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
+  import type { FactCategory } from "@/types/FactCategory";
 
   const emit = defineEmits<{
     (e: 'openDrawer'): void
@@ -14,15 +14,21 @@ import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
 
   const networkStore = useNetworkStore();
 
-  const isFetching = ref<boolean>(true);
+  const isFetching = ref<boolean>(false);
   const categories = ref<FactCategory[]>([]);
   const error = reactive({
     statusCode: 0,
     message: ''
   })
 
+  onMounted(async () => {
+    if (networkStore._isConnected) {
+      await fetchCategories()
+    }
+  })
+
   watch(() => networkStore._isConnected, async (isConnected) => {
-    if (isConnected && categories.value.length === 0) {
+    if (isConnected) {
       await fetchCategories()
     }
   }, { immediate: true })
