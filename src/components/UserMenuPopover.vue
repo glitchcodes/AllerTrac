@@ -2,9 +2,11 @@
 import { computed } from "vue";
 import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonIcon, popoverController, useIonRouter } from "@ionic/vue";
 import { logOut, sparklesOutline } from "ionicons/icons";
+import { useNetworkStore } from "@/store/network";
 import type { User } from "@/types/User";
 
 const ionRouter = useIonRouter();
+const networkStore = useNetworkStore();
 
 const props = defineProps<{
   user: User
@@ -45,7 +47,7 @@ const logoutUser = async () => {
         <ion-icon aria-hidden="true" :icon="sparklesOutline" slot="start"></ion-icon>
         <ion-label>Attributions</ion-label>
       </ion-item>
-      <ion-item button @click="logoutUser">
+      <ion-item button :disabled="!networkStore._isConnected" @click="logoutUser">
         <ion-icon aria-hidden="true" :icon="logOut" slot="start"></ion-icon>
         <ion-label>Logout</ion-label>
       </ion-item>

@@ -3,11 +3,14 @@
   import { IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
   import { checkmarkCircleOutline, fastFood, save } from "ionicons/icons";
   import { useAllergenStore } from "@/store/allergen";
+  import { useNetworkStore } from "@/store/network";
   import { useToastController } from "@/composables/useToastController";
   import SkeletonAllergens from "@/components/skeleton/SkeletonAllergens.vue";
   import AllergenSelector from "@/components/AllergenSelector.vue";
+  import AllergenSelectorOffline from "@/components/AllergenSelectorOffline.vue";
   import type { Allergen } from "@/types/Allergen";
 
+  const networkStore = useNetworkStore();
   const allergenStore = useAllergenStore();
   const { presentToast } = useToastController()
 
@@ -55,11 +58,19 @@
       </h6>
 
       <template v-if="!isSaving">
-        <ion-button v-if="isPlatform('ios')" fill="outline" :disabled="!hasEdited" @click="handleSaveEvent">
+        <ion-button v-if="isPlatform('ios')"
+                    fill="outline"
+                    :disabled="!hasEdited || !networkStore._isConnected"
+                    @click="handleSaveEvent"
+        >
           <ion-icon slot="icon-only" aria-label="Save" :icon="save"></ion-icon>
         </ion-button>
 
-        <ion-button v-else fill="outline" shape="round" :disabled="!hasEdited" @click="handleSaveEvent">
+        <ion-button v-else
+                    fill="outline" shape="round"
+                    :disabled="!hasEdited || !networkStore._isConnected"
+                    @click="handleSaveEvent"
+        >
           <ion-icon slot="start" aria-label="Save" :icon="save"></ion-icon>
           <span class="ms-1">Save</span>
         </ion-button>
@@ -78,7 +89,8 @@
     </div>
 
     <Suspense>
-      <AllergenSelector v-model="allergens" @change="handleChangeEvent" />
+      <AllergenSelector v-if="networkStore._isConnected" v-model="allergens" @change="handleChangeEvent" />
+      <AllergenSelectorOffline v-else />
 
       <template #fallback>
         <SkeletonAllergens />

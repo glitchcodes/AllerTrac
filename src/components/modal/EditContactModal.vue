@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive, ref} from "vue";
+  import { reactive, ref } from "vue";
   import { arrowBack, save } from "ionicons/icons";
   import {
     IonHeader,
@@ -18,15 +18,16 @@ import {reactive, ref} from "vue";
     loadingController
   } from "@ionic/vue";
   import { useContactStore } from "@/store/contact";
+  import { useNetworkStore } from "@/store/network";
   import { useAlertController } from "@/composables/useAlertController";
-
   import { default as EmergencyContactComponent } from "@/components/EmergencyContact.vue"
-  import WarningAlert from "@/components/alert/WarningAlert.vue";
+  import AlertMessage from "@/components/AlertMessage.vue";
 
   import { phoneMaskOptions } from "@/utils/helpers";
+  import FetchError from "@/utils/errors/FetchError";
   import type { EmergencyContact } from "@/types/EmergencyContact";
-import FetchError from "@/utils/errors/FetchError";
 
+  const networkStore = useNetworkStore();
   const contactStore = useContactStore();
   const alertController = useAlertController();
 
@@ -137,7 +138,7 @@ import FetchError from "@/utils/errors/FetchError";
         </ion-button>
       </ion-buttons>
       <ion-buttons slot="end">
-        <ion-button :strong="true" @click="saveChanges">
+        <ion-button :strong="true" :disabled="!networkStore._isConnected" @click="saveChanges">
           <ion-icon aria-label="Confirm" :icon="save" />
         </ion-button>
       </ion-buttons>
@@ -145,6 +146,10 @@ import FetchError from "@/utils/errors/FetchError";
   </ion-header>
 
   <ion-content class="ion-padding">
+
+    <AlertMessage v-if="!networkStore._isConnected" type="warning" class="shadow-md mb-5">
+      A working internet connection is required to make changes.
+    </AlertMessage>
 
     <EmergencyContactComponent :contact="form" :can-edit="false" />
 
@@ -214,9 +219,9 @@ import FetchError from "@/utils/errors/FetchError";
       </ion-list>
     </div>
 
-    <WarningAlert class="shadow-md mt-5">
+    <AlertMessage type="warning" class="shadow-md mt-5">
       Any emergency contacts you've added will be automatically contacted when you activate the emergency alarm
-    </WarningAlert>
+    </AlertMessage>
 
   </ion-content>
 </template>

@@ -1,37 +1,71 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+import {reactive, ref, watch} from "vue";
   import { IonChip, IonLabel } from "@ionic/vue";
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useNetworkStore } from "@/store/network";
   import type { FactCategory } from "@/types/FactCategory";
   import AlertMessage from "@/components/AlertMessage.vue";
+import FetchError from "@/utils/errors/FetchError";
+import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
 
   const emit = defineEmits<{
     (e: 'openDrawer'): void
   }>()
 
   const networkStore = useNetworkStore();
+
+  const isFetching = ref<boolean>(true);
   const categories = ref<FactCategory[]>([]);
+  const error = reactive({
+    statusCode: 0,
+    message: ''
+  })
 
-  try {
-    const response = await useFetchAPI({
-      url: '/facts/category/all',
-      method: 'GET'
-    })
+  watch(() => networkStore._isConnected, async (isConnected) => {
+    if (isConnected && categories.value.length === 0) {
+      await fetchCategories()
+    }
+  }, { immediate: true })
 
-    categories.value = response.data.categories;
-  } catch (error) {
-    console.error(error);
+  const fetchCategories = async () => {
+    try {
+      isFetching.value = true;
+
+      categories.value = [];
+
+      const response = await useFetchAPI({
+        url: '/facts/category/all',
+        method: 'GET'
+      })
+
+      categories.value = response.data.categories;
+    } catch (errorResponse) {
+      if (errorResponse instanceof FetchError) {
+        error.statusCode = errorResponse.statusCode;
+        error.message = errorResponse.message;
+      } else {
+        error.statusCode = 500;
+        error.message = 'Something went wrong'
+      }
+
+      console.error(error);
+    } finally {
+      isFetching.value = false;
+    }
   }
 </script>
 
 <template>
   <div>
-    <AlertMessage v-if="!networkStore._isConnected && categories.length === 0" type="warning">
-      You aren't connected to the internet
+    <AlertMessage v-if="!networkStore._isConnected && categories.length === 0" type="warning" class="shadow">
+      Unable to fetch facts because your device is not connected to the internet
     </AlertMessage>
 
-    <section v-if="categories.length > 0">
+    <AlertMessage v-if="networkStore._isConnected && error.statusCode > 0" type="danger" class="shadow">
+      {{ error.message }}
+    </AlertMessage>
+
+    <section v-if="!isFetching && categories.length > 0">
       <div class="rounded-md flex justify-between mt-5 mb-3">
         <h5 class="font-bold">
           Here are some facts!
@@ -47,6 +81,8 @@
         </ion-chip>
       </div>
     </section>
+
+    <SkeletonChipSlider v-if="isFetching && networkStore._isConnected" class="mt-2 mb-4" />
   </div>
 </template>
 

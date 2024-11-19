@@ -1,14 +1,26 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useFetchAPI } from "@/composables/useFetchAPI";
+import { useNetworkStore } from "@/store/network";
 import type { EmergencyContact } from "@/types/EmergencyContact";
+import {Preferences} from "@capacitor/preferences";
 
 export const useContactStore = defineStore('contacts', () => {
+  const networkStore = useNetworkStore();
+
   const contacts = ref<EmergencyContact[]>([]);
 
   const _contacts = computed(() => contacts.value);
 
   const getContacts = async () => {
+    if (!networkStore._isConnected && contacts.value.length === 0) {
+      const { value } = await Preferences.get({ key: 'contacts' })
+
+      contacts.value = value ? JSON.parse(value) : [];
+
+      return;
+    }
+
     const response = await useFetchAPI({
       url: '/contacts',
       method: 'GET'
@@ -29,6 +41,12 @@ export const useContactStore = defineStore('contacts', () => {
     const contact = response.data.contact;
     contacts.value.push(contact);
 
+    // Update local data
+    await Preferences.set({
+      key: 'contacts',
+      value: JSON.stringify(contacts.value)
+    })
+
     return contact;
   }
 
@@ -45,6 +63,11 @@ export const useContactStore = defineStore('contacts', () => {
     const index = contacts.value.findIndex((item) => contact.id === item.id);
     contacts.value[index] = contact;
 
+    await Preferences.set({
+      key: 'contacts',
+      value: JSON.stringify(contacts.value)
+    })
+
     return contact;
   }
 
@@ -57,6 +80,11 @@ export const useContactStore = defineStore('contacts', () => {
     // Remove contact from array
     const index = contacts.value.findIndex((item) => id === item.id);
     contacts.value.splice(index, 1);
+
+    await Preferences.set({
+      key: 'contacts',
+      value: JSON.stringify(contacts.value)
+    })
 
     return response;
   }

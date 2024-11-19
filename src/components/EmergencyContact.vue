@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {
-  IonRippleEffect,
-  actionSheetController,
-  modalController, isPlatform
-} from "@ionic/vue";
+  import {
+    IonRippleEffect,
+    actionSheetController,
+    modalController, isPlatform
+  } from "@ionic/vue";
   import { Clipboard } from "@capacitor/clipboard";
   import {
     arrowBackOutline,
@@ -13,12 +13,14 @@ import {
     trashOutline
   } from "ionicons/icons";
 
+  import { useNetworkStore } from "@/store/network";
   import { useToastController } from "@/composables/useToastController";
   import { useAlertController } from "@/composables/useAlertController";
 
   import EditContactModal from "@/components/modal/EditContactModal.vue";
   import type { EmergencyContact } from "@/types/EmergencyContact";
 
+  const networkStore = useNetworkStore();
   const { presentAlert } = useAlertController();
   const { presentToast } = useToastController();
 
@@ -85,6 +87,21 @@ import {
     // Open edit modal
     switch (dismissEvent.data.action) {
       case 'delete':
+        if (!networkStore._isConnected) {
+          await presentAlert({
+            header: "Internet connection required",
+            message: "You must be connected to the internet to perform this action",
+            buttons: [
+              {
+                text: "Ok",
+                role: "cancel"
+              },
+            ]
+          });
+
+          return;
+        }
+
         // Show alert modal
         await presentAlert({
           header: "Delete contact?",

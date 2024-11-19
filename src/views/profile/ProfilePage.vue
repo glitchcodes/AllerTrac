@@ -30,6 +30,7 @@
     sparklesOutline
   } from 'ionicons/icons';
   import ProfileCard from "@/components/profile/ProfileCard.vue";
+  import { useNetworkStore } from "@/store/network";
   import { useAuthStore } from "@/store/auth";
   import { useAlertController } from "@/composables/useAlertController";
 
@@ -39,6 +40,7 @@
   import AlarmsSegment from "@/components/profile/AlarmsSegment.vue";
 
   const ionRouter = useIonRouter();
+  const networkStore = useNetworkStore();
   const authStore = useAuthStore();
   const alertController = useAlertController();
 
@@ -168,11 +170,11 @@
             <ion-list-header>
               <ion-label>Profile</ion-label>
             </ion-list-header>
-            <ion-item button @click="navigateToPage('/pages/profile/edit')">
+            <ion-item button :disabled="!networkStore._isConnected" @click="navigateToPage('/pages/profile/edit')">
               <ion-icon aria-hidden="true" :icon="createOutline" slot="start"></ion-icon>
               <ion-label>Edit Profile</ion-label>
             </ion-item>
-            <ion-item button @click="navigateToPage('/pages/profile/security')">
+            <ion-item button :disabled="!networkStore._isConnected" @click="navigateToPage('/pages/profile/security')">
               <ion-icon aria-hidden="true" :icon="keyOutline" slot="start"></ion-icon>
               <ion-label>Security</ion-label>
             </ion-item>
@@ -186,7 +188,7 @@
               <ion-icon aria-hidden="true" :icon="sparklesOutline" slot="start"></ion-icon>
               <ion-label>Attributions</ion-label>
             </ion-item>
-            <ion-item button @click="handleLogout">
+            <ion-item button :disabled="!networkStore._isConnected" @click="handleLogout">
               <ion-icon aria-hidden="true" :icon="logOut" slot="start"></ion-icon>
               <ion-label>Logout</ion-label>
             </ion-item>

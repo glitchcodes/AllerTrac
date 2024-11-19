@@ -23,6 +23,7 @@
   import { StatusBar } from "@capacitor/status-bar";
   import { checkmarkCircleOutline, chevronBack, createOutline } from "ionicons/icons";
   import { useAuthStore } from "@/store/auth";
+  import { useNetworkStore } from "@/store/network"
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useAlertController } from "@/composables/useAlertController";
   import { useToastController } from "@/composables/useToastController";
@@ -31,6 +32,7 @@
   import FetchError from "@/utils/errors/FetchError";
   import type { User } from "@/types/User"
   import CropAvatarModal from "@/components/modal/CropAvatarModal.vue";
+  import AlertMessage from "@/components/AlertMessage.vue";
 
   interface FormBody {
     first_name: string
@@ -41,6 +43,7 @@
   }
 
   // Stores
+  const networkStore = useNetworkStore();
   const authStore = useAuthStore();
 
   // Composables
@@ -318,6 +321,10 @@
       <template v-if="!isLoading && user">
         <ProfileCard :user="user" :edit-mode="true" class="mb-4" @open-avatar-action="openAvatarActions" />
 
+        <AlertMessage v-if="!networkStore._isConnected" type="danger" class="mb-4">
+          You cannot make changes to your profile because your device is not connected to the internet
+        </AlertMessage>
+
         <div class="bg-white rounded-md shadow-md ion-padding mb-4">
           <h5 class="text-lg font-bold mb-4">
             Personal Information
@@ -330,6 +337,7 @@
                        label-placement="floating"
                        fill="outline"
                        placeholder="John"
+                       :disabled="!networkStore._isConnected"
                        :class="{ 'ion-touched ion-invalid': inputErrors.first_name }"
                        :error-text="getErrorMessage('first_name')"
                        @ionInput="() => inputErrors.first_name = ''">
@@ -341,6 +349,7 @@
                        label-placement="floating"
                        fill="outline"
                        placeholder="Doe"
+                       :disabled="!networkStore._isConnected"
                        :class="{ 'ion-touched ion-invalid': inputErrors.last_name }"
                        :error-text="getErrorMessage('last_name')"
                        @ionInput="() => inputErrors.last_name = ''">
@@ -354,6 +363,7 @@
                        label-placement="floating"
                        fill="outline"
                        placeholder="+639XX XXX XXXX"
+                       :disabled="!networkStore._isConnected"
                        :class="{ 'ion-touched ion-invalid': inputErrors.phone_number }"
                        :error-text="getErrorMessage('phone_number')"
                        @ionInput="() => inputErrors.phone_number = ''">
@@ -367,6 +377,7 @@
                          fill="outline"
                          :value="formatToFriendlyDate(user.birthday)"
                          readonly
+                         :disabled="!networkStore._isConnected"
                          :class="{ 'ion-touched ion-invalid': inputErrors.birthday }"
                          :error-text="getErrorMessage('birthday')"
                          @ionInput="() => inputErrors.birthday = ''">
@@ -385,7 +396,11 @@
           </div>
         </div>
 
-        <ion-button class="submit-btn" expand="block" :disabled="!hasChanges" @click="saveChanges">
+        <ion-button class="submit-btn"
+                    expand="block"
+                    :disabled="!hasChanges || !networkStore._isConnected"
+                    @click="saveChanges"
+        >
           Save changes
         </ion-button>
       </template>

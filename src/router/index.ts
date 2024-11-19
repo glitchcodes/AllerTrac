@@ -13,6 +13,7 @@ import ScanResultPage from "@/views/ScanResultPage.vue";
 import SearchFoodPage from "@/views/SearchFoodPage.vue";
 import OnboardingLayout from "@/views/layouts/OnboardingLayout.vue";
 import LogoutPage from "@/views/auth/LogoutPage.vue";
+import {useNetworkStore} from "@/store/network";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -197,6 +198,7 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const alertController = useAlertController();
   const authStore = useAuthStore();
+  const networkStore = useNetworkStore();
 
   if (to.matched.some(record => record.meta.requiresNoAuth)) {
     const hasBearerToken = await Preferences.get({ key: 'access_token' });
@@ -211,6 +213,10 @@ router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // If not authenticated, return false
     try {
+      if (!networkStore._isConnected && authStore._isLoggedIn) {
+        return true;
+      }
+
       await authStore.validateToken();
     } catch (error) {
       // Remove the access token from the Preferences

@@ -29,6 +29,7 @@
   } from "ionicons/icons";
   import { Capacitor } from "@capacitor/core";
 
+  import { useNetworkStore } from "@/store/network";
   import { useNotificationStore } from "@/store/notification";
   import { useAlarmStore } from "@/store/alarm";
 
@@ -36,6 +37,7 @@
   import type { Alarm } from "@/types/Alarm";
 
   const ionRouter = useIonRouter();
+  const networkStore = useNetworkStore();
   const notificationStore = useNotificationStore();
   const alarmStore = useAlarmStore();
 
@@ -182,7 +184,7 @@
                 <ion-icon aria-hidden="true" :icon="addSharp" slot="start"></ion-icon>
                 <ion-label>New alarm</ion-label>
               </ion-item>
-              <ion-item button @click="handleSyncAlarms">
+              <ion-item button :disabled="!networkStore._isConnected" @click="handleSyncAlarms">
                 <ion-icon aria-hidden="true" :icon="syncOutline" slot="start"></ion-icon>
                 <ion-label>Sync alarms</ion-label>
               </ion-item>

@@ -18,9 +18,7 @@
 
   import { CupertinoPane } from "cupertino-pane";
   import FactCarousel from "@/components/facts/FactCarousel.vue";
-  import SkeletonCard from "@/components/skeleton/SkeletonCard.vue";
   import FactCategorySlider from "@/components/facts/FactCategorySlider.vue";
-  import SkeletonChipSlider from "@/components/skeleton/SkeletonChipSlider.vue";
   import WarningAlert from "@/components/alert/WarningAlert.vue";
 
   const FactCategories = defineAsyncComponent(() => import('@/components/facts/FactCategories.vue'));
@@ -117,7 +115,7 @@
         Some features are only available to registered users.
       </WarningAlert>
 
-      <div class="bg-white rounded-2xl shadow-xl p-5 mt-4">
+      <div class="bg-white rounded-2xl shadow-xl p-5 my-4">
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-xl text-primary font-bold mb-3">
@@ -131,25 +129,9 @@
         </div>
       </div>
 
-      <Suspense>
-        <FactCategorySlider class="mt-2 mb-4" @open-drawer="() => drawer.present({ animate: true })" />
+      <FactCategorySlider class="mt-2 mb-4" @open-drawer="() => drawer.present({ animate: true })" />
 
-        <template #fallback>
-          <SkeletonChipSlider class="mt-2 mb-4" />
-        </template>
-      </Suspense>
-
-      <Suspense>
-        <FactCarousel />
-
-        <template #fallback>
-          <div class="mt-4 overflow-x-auto scroll-smooth flex flex-nowrap snap-mandatory snap-x no-scrollbar">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
-        </template>
-      </Suspense>
+      <FactCarousel />
 
       <ion-drawer id="fact-categories">
         <FactCategories v-if="isCategoriesMounted" @navigate="navigateTo($event)" />

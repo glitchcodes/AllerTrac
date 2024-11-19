@@ -50,12 +50,29 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null;
   }
 
+  const loadUserInfo = async () => {
+    const { value } = await Preferences.get({ key: 'user_info' });
+
+    user.value = JSON.parse(value as string);
+
+    await getBearerToken();
+  }
+
+  const updateUserInfo = async (details: User) => {
+    await Preferences.set({
+      key: 'user_info',
+      value: JSON.stringify(details)
+    });
+
+    user.value = details;
+  }
+
   const validateToken = async () => {
     try {
       const response = await useFetchAPI({ url: '/auth/check', method: 'GET' });
 
       // Update the user state
-      user.value = response.data.user;
+      await updateUserInfo(response.data.user)
 
       return response;
     } catch (error) {
@@ -68,5 +85,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, _user, bearerToken, _isLoggedIn, getBearerToken, setBearerToken, removeBearerToken, validateToken }
+  return { user, _user, bearerToken, _isLoggedIn, getBearerToken, setBearerToken, removeBearerToken, validateToken, loadUserInfo, updateUserInfo }
 })

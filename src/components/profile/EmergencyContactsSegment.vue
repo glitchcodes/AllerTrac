@@ -7,10 +7,13 @@
   } from "@ionic/vue";
 
   import { medkit, add } from "ionicons/icons";
+  import { useNetworkStore } from "@/store/network";
   import CreateContactModal from "@/components/modal/CreateContactModal.vue";
   import EmergencyContactsList from "@/components/EmergencyContactsList.vue";
   import SkeletonContacts from "@/components/skeleton/SkeletonContacts.vue";
   import { StatusBar } from "@capacitor/status-bar";
+
+  const networkStore = useNetworkStore();
 
   const openCreateModal = async () => {
     const modal = await modalController.create({
@@ -43,11 +46,11 @@
         Emergency Contacts
       </h6>
 
-      <ion-button v-if="isPlatform('ios')" fill="outline" @click="openCreateModal">
+      <ion-button v-if="isPlatform('ios')" fill="outline" :disabled="!networkStore._isConnected" @click="openCreateModal">
         <ion-icon slot="icon-only" aria-label="New contact" :icon="add"></ion-icon>
       </ion-button>
 
-      <ion-button v-else fill="outline" shape="round" @click="openCreateModal">
+      <ion-button v-else fill="outline" shape="round" :disabled="!networkStore._isConnected" @click="openCreateModal">
         <ion-icon slot="start" aria-label="New contact" :icon="add"></ion-icon>
         <span class="ms-1">New</span>
       </ion-button>

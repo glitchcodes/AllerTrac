@@ -137,6 +137,10 @@
           await authStore.removeBearerToken();
         }
       }
+    } else {
+      // Load from local storage
+      await authStore.loadUserInfo();
+      await allergenStore.getAllergensOffline();
     }
 
     isInitializing.value = false;

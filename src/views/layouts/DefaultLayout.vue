@@ -2,6 +2,8 @@
   import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import { Capacitor } from "@capacitor/core";
+  import { useNetworkStore } from "@/store/network";
+  import { useToastController } from "@/composables/useToastController";
   import {
     IonTabBar,
     IonTabButton,
@@ -13,14 +15,17 @@
     IonRouterOutlet,
     isPlatform
   } from '@ionic/vue';
-  import { camera, home, fastFood, person } from 'ionicons/icons';
+  import { camera, home, fastFood, person, closeCircleOutline } from 'ionicons/icons';
   import { Emitter } from "mitt";
-  import {Keyboard} from "@capacitor/keyboard";
+  import { Keyboard } from "@capacitor/keyboard";
 
   type Events = {
     cameraStatusChanged: boolean,
     capturePhoto: void
   }
+
+  const networkStore = useNetworkStore();
+  const toastController = useToastController();
 
   const router = useRouter()
   const route = useRoute();
@@ -65,7 +70,7 @@
     return route.path
   });
 
-  const handleCameraClick = () => {
+  const handleCameraClick = async () => {
     // Navigate to scan food page
     if (currentPage.value !== '/pages/scan-food') {
       return router.push({ path: '/pages/scan-food' })
@@ -73,6 +78,18 @@
 
     // Emit an even when clicked & the camera is active
     if (isCameraActive.value) {
+      if (!networkStore._isConnected) {
+        await toastController.presentToast({
+          message: 'Internet connection is required',
+          duration: 3000,
+          icon: closeCircleOutline,
+          position: 'bottom',
+          positionAnchor: 'scan-food-button'
+        })
+
+        return;
+      }
+
       emitter.emit('capturePhoto')
     }
   }

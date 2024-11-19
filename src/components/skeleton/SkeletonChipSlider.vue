@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {IonChip, IonLabel, IonSkeletonText} from "@ionic/vue";
+import { IonChip, IonSkeletonText } from "@ionic/vue";
 </script>
 
 <template>
@@ -8,7 +8,7 @@ import {IonChip, IonLabel, IonSkeletonText} from "@ionic/vue";
       <h5 class="font-bold">
         Here are some facts!
       </h5>
-      <h5 class="text-primary font-bold">
+      <h5 class="font-bold">
         See all
       </h5>
     </div>

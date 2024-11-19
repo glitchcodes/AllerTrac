@@ -13,6 +13,7 @@
   import { ellipsisHorizontal, logIn } from "ionicons/icons";
 
   import { useAuthStore } from "@/store/auth";
+  import { useNetworkStore } from "@/store/network";
   import { useEmergencyStore } from "@/store/emergency";
   import { useMenuNav } from "@/composables/useMenuNav";
 
@@ -20,6 +21,7 @@
   import AlertMessage from "@/components/AlertMessage.vue";
 
   const authStore = useAuthStore();
+  const networkStore = useNetworkStore();
   const emergencyStore = useEmergencyStore();
   const { openUserMenu } = useMenuNav();
 
@@ -103,7 +105,11 @@
 
           <div class="border-t-[1px] border-gray-300 w-1/2 my-5" :key="'border'"></div>
 
-          <ion-button shape="round" :key="'button'" router-link="/pages/emergency/hospitals" router-direction="forward" >
+          <ion-button shape="round"
+                      router-link="/pages/emergency/hospitals"
+                      router-direction="forward"
+                      :disabled="!networkStore._isConnected"
+          >
             Locate nearby hospitals
           </ion-button>
         </transition-group>
