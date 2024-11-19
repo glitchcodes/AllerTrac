@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { ref, defineAsyncComponent } from "vue";
   import { IonIcon, IonButton, IonSpinner, isPlatform } from "@ionic/vue";
   import { checkmarkCircleOutline, fastFood, save } from "ionicons/icons";
   import { useAllergenStore } from "@/store/allergen";
@@ -7,8 +7,9 @@
   import { useToastController } from "@/composables/useToastController";
   import SkeletonAllergens from "@/components/skeleton/SkeletonAllergens.vue";
   import AllergenSelector from "@/components/AllergenSelector.vue";
-  import AllergenSelectorOffline from "@/components/AllergenSelectorOffline.vue";
   import type { Allergen } from "@/types/Allergen";
+
+  const AllergenSelectorOffline = defineAsyncComponent(() => import("@/components/AllergenSelectorOffline.vue"))
 
   const networkStore = useNetworkStore();
   const allergenStore = useAllergenStore();

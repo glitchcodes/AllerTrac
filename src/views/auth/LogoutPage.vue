@@ -5,11 +5,15 @@
   import { useAuthStore } from "@/store/auth";
   import { useAllergenStore } from "@/store/allergen";
   import { useBookmarkStore } from "@/store/bookmark";
+  import { useContactStore } from "@/store/contact";
+  import { useAlarmStore } from "@/store/alarm";
   import { useFetchAPI } from "@/composables/useFetchAPI";
 
   const router = useRouter();
   const authStore = useAuthStore();
+  const contactStore = useContactStore();
   const allergenStore = useAllergenStore();
+  const alarmStore = useAlarmStore();
   const bookmarkStore = useBookmarkStore();
   const hasErrors = ref<boolean>(false);
 
@@ -29,8 +33,10 @@
       // Remove access token from preferences
       await authStore.removeBearerToken()
 
-      // Remove cached allergen and bookmarks
-      allergenStore.reset();
+      // Remove all cached data
+      await allergenStore.reset();
+      await contactStore.reset();
+      await alarmStore.reset();
       bookmarkStore.reset();
 
       // Redirect to homepage

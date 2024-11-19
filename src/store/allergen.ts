@@ -72,7 +72,8 @@ export const useAllergenStore = defineStore('allergen', () => {
     return response;
   }
 
-  const reset = () => {
+  const reset = async () => {
+    await Preferences.remove({ key: 'allergens' })
     allergens.value = [];
   }
 

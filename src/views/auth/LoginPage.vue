@@ -8,6 +8,9 @@
   import { useFetchAPI } from "@/composables/useFetchAPI";
   import { useToastController } from "@/composables/useToastController";
 
+  import { useAllergenStore } from "@/store/allergen";
+  import { useContactStore } from "@/store/contact";
+
   import LogoComponent from "@/components/auth/LogoComponent.vue";
   import InputComponent from "@/components/auth/input/TextInput.vue";
   import FetchError from "@/utils/errors/FetchError";
@@ -96,7 +99,12 @@
       if (result.data.redirect_to === 'onboarding') {
         await router.push({ name: 'onboarding-welcome' })
       } else {
-        await router.push({ name: 'home' })
+        // Get allergens
+        await useAllergenStore().getAllergens()
+        // Get contacts
+        await useContactStore().getContacts()
+
+        await router.push({ name: 'home' });
       }
     } catch (error) {
       if (error instanceof FetchError) {

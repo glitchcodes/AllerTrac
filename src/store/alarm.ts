@@ -315,5 +315,13 @@ export const useAlarmStore = defineStore('alarms', () => {
     })
   }
 
-  return { alarms, alarmVersion, isSyncing, isOutdated, checkAlarmVersion, init, syncAlarms, getAlarm, addAlarm, scheduleAlarm, editAlarm, cancelAlarm, deleteAlarm }
+  const reset = async () => {
+    alarms.value.forEach((alarm) => {
+      deleteAlarm(alarm.id);
+    })
+
+    await Preferences.remove({ key: ALARM_STORAGE_KEY })
+  }
+
+  return { alarms, alarmVersion, isSyncing, isOutdated, checkAlarmVersion, init, syncAlarms, getAlarm, addAlarm, scheduleAlarm, editAlarm, cancelAlarm, deleteAlarm, reset }
 })
