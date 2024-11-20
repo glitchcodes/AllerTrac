@@ -16,8 +16,10 @@
     loadingController,
     onIonViewDidEnter,
     onIonViewWillLeave,
-    RadioGroupCustomEvent
+    useIonRouter,
+    RadioGroupCustomEvent,
   } from "@ionic/vue";
+  import { NativeSettings, AndroidSettings, IOSSettings } from 'capacitor-native-settings';
 
   import { arrowBack, locateOutline, optionsOutline } from "ionicons/icons";
   import { Geolocation } from "@capacitor/geolocation";
@@ -27,13 +29,19 @@
 
   import { Loader } from "@googlemaps/js-api-loader";
   import { CupertinoPane } from "cupertino-pane";
-  import { buildAddressString, calculateDistance } from "@/utils/helpers";
+  import { useAlertController } from "@/composables/useAlertController";
 
+  import { buildAddressString, calculateDistance } from "@/utils/helpers";
   import type { MapPlace } from "@/types/Map";
   import type { LatLng } from "@capacitor/google-maps/dist/typings/definitions";
 
+
   // Status Bar
   const statusBarHeight = ref<number>();
+
+  // Composables
+  const ionRouter = useIonRouter();
+  const alertController = useAlertController();
 
   // Cupertino Pane
   const drawer = ref();
@@ -104,9 +112,6 @@
   }
 
   onIonViewDidEnter(async () => {
-    // Show loading controller
-    await showLoading()
-
     // Instantiate cupertino pane
     drawer.value = new CupertinoPane('ion-drawer#hospital-drawer', {
       // parentElement: '#hospital-locator',
@@ -121,6 +126,71 @@
         },
       }
     });
+
+    // Check permissions
+    try {
+      let permissions = await Geolocation.checkPermissions();
+
+      console.log(permissions)
+
+      if (permissions.location === 'prompt' || permissions.location === 'prompt-with-rationale') {
+        permissions = await Geolocation.requestPermissions({permissions: ['location']});
+      }
+
+      if (permissions.location === 'denied') {
+        await alertController.presentAlert({
+          header: 'Precise location permissions needed',
+          message: 'To accurately provide you hospital locations, we need your permission to use precise location.',
+          buttons: [
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              handler: () => {
+                ionRouter.navigate('/pages/emergency', 'back', 'pop');
+              },
+            },
+            {
+              text: 'Ok',
+              handler: async () => {
+                ionRouter.navigate('/pages/emergency', 'back', 'pop');
+
+                await NativeSettings.open({
+                  optionAndroid: AndroidSettings.ApplicationDetails,
+                  optionIOS: IOSSettings.App
+                })
+              }
+            }
+          ],
+        })
+      } else if (permissions.location === 'granted') {
+        await initMap()
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      await dismissLoading();
+    }
+
+  });
+
+  onIonViewWillLeave(() => {
+    // Remove markers
+    removeMarkers()
+
+    // Destroy map
+    if (map) {
+      map.destroy();
+    }
+
+    // Destroy sheet modal
+    if (drawer.value) {
+      drawer.value.destroy({ animate: false });
+    }
+  });
+  
+  const initMap = async () => {
+    // Show loading controller
+    await showLoading()
 
     // Create map and get current position
     await createMap();
@@ -154,23 +224,7 @@
       lat: currentPosition.value.lat,
       lng: currentPosition.value.lng,
     }, 15);
-
-    // await openSheetModal();
-    await dismissLoading();
-  });
-
-  onIonViewWillLeave(() => {
-    // Remove markers
-    removeMarkers()
-
-    // Destroy map
-    map.destroy();
-
-    // Destroy sheet modal
-    if (drawer.value) {
-      drawer.value.destroy({ animate: false });
-    }
-  });
+  }
 
   // Controls
   const currentLocationEnabled = ref(false);

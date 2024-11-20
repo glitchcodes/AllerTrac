@@ -42,6 +42,7 @@
     "@vueuse/components": "^11.1.0",
     "@vueuse/core": "^10.11.0",
     "animate.css": "^4.1.1",
+    "capacitor-native-settings": "^6.0.1",
     "cupertino-pane": "^1.4.22",
     "ionicons": "^7.0.0",
     "mitt": "^3.0.1",
