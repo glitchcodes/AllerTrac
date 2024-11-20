@@ -105,7 +105,8 @@
 
           <div class="border-t-[1px] border-gray-300 w-1/2 my-5" :key="'border'"></div>
 
-          <ion-button shape="round"
+          <ion-button key="button"
+                      shape="round"
                       router-link="/pages/emergency/hospitals"
                       router-direction="forward"
                       :disabled="!networkStore._isConnected"
