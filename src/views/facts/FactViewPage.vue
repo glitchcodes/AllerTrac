@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, reactive, onMounted } from "vue";
+  import { ref, reactive, onMounted, computed } from "vue";
   import {
     IonButton,
     IonButtons,
@@ -17,6 +17,9 @@
   import { useRoute, useRouter } from "vue-router";
   import { chevronBack } from "ionicons/icons";
   import { useFetchAPI } from "@/composables/useFetchAPI";
+
+  import sanitizeHtml from 'sanitize-html';
+
   import type { Fact } from "@/types/Fact";
   import type { Author } from "@/types/Author";
 
@@ -35,6 +38,10 @@
     author: undefined as unknown as Author,
     references: ""
   });
+
+  const sanitizedContent = computed(() => {
+    return sanitizeHtml(fact.description)
+  })
 
   const error = ref<any>()
   const errorMessage = ref<string>('');
@@ -101,21 +108,7 @@
       <div v-if="!isLoading" class="bg-white p-4 rounded-lg">
         <img v-if="fact.cover_image.length > 0" :src="fact.cover_image" :alt="fact.title" class="rounded-lg mb-5" />
 
-        <p>
-          {{ fact.description }}
-        </p>
-<!--        <ion-card>-->
-<!--          <img v-if="fact.cover_image.length > 0" :src="fact.cover_image" :alt="fact.title" />-->
-<!--          <ion-card-header>-->
-<!--            <ion-card-title>-->
-<!--              {{ fact.title }}-->
-<!--            </ion-card-title>-->
-<!--          </ion-card-header>-->
-
-<!--          <ion-card-content>-->
-<!--            {{ fact.description }}-->
-<!--          </ion-card-content>-->
-<!--        </ion-card>-->
+        <div v-html="sanitizedContent"></div>
       </div>
 
     </ion-content>
