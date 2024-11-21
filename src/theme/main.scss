@@ -88,3 +88,7 @@ a:hover {
     display: none;
   }
 }
+
+[data-remove-styles] * {
+  all: initial;
+}
