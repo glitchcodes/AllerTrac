@@ -15,6 +15,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
   const toastController = useToastController();
 
   const ringtone = ref('siren-alert');
+  const isTextingAllowed = ref<boolean>(false);
   const isAlertActivated = ref<boolean>(false);
 
   const getSelectedRingtone = async () => {
@@ -30,6 +31,21 @@ export const useEmergencyStore = defineStore('emergency', () => {
     });
 
     ringtone.value = ringtoneName;
+  }
+
+  const getTextPermission = async () => {
+    const { value } = await Preferences.get({ key: 'emergency_text_allowed' });
+
+    isTextingAllowed.value = value ? JSON.parse(value) : false;
+  }
+
+  const updateTextPermission = async (permission: boolean) => {
+    await Preferences.set({
+      key: 'emergency_text_allowed',
+      value: JSON.stringify(permission)
+    });
+
+    isTextingAllowed.value = permission;
   }
 
   const activateAlert = async () => {
@@ -77,7 +93,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
   }
 
   const sendEmergencyText = async () => {
-    if (!authStore._isLoggedIn) return;
+    if (!authStore._isLoggedIn || !isTextingAllowed.value) return;
 
     try {
       await useFetchAPI({
@@ -125,5 +141,15 @@ export const useEmergencyStore = defineStore('emergency', () => {
     }
   }
 
-  return { ringtone, isAlertActivated, getSelectedRingtone, updateSelectedRingtone, activateAlert, deactivateAlert }
+  return {
+    ringtone,
+    isTextingAllowed,
+    isAlertActivated,
+    getSelectedRingtone,
+    updateSelectedRingtone,
+    getTextPermission,
+    updateTextPermission,
+    activateAlert,
+    deactivateAlert
+  }
 });

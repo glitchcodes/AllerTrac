@@ -13,7 +13,10 @@
     IonItem,
     IonSelect,
     IonSelectOption,
-    isPlatform, SelectCustomEvent
+    IonCheckbox,
+    isPlatform,
+    SelectCustomEvent,
+    CheckboxCustomEvent
   } from "@ionic/vue";
   import { ellipsisHorizontal, logIn, navigateOutline } from "ionicons/icons";
 
@@ -31,17 +34,26 @@
   const { openUserMenu } = useMenuNav();
 
   const ringtone = ref<string>('');
+  const isTextingAllowed = ref<boolean>(false);
 
   onMounted(async () => {
     await emergencyStore.getSelectedRingtone()
+    await emergencyStore.getTextPermission()
 
     ringtone.value = emergencyStore.ringtone;
+    isTextingAllowed.value = emergencyStore.isTextingAllowed;
   });
 
   const handleUpdateRingtone = async (e: SelectCustomEvent) => {
     ringtone.value = e.detail.value;
 
     await emergencyStore.updateSelectedRingtone(ringtone.value)
+  }
+
+  const handleUpdateTextPermission = async (e: CheckboxCustomEvent) => {
+    isTextingAllowed.value = e.detail.checked;
+
+    await emergencyStore.updateTextPermission(isTextingAllowed.value)
   }
 
   // Animations
@@ -152,6 +164,11 @@
                 Beep
               </ion-select-option>
             </ion-select>
+          </ion-item>
+          <ion-item v-if="authStore._isLoggedIn">
+            <ion-checkbox :checked="isTextingAllowed" @ionChange="handleUpdateTextPermission">
+              Send notifications to my contacts
+            </ion-checkbox>
           </ion-item>
         </ion-list>
       </div>
