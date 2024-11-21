@@ -60,7 +60,7 @@ export const useEmergencyStore = defineStore('emergency', () => {
     }
 
     // Send emergency tex
-    // await sendEmergencyText()
+    await sendEmergencyText()
   }
 
   const deactivateAlert = async () => {
