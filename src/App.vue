@@ -102,31 +102,31 @@
     });
 
     App.addListener('resume', () => {
-      NativeAudio.preload({
-        assetId: 'siren-alert',
-        assetPath: 'alert.wav',
-        audioChannelNum: 1,
-        isUrl: false
-      });
-
-      NativeAudio.preload({
-        assetId: 'beep-alert',
-        assetPath: 'beep.wav',
-        audioChannelNum: 1,
-        isUrl: false
-      });
+      // NativeAudio.preload({
+      //   assetId: 'siren-alert',
+      //   assetPath: 'alert.wav',
+      //   audioChannelNum: 1,
+      //   isUrl: false
+      // });
+      //
+      // NativeAudio.preload({
+      //   assetId: 'beep-alert',
+      //   assetPath: 'beep.wav',
+      //   audioChannelNum: 1,
+      //   isUrl: false
+      // });
     })
 
     App.addListener('pause', () => {
       emergencyStore.deactivateAlert();
 
-      NativeAudio.unload({
-        assetId: 'siren-alert'
-      });
-
-      NativeAudio.unload({
-        assetId: 'beep-alert'
-      })
+      // NativeAudio.unload({
+      //   assetId: 'siren-alert'
+      // });
+      //
+      // NativeAudio.unload({
+      //   assetId: 'beep-alert'
+      // })
     });
 
     // Listen for network connection change
