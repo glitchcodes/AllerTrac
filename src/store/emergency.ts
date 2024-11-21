@@ -25,6 +25,8 @@ export const useEmergencyStore = defineStore('emergency', () => {
   }
 
   const updateSelectedRingtone = async (ringtoneName: string) => {
+    await deactivateAlert()
+
     await Preferences.set({
       key: 'emergency_ringtone',
       value: ringtoneName
