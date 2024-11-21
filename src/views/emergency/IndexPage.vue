@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { ref, onMounted } from "vue";
   import {
     IonPage,
     IonHeader,
@@ -8,9 +9,13 @@
     IonButton,
     IonIcon,
     IonButtons,
-    isPlatform
+    IonList,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
+    isPlatform, SelectCustomEvent
   } from "@ionic/vue";
-  import { ellipsisHorizontal, logIn } from "ionicons/icons";
+  import { ellipsisHorizontal, logIn, navigateOutline } from "ionicons/icons";
 
   import { useAuthStore } from "@/store/auth";
   import { useNetworkStore } from "@/store/network";
@@ -24,6 +29,20 @@
   const networkStore = useNetworkStore();
   const emergencyStore = useEmergencyStore();
   const { openUserMenu } = useMenuNav();
+
+  const ringtone = ref<string>('');
+
+  onMounted(async () => {
+    await emergencyStore.getSelectedRingtone()
+
+    ringtone.value = emergencyStore.ringtone;
+  });
+
+  const handleUpdateRingtone = async (e: SelectCustomEvent) => {
+    ringtone.value = e.detail.value;
+
+    await emergencyStore.updateSelectedRingtone(ringtone.value)
+  }
 
   // Animations
   const onBeforeEnter = (el: any) => {
@@ -64,7 +83,7 @@
     </ion-header>
 
     <ion-content class="ion-padding" :fullscreen="true">
-      <div v-if="!isPlatform('ios')" class="bg-white/50 rounded-lg shadow-lg w-full text-center p-4 mb-6">
+      <div v-if="!isPlatform('ios')" class="bg-white rounded-lg shadow-lg w-full text-center p-4 mb-6">
         <h1 class="text-2xl font-bold text-[#eb0c1b] ion-text-uppercase">
           Emergency
         </h1>
@@ -74,7 +93,7 @@
         Sending alerts to emergency contacts are only available to registered users
       </AlertMessage>
 
-      <div class="flex flex-col items-center justify-center bg-white/50 rounded-2xl shadow-2xl px-4 py-8 gap-6 custom-flex"
+      <div class="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md px-4 py-8 gap-6 mb-4"
            :class="{ 'border-2 border-[#eb0c1b]': emergencyStore.isAlertActivated }">
 
         <transition-group name="fade" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
@@ -102,19 +121,39 @@
 
             <p>to alert people around you and your emergency contacts</p>
           </div>
+        </transition-group>
+      </div>
 
-          <div class="border-t-[1px] border-gray-300 w-1/2 my-5" :key="'border'"></div>
-
-          <ion-button key="button"
-                      shape="round"
+      <div class="bg-white rounded-2xl shadow-md p-4 mb-4">
+        <div class="flex items-center">
+          <p class="flex-1">Locate Nearby Hospitals</p>
+          <ion-button shape="round"
                       router-link="/pages/emergency/hospitals"
                       router-direction="forward"
                       :disabled="!networkStore._isConnected"
           >
-            Locate nearby hospitals
+            <ion-icon slot="icon-only" aria-label="Navigate" :icon="navigateOutline" />
           </ion-button>
-        </transition-group>
+        </div>
+      </div>
 
+      <div class="bg-white rounded-2xl p-4 shadow-md">
+        <h5 class="text-xl font-bold mb-2">
+          Settings
+        </h5>
+
+        <ion-list lines="none">
+          <ion-item>
+            <ion-select label="Ringtone" label-placement="fixed" placeholder="Sound" :value="ringtone" @ionChange="handleUpdateRingtone">
+              <ion-select-option value="siren-alert">
+                Siren
+              </ion-select-option>
+              <ion-select-option value="beep-alert">
+                Beep
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
       </div>
 
     </ion-content>
@@ -125,4 +164,15 @@
   //.custom-flex {
   //  height: calc(100% - 16px - 64px - 24px);
   //}
+
+  ion-list {
+    background: white;
+    padding: 0;
+  }
+
+  ion-item {
+    --background: white;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+  }
 </style>

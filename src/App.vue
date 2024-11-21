@@ -80,6 +80,20 @@
       }
     }
 
+    NativeAudio.preload({
+      assetId: 'siren-alert',
+      assetPath: 'alert.wav',
+      audioChannelNum: 1,
+      isUrl: false
+    });
+
+    NativeAudio.preload({
+      assetId: 'beep-alert',
+      assetPath: 'beep.wav',
+      audioChannelNum: 1,
+      isUrl: false
+    });
+
     // Listen for app state changes
     App.addListener('appStateChange', () => {
       if (Capacitor.isNativePlatform() && isPlatform('android')) {
@@ -89,8 +103,15 @@
 
     App.addListener('resume', () => {
       NativeAudio.preload({
-        assetId: 'emergency-alert',
+        assetId: 'siren-alert',
         assetPath: 'alert.wav',
+        audioChannelNum: 1,
+        isUrl: false
+      });
+
+      NativeAudio.preload({
+        assetId: 'beep-alert',
+        assetPath: 'beep.wav',
         audioChannelNum: 1,
         isUrl: false
       });
@@ -100,7 +121,11 @@
       emergencyStore.deactivateAlert();
 
       NativeAudio.unload({
-        assetId: 'emergency-alert'
+        assetId: 'siren-alert'
+      });
+
+      NativeAudio.unload({
+        assetId: 'beep-alert'
       })
     });
 

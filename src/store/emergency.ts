@@ -6,34 +6,51 @@ import { NativeAudio } from "@capacitor-community/native-audio";
 import { useAuthStore } from "@/store/auth";
 import { useToastController } from "@/composables/useToastController";
 import { useFetchAPI } from "@/composables/useFetchAPI";
-import {checkmarkCircleOutline, closeCircleOutline} from "ionicons/icons";
+import { checkmarkCircleOutline, closeCircleOutline } from "ionicons/icons";
 import FetchError from "@/utils/errors/FetchError";
+import {Preferences} from "@capacitor/preferences";
 
 export const useEmergencyStore = defineStore('emergency', () => {
   const authStore = useAuthStore();
   const toastController = useToastController();
 
+  const ringtone = ref('siren-alert');
   const isAlertActivated = ref<boolean>(false);
+
+  const getSelectedRingtone = async () => {
+    const { value } = await Preferences.get({ key: 'emergency_ringtone' });
+
+    ringtone.value = value ? value : 'siren-alert';
+  }
+
+  const updateSelectedRingtone = async (ringtoneName: string) => {
+    await Preferences.set({
+      key: 'emergency_ringtone',
+      value: ringtoneName
+    });
+
+    ringtone.value = ringtoneName;
+  }
 
   const activateAlert = async () => {
     isAlertActivated.value = true;
 
     // Attempt to play alert sound
-    const audio = await NativeAudio.isPlaying({ assetId: 'emergency-alert' });
+    const audio = await NativeAudio.isPlaying({ assetId: ringtone.value });
 
     if (!audio.isPlaying) {
       // Must call play() before loop()
       NativeAudio.play({
-        assetId: 'emergency-alert',
+        assetId: ringtone.value,
         time: 0
       })
 
       NativeAudio.loop({
-        assetId: 'emergency-alert'
+        assetId: ringtone.value
       });
 
       await NativeAudio.setVolume({
-        assetId: 'emergency-alert',
+        assetId: ringtone.value,
         volume: 1.0
       })
     }
@@ -43,18 +60,18 @@ export const useEmergencyStore = defineStore('emergency', () => {
     }
 
     // Send emergency tex
-    await sendEmergencyText()
+    // await sendEmergencyText()
   }
 
   const deactivateAlert = async () => {
     isAlertActivated.value = false;
 
     // Attempt to stop emergency alert
-    const audio = await NativeAudio.isPlaying({ assetId: 'emergency-alert' });
+    const audio = await NativeAudio.isPlaying({ assetId: ringtone.value });
 
     if (audio.isPlaying) {
       NativeAudio.pause({
-        assetId: 'emergency-alert'
+        assetId: ringtone.value
       })
     }
   }
@@ -108,5 +125,5 @@ export const useEmergencyStore = defineStore('emergency', () => {
     }
   }
 
-  return { isAlertActivated, activateAlert, deactivateAlert }
+  return { ringtone, isAlertActivated, getSelectedRingtone, updateSelectedRingtone, activateAlert, deactivateAlert }
 });

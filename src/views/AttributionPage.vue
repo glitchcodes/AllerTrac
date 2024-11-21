@@ -101,10 +101,20 @@
           <ion-item>
             <ion-label>
               <div>
-                Emergency Alarm (Alarm2.wav)
+                Siren Emergency Alarm (Alarm2.wav)
               </div>
               <ion-note>
                 <a href="https://freesound.org/people/JomelleJager/sounds/256655/" target="_blank">Alarm 2.wav</a> by <a href="https://freesound.org/people/JomelleJager/" target="_blank">JomelleJager</a> | License: <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Attribution 3.0</a>
+              </ion-note>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>
+              <div>
+                Beep Emergency Alarm (1 alarm short e.wav)
+              </div>
+              <ion-note>
+                <a href="https://freesound.org/people/jobro/sounds/33732/" target="_blank">1 alarm short e.wav</a> by <a href="https://freesound.org/people/jobro/" target="_blank">jobro</a> | License: <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Attribution 3.0</a>
               </ion-note>
             </ion-label>
           </ion-item>
