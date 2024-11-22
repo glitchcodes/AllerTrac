@@ -12,6 +12,7 @@ export type MapPlace = {
     lat: () => number
     lng: () => number
   }
+  distance: number
 }
 
 export type PlaceAddressComponents = {

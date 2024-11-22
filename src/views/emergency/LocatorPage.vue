@@ -73,7 +73,7 @@
   // Map
   let map: GoogleMap;
   const mapRef = ref<HTMLElement>();
-  const currentPosition = ref<LatLng>();
+  const currentPosition = ref<LatLng>({} as LatLng);
 
   const placeLibrary = ref();
 
@@ -130,8 +130,6 @@
     // Check permissions
     try {
       let permissions = await Geolocation.checkPermissions();
-
-      console.log(permissions)
 
       if (permissions.location === 'prompt' || permissions.location === 'prompt-with-rationale') {
         permissions = await Geolocation.requestPermissions({permissions: ['location']});
@@ -286,6 +284,18 @@
 
     const { places } = await placeLibrary.value.searchNearby(request)
 
+    const hospitalsWithDistance = await Promise.all(places.map(async (place: any) => {
+      const distance = calculateDistance(currentPosition.value, {
+        lat: place.Ng.lat(),
+        lng: place.Ng.lng()
+      });
+
+      return {
+        ...place,
+        distance
+      }
+    }));
+
     // Add markers on the map
     for (const place of places) {
       const markerId = await map.addMarker({
@@ -299,9 +309,7 @@
       markers.value.push(markerId);
     }
 
-    // console.log(markers.value)
-
-    return places;
+    return hospitalsWithDistance.sort((a, b) => a.distance - b.distance);
   }
 </script>
 
@@ -373,7 +381,7 @@
                   </p>
                 </ion-label>
                 <ion-badge slot="end">
-                  {{ calculateDistance(currentPosition!, { lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }) }}km
+                  {{ hospital.distance }}km
                 </ion-badge>
               </ion-item>
             </ion-list>
