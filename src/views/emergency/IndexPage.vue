@@ -101,8 +101,17 @@
         </h1>
       </div>
 
-      <AlertMessage v-if="!authStore._isLoggedIn" type="warning" class="shadow mb-4">
+      <AlertMessage v-if="!authStore._isLoggedIn" type="info" class="shadow mb-4">
         Sending alerts to emergency contacts are only available to registered users
+      </AlertMessage>
+
+      <AlertMessage type="warning" class="shadow mb-4">
+        <div>
+          <p class="mb-2">
+            This feature does not replace actual professional emergency services.
+          </p>
+          <p>Contact emergency numbers if needed.</p>
+        </div>
       </AlertMessage>
 
       <div class="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md px-4 py-8 gap-6 mb-4"
