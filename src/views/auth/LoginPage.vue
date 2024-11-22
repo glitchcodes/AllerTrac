@@ -134,6 +134,16 @@
         case "INPUT_INVALID":
           inputErrors.value = error.data.errors;
           break;
+        case "ACCESS_DENIED":
+          // Unverified users must be redirected to verification page
+          await toast.presentToast({
+            message: 'Error: ' + error.data.message,
+            duration: 5000,
+            icon: alertCircle
+          })
+
+          await router.push({ name: 'verify-registration', query: { i: error.data.payload.identifier } });
+          break;
         default:
           await toast.presentToast({
             message: 'Error: ' + error.data.message,
