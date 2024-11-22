@@ -41,7 +41,7 @@
 </script>
 
 <template>
-  <div v-if="contactStore._contacts.length > 0">
+  <div v-if="contactStore._contacts.length > 0" class="flex flex-col gap-4">
     <template v-for="contact in contactStore._contacts" :key="contact.id">
       <EmergencyContactComponent :contact="contact" @delete="handleDeleteContact" />
     </template>
