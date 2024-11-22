@@ -116,7 +116,7 @@
     drawer.value = new CupertinoPane('ion-drawer#hospital-drawer', {
       // parentElement: '#hospital-locator',
       buttonDestroy: false,
-      bottomOffset: 56,
+      bottomOffset: isPlatform('ios') ? 50 : 56,
       touchMoveStopPropagation: true,
       breaks: {
         top: { // Topper point that pane can reach
