@@ -19,14 +19,17 @@
 
   const saveChanges = async () => {
     const { canvas } = cropperRef.value.getResult();
-    let blobUrl: string|null = null;
+    // let blobUrl: string|null = null;
 
     if (canvas) {
       // Create an url and then emit it back
-      canvas.toBlob((blob: any) => {
-        blobUrl = URL.createObjectURL(blob);
-        modalController.dismiss({ image: blobUrl }, 'confirm');
-      }, 'image/jpeg');
+      const blobUrl = new Promise((resolve) => {
+        canvas.toBlob((blob: any) => {
+          resolve(URL.createObjectURL(blob))
+        }, 'image/jpeg');
+      })
+
+      await modalController.dismiss({ image: await blobUrl }, 'confirm');
     }
 
   }
