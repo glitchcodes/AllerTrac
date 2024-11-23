@@ -87,8 +87,7 @@
 
     await Share.share({
       title: props.meal.label,
-      url: secureUrl,
-      dialogTitle: props.meal.label
+      url: secureUrl
     });
   }
 
