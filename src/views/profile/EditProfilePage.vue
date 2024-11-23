@@ -223,7 +223,7 @@
   }
 
   const handleDismissEvent = async (action: string) => {
-    const isMobile = isPlatform('capacitor');
+    const isAndroid = isPlatform('android');
 
     if (action === 'upload-avatar') {
       const image = await avatarUploader.pickImage();
@@ -239,7 +239,7 @@
       await modal.present()
 
       // Change status bar color to white
-      if (isMobile) {
+      if (isAndroid) {
         await StatusBar.setBackgroundColor({ color: '#ffffff' });
       }
 
@@ -248,7 +248,7 @@
 
       if (dismissEvent) {
         // Revert status bar color
-        if (isMobile) {
+        if (isAndroid) {
           await StatusBar.setBackgroundColor({ color: '#efeee9' });
         }
 
