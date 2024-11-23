@@ -39,6 +39,9 @@ import './theme/tailwind.scss'
 /* Theme variables */
 import './theme/variables.css';
 
+// Canvas Blob Polyfill
+import 'blueimp-canvas-to-blob';
+
 /* Event Bus */
 import mitt from "mitt";
 const emitter = mitt();

@@ -21,7 +21,7 @@
     const { canvas } = cropperRef.value.getResult();
     // let blobUrl: string|null = null;
 
-    if (canvas) {
+    if (canvas && canvas.toBlob) {
       // Create an url and then emit it back
       const blobUrl = new Promise((resolve) => {
         canvas.toBlob((blob: any) => {
