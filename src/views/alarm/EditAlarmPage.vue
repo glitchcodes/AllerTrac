@@ -72,7 +72,8 @@
   const ionTime = computed(() => {
     const d = new Date();
 
-    d.setHours(alarm!.time.hour - d.getTimezoneOffset(), alarm!.time.minute - d.getTimezoneOffset());
+    d.setHours(alarm!.time.hour - d.getTimezoneOffset());
+    d.setMinutes(alarm!.time.minute - d.getTimezoneOffset());
 
     return d.toISOString();
   })
