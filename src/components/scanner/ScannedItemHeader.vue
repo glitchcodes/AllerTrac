@@ -24,7 +24,7 @@
   const chipColor = computed(() => {
     let chipClass: string;
 
-    if (confidence.value > 90) {
+    if (confidence.value > 85) {
       chipClass = 'success';
     } else if (confidence.value > 70) {
       chipClass = 'warning';

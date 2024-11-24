@@ -31,13 +31,13 @@
   });
 
   const computedConfidence = (value: number) => {
-    return (value * 100).toFixed(2);
+    return parseFloat((value * 100).toFixed(2));
   }
 
   const computedChipColor = (confidence: number) => {
     let chipClass: string;
 
-    if (confidence > 90) {
+    if (confidence > 85) {
       chipClass = 'success';
     } else if (confidence > 70) {
       chipClass = 'warning';
