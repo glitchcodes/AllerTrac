@@ -29,8 +29,9 @@
 
   import { Loader } from "@googlemaps/js-api-loader";
   import { CupertinoPane } from "cupertino-pane";
-  import { useAlertController } from "@/composables/useAlertController";
 
+  import AlertMessage from "@/components/AlertMessage.vue";
+  import { useAlertController } from "@/composables/useAlertController";
   import { buildAddressString, calculateDistance } from "@/utils/helpers";
   import type { MapPlace } from "@/types/Map";
   import type { LatLng } from "@capacitor/google-maps/dist/typings/definitions";
@@ -362,6 +363,10 @@
                 </ion-radio-group>
               </ion-content>
             </ion-popover>
+
+            <AlertMessage type="warning" class="mb-4">
+              Not every hospital has the capability to treat food allergens
+            </AlertMessage>
 
             <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
               <ion-item v-for="hospital in hospitals"
