@@ -365,7 +365,7 @@
             </ion-popover>
 
             <AlertMessage type="warning" class="mb-4">
-              Not every hospital has the capability to treat food allergens
+              Not every hospital has the capability to treat allergies
             </AlertMessage>
 
             <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
