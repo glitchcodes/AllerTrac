@@ -173,7 +173,7 @@
           <ion-icon slot="icon-only" :icon="bookmarkOutline" />
         </ion-button>
 
-        <ion-button shape="round" color="tertiary" @click="handleShareMeal">
+        <ion-button v-if="!isPlatform('ios')" shape="round" color="tertiary" @click="handleShareMeal">
           <ion-icon slot="icon-only" :icon="shareOutline" />
         </ion-button>
       </div>
