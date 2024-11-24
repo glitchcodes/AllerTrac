@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { reactive, onMounted, computed } from "vue";
+  import { reactive, computed } from "vue";
   import {
     DatetimeCustomEvent,
     IonButton,
@@ -59,14 +59,6 @@
   const formErrors = reactive<FormErrors>({
     title: [],
     message: [],
-  });
-
-  onMounted(() => {
-    // Get current hour and minute
-    const date = new Date();
-
-    form.time.hour = date.getHours();
-    form.time.minute = date.getMinutes();
   });
 
   const ionTime = computed(() => {
