@@ -336,7 +336,7 @@
           <p><strong>Effective Date:</strong> November 15, 2024</p>
           <p>Welcome to AllerTrac, a mobile application designed to support individuals with common food allergies by providing tools for allergen identification, emergency assistance, and medication management. Please read these Terms and Conditions carefully before using AllerTrac. By accessing or using AllerTrac, you agree to abide by these Terms. If you do not agree with any part of these Terms, please discontinue use of AllerTrac.</p>
           <h3 id="-1-eligibility-"><strong>1. Eligibility</strong></h3>
-          <p>AllerTrac is intended for individuals aged 18 or older. By using AllerTrac, you confirm that you meet the age requirement or are supervised by a legal guardian who consents to these Terms.</p>
+          <p>AllerTrac is intended for individuals aged 13 or older. By using AllerTrac, you confirm that you meet the age requirement or are supervised by a legal guardian who consents to these Terms.</p>
           <h3 id="-2-user-accounts-"><strong>2. User Accounts</strong></h3>
           <p>To access AllerTrac’s features, you must create an account. You are responsible for maintaining the confidentiality of your account details and for all activities under your account. Your session will expire after 90 days of inactivity.</p>
           <h3 id="-3-scope-of-services-"><strong>3. Scope of Services</strong></h3>
@@ -415,7 +415,7 @@
           <p><strong>C. Health and Allergy Information</strong></p>
           <ul>
             <li><strong>Allergy Profile:</strong> AllerTrac allows you to input information about your food allergies to tailor allergen detection and suggestions.</li>
-            <li><strong>Food Scanning Data:</strong> Images you upload for food scanning may be temporarily processed to detect allergens, but we do not store these images after scanning.</li>
+            <li><strong>Food Scanning Data:</strong>Images uploaded for food scanning are processed through the <strong>Foodvisor.io API</strong>, a trusted third-party service specializing in food recognition. These images are temporarily processed to detect allergens and improve service quality, such as food recognition and personalized suggestions. No images are stored after processing, and all data is anonymized during analysis.</li>
           </ul>
           <p><strong>2. How We Use Your Information</strong></p>
           <p>We use your information for the following purposes:</p>
@@ -429,7 +429,7 @@
           <p>We limit sharing of your information and only share it in the following cases:</p>
           <ul>
             <li><strong>With Your Consent:</strong> We share data with emergency contacts or other parties only when you explicitly request it, such as during an emergency notification.</li>
-            <li><strong>Service Providers:</strong> We may work with third-party providers to assist in operating and improving AllerTrac, such as the food allergen recognition API.</li>
+            <li><strong>Service Providers:</strong> To enhance the accuracy and quality of allergen detection, AllerTrac uses the <strong>Foodvisor.io API</strong> for analyzing food images. Foodvisor.io adheres to strict privacy protocols, ensuring that user data remains anonymized and is not stored after use.</li>
             <li><strong>Legal Compliance:</strong> We may disclose your information if required by law or to comply with a court order, regulatory request, or legal process.</li>
           </ul>
           <p><strong>4. Data Retention</strong></p>
