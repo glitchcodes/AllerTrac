@@ -5,6 +5,7 @@
   import { Capacitor } from "@capacitor/core";
   import { Preferences } from "@capacitor/preferences";
   import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
+  import { Camera, CameraPermissionState } from "@capacitor/camera"
   import {
     CameraPreview,
     CameraPreviewFlashMode,
@@ -16,6 +17,8 @@
   import { useScannerStore } from "@/store/scanner";
   import { Emitter } from "mitt";
   import ScannerToast from "@/components/ScannerToast.vue";
+  import AlertMessage from "@/components/AlertMessage.vue";
+  import {AndroidSettings, IOSSettings, NativeSettings} from "capacitor-native-settings";
 
   type Events = {
     cameraStatusChanged: boolean,
@@ -28,9 +31,22 @@
 
   const statusBarHeight = ref();
 
+  const cameraPermission = ref<CameraPermissionState>();
+
   onMounted(async () => {
-    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height
-  })
+    statusBarHeight.value = (await SafeArea.getStatusBarHeight()).height;
+
+
+  });
+
+  const requestCameraPermissions = async () => {
+    if (Capacitor.isNativePlatform()) {
+      await NativeSettings.open({
+        optionAndroid: AndroidSettings.ApplicationDetails,
+        optionIOS: IOSSettings.App
+      })
+    }
+  }
 
   const flashMode = ref<CameraPreviewFlashMode>('off');
 
@@ -57,6 +73,7 @@
     }
 
     flashMode.value = mode;
+
     await CameraPreview.setFlashMode({
       flashMode: flashMode.value
     });
@@ -84,10 +101,20 @@
     position: "rear"
   }
 
-  onIonViewDidEnter(() => {
-    CameraPreview.start(cameraPreviewOptions)
+  onIonViewDidEnter(async () => {
+    // Check camera permissions
+    cameraPermission.value = (await Camera.checkPermissions()).camera;
 
-    emitter.emit("cameraStatusChanged", true);
+    // Request camera permission
+    if (cameraPermission.value === 'prompt' || cameraPermission.value === 'prompt-with-rationale') {
+      cameraPermission.value = (await Camera.requestPermissions({ permissions: ['camera'] })).camera;
+    }
+
+    if (cameraPermission.value === 'granted') {
+      await CameraPreview.start(cameraPreviewOptions)
+
+      emitter.emit("cameraStatusChanged", true);
+    }
   });
 
   onIonViewWillLeave(() => {
@@ -123,7 +150,19 @@
   <ion-page>
     <ion-content class="relative" :fullscreen="true">
       <div :style="{ marginTop: Capacitor.isNativePlatform() && isPlatform('ios') ? statusBarHeight + 'px' : '0' }">
-        <ScannerToast v-if="!isToastDismissed" @dismiss="updateToastStatus" />
+        <ScannerToast v-if="!isToastDismissed && cameraPermission === 'granted'" @dismiss="updateToastStatus" />
+
+        <!-- Permission Warning -->
+        <AlertMessage v-if="cameraPermission !== 'granted'"
+                      type="danger"
+                      class="absolute mx-4 z-[1000]"
+                      :style="{ 'margin-top': (statusBarHeight + 16) + 'px'}">
+          We need permission to access your camera in order to scan.
+          <ion-button slot="end" size="small" color="secondary" @click="requestCameraPermissions">
+            Fix
+          </ion-button>
+        </AlertMessage>
+        <!-- END Permission Warning -->
       </div>
       <img class="camera-stencil" src="/images/camera-stencil.png" alt="Camera Stencil" />
       <div id="camera-preview"></div>
