@@ -72,14 +72,14 @@
       }
     }
 
-    await NativeAudio.preload({
+    NativeAudio.preload({
       assetId: 'siren-alert',
       assetPath: 'alert.wav',
       audioChannelNum: 1,
       isUrl: false
     });
 
-    await NativeAudio.preload({
+    NativeAudio.preload({
       assetId: 'beep-alert',
       assetPath: 'beep.wav',
       audioChannelNum: 1,
