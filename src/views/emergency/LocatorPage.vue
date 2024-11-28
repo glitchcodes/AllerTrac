@@ -21,7 +21,7 @@
   } from "@ionic/vue";
   import { NativeSettings, AndroidSettings, IOSSettings } from 'capacitor-native-settings';
 
-  import { arrowBack, locateOutline, optionsOutline } from "ionicons/icons";
+  import { arrowBack, closeCircleOutline, locateOutline, optionsOutline } from "ionicons/icons";
   import { Geolocation } from "@capacitor/geolocation";
   import { GoogleMap } from "@capacitor/google-maps";
   import { SafeArea } from "@aashu-dubey/capacitor-statusbar-safe-area";
@@ -32,6 +32,7 @@
 
   import AlertMessage from "@/components/AlertMessage.vue";
   import { useAlertController } from "@/composables/useAlertController";
+  import { useToastController } from "@/composables/useToastController";
   import { buildAddressString, calculateDistance } from "@/utils/helpers";
   import type { MapPlace } from "@/types/Map";
   import type { LatLng } from "@capacitor/google-maps/dist/typings/definitions";
@@ -43,6 +44,7 @@
   // Composables
   const ionRouter = useIonRouter();
   const alertController = useAlertController();
+  const toastController = useToastController();
 
   // Cupertino Pane
   const drawer = ref();
@@ -119,6 +121,7 @@
       buttonDestroy: false,
       bottomOffset: isPlatform('ios') ? 50 : 56,
       touchMoveStopPropagation: true,
+      ionContentScroll: true,
       breaks: {
         top: { // Topper point that pane can reach
           enabled: true, // Enable or disable breakpoint
@@ -133,7 +136,7 @@
       let permissions = await Geolocation.checkPermissions();
 
       if (permissions.location === 'prompt' || permissions.location === 'prompt-with-rationale') {
-        permissions = await Geolocation.requestPermissions({permissions: ['location']});
+        permissions = await Geolocation.requestPermissions({ permissions: ['location'] });
       }
 
       if (permissions.location === 'denied') {
@@ -207,22 +210,32 @@
     // Enable current location
     enableCurrentLocation();
 
-    const { coords } = await Geolocation.getCurrentPosition();
+    try {
+      const { coords } = await Geolocation.getCurrentPosition();
 
-    currentPosition.value = {
-      lat: coords.latitude,
-      lng: coords.longitude
+      currentPosition.value = {
+        lat: coords.latitude,
+        lng: coords.longitude
+      }
+
+      // Search hospitals
+      hospitals.value = await locateHospitals();
+      await drawer.value.present()
+
+      // Move the camera into current position
+      await moveCamera({
+        lat: currentPosition.value.lat,
+        lng: currentPosition.value.lng,
+      }, 15);
+    } catch (e) {
+      await toastController.presentToast({
+        message: 'Something went wrong while locating your position. Please try again later.',
+        duration: 3000,
+        icon: closeCircleOutline,
+        position: 'bottom',
+        positionAnchor: 'scan-food-button'
+      })
     }
-
-    // Search hospitals
-    hospitals.value = await locateHospitals();
-    await drawer.value.present()
-
-    // Move the camera into current position
-    await moveCamera({
-      lat: currentPosition.value.lat,
-      lng: currentPosition.value.lng,
-    }, 15);
   }
 
   // Controls
@@ -332,68 +345,66 @@
         <ion-icon slot="icon-only" :icon="locateOutline" class="location-on" />
       </ion-button>
     </nav>
-    <ion-content>
-      <capacitor-google-map ref="mapRef"></capacitor-google-map>
+    <capacitor-google-map ref="mapRef"></capacitor-google-map>
 
-      <div>
-        <ion-drawer id="hospital-drawer">
-          <div class="ion-padding">
+    <div>
+      <ion-drawer id="hospital-drawer">
+        <div class="ion-padding">
 
-            <div class="flex items-center mb-6">
-              <h1 class="text-2xl font-bold flex-1">
-                Nearby Hospitals
-              </h1>
-              <ion-button shape="round" color="tertiary" id="search-options">
-                <ion-icon slot="icon-only" :icon="optionsOutline" aria-label="Options" />
-              </ion-button>
-            </div>
-
-            <ion-popover trigger="search-options" trigger-action="click">
-              <ion-content class="ion-padding ">
-                <p class="mb-3">
-                  Search distance
-                </p>
-                <ion-radio-group :value="searchDistance" @ionChange="handleDistanceChange">
-                  <ion-item lines="none" color="light" class="rounded-lg shadow mb-3">
-                    <ion-radio :value="5" justify="space-between">5km</ion-radio>
-                  </ion-item>
-                  <ion-item lines="none" color="light" class="rounded-lg shadow">
-                    <ion-radio :value="10" justify="space-between">10km</ion-radio>
-                  </ion-item>
-                </ion-radio-group>
-              </ion-content>
-            </ion-popover>
-
-            <AlertMessage type="warning" class="mb-4">
-              Not every hospital has the capability to treat allergies
-            </AlertMessage>
-
-            <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
-              <ion-item v-for="hospital in hospitals"
-                        :key="hospital.id"
-                        color="light"
-                        class="rounded-lg shadow mb-3"
-                        button
-                        @click="async () => await moveCamera({ lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }, 18)"
-              >
-                <ion-icon slot="start" icon="/icons/building-office.svg" aria-label="Navigate Icon" />
-                <ion-label>
-                  <h2 class="font-bold">
-                    {{ hospital.Eg.displayName }}
-                  </h2>
-                  <p class="text-xs leading-tight !text-black/75">
-                    {{ buildAddressString(hospital.Eg.addressComponents) }}
-                  </p>
-                </ion-label>
-                <ion-badge slot="end">
-                  {{ hospital.distance }}km
-                </ion-badge>
-              </ion-item>
-            </ion-list>
+          <div class="flex items-center mb-6">
+            <h1 class="text-2xl font-bold flex-1">
+              Nearby Hospitals
+            </h1>
+            <ion-button shape="round" color="tertiary" id="search-options">
+              <ion-icon slot="icon-only" :icon="optionsOutline" aria-label="Options" />
+            </ion-button>
           </div>
-        </ion-drawer>
-      </div>
-    </ion-content>
+
+          <ion-popover trigger="search-options" trigger-action="click">
+            <ion-content class="ion-padding ">
+              <p class="mb-3">
+                Search distance
+              </p>
+              <ion-radio-group :value="searchDistance" @ionChange="handleDistanceChange">
+                <ion-item lines="none" color="light" class="rounded-lg shadow mb-3">
+                  <ion-radio :value="5" justify="space-between">5km</ion-radio>
+                </ion-item>
+                <ion-item lines="none" color="light" class="rounded-lg shadow">
+                  <ion-radio :value="10" justify="space-between">10km</ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </ion-content>
+          </ion-popover>
+
+          <AlertMessage type="warning" class="mb-4">
+            Not every hospital has the capability to treat allergies
+          </AlertMessage>
+
+          <ion-list v-if="hospitals.length > 0" lines="none" hide-on-bottom>
+            <ion-item v-for="hospital in hospitals"
+                      :key="hospital.id"
+                      color="light"
+                      class="rounded-lg shadow mb-3"
+                      button
+                      @click="async () => await moveCamera({ lat: hospital.Ng.lat(), lng: hospital.Ng.lng() }, 18)"
+            >
+              <ion-icon slot="start" icon="/icons/building-office.svg" aria-label="Navigate Icon" />
+              <ion-label>
+                <h2 class="font-bold">
+                  {{ hospital.Eg.displayName }}
+                </h2>
+                <p class="text-xs leading-tight !text-black/75">
+                  {{ buildAddressString(hospital.Eg.addressComponents) }}
+                </p>
+              </ion-label>
+              <ion-badge slot="end">
+                {{ hospital.distance }}km
+              </ion-badge>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-drawer>
+    </div>
   </ion-page>
 </template>
 
