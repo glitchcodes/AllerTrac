@@ -31,6 +31,7 @@
   const form = reactive<EmergencyContact>({
     full_name: '',
     relationship: 'parent',
+    relationship_specific: undefined,
     phone_number: '',
     email: '',
   });
@@ -41,19 +42,10 @@
   // As a workaround, show only return one error
   const getErrorMessage = (type: string) => {
     const errors = inputErrors.value;
-    switch (type) {
-      case "full_name":
-        if (!errors.full_name || errors.full_name.length === null) return "";
-        return errors.full_name[0]
-      case "relationship":
-        if (!errors.relationship || errors.relationship.length === null) return "";
-        return errors.relationship[0]
-      case "phone_number":
-        if (!errors.phone_number || errors.phone_number.length === null) return "";
-        return errors.phone_number[0]
-      case "email":
-        if (!errors.email || errors.email.length === null) return "";
-        return errors.email[0]
+    const errorTypes = ["full_name", "relationship", "relationship_specific", "phone_number", "email"];
+
+    if (errorTypes.includes(type)) {
+      return errors[type]?.[0] || "";
     }
   }
 
@@ -189,7 +181,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-md shadow-md ion-padding mt-5">
+    <div class="bg-white rounded-md shadow-md ion-padding mt-5 relationship-card">
       <ion-list lines="none">
         <ion-item class="ion-no-padding">
           <ion-select v-model="form.relationship" :value="form.relationship" label="Relationship" label-placement="fixed">
@@ -210,6 +202,16 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-item v-if="form.relationship === 'other'" class="ion-no-padding">
+          <ion-input v-model="form.relationship_specific"
+                     label="Specify"
+                     label-placement="fixed"
+                     placeholder="e.g. Relative"
+                     :class="{ 'ion-touched ion-invalid': inputErrors.relationship_specific }"
+                     :error-text="getErrorMessage('relationship_specific')"
+                     @ionInput="() => inputErrors.relationship_specific = ''">
+          </ion-input>
+        </ion-item>
       </ion-list>
     </div>
 
@@ -225,10 +227,23 @@
     --background: white;
   }
 
+  ion-item {
+    --inner-padding-end: 0;
+  }
+
   ion-input {
     &.input-fill-outline:deep(.label-text-wrapper.sc-ion-input-md) {
       -webkit-transform: translateY(65%) scale(1);
       transform: translateY(65%) scale(1);
+    }
+  }
+
+  .relationship-card ion-input {
+    &:deep(.label-text) {
+      color: var(--ion-color-primary);
+    }
+    &:deep(.native-input) {
+      text-align: right;
     }
   }
 

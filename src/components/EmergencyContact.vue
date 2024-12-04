@@ -179,7 +179,10 @@
     </h2>
     <ul class="text-primary text-sm">
       <li class="text-[12px]">
-        Relationship: <span class="capitalize">{{ props.contact.relationship || "Parent" }}</span>
+        Relationship:
+        <span class="capitalize">
+          {{ props.contact.relationship_specific || props.contact.relationship || 'Parent' }}
+        </span>
       </li>
       <li class="text-[12px]">Phone Number: {{ props.contact.phone_number || "09XX XXX XXXX" }}</li>
       <li class="text-[12px]">Email Address: {{ props.contact.email || "N/A" }}</li>
