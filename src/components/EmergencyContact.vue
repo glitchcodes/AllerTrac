@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { computed } from "vue";
   import {
     IonRippleEffect,
     actionSheetController,
@@ -34,6 +35,14 @@
   }>(), {
     canEdit: true
   });
+
+  const relationship = computed(() => {
+    if (props.contact.relationship === 'other') {
+      return props.contact.relationship_specific
+    }
+
+    return props.contact.relationship || 'Parent';
+  })
 
   const openActionSheet = async () => {
     if (!props.canEdit) return;
@@ -181,7 +190,7 @@
       <li class="text-[12px]">
         Relationship:
         <span class="capitalize">
-          {{ props.contact.relationship_specific || props.contact.relationship || 'Parent' }}
+          {{ relationship }}
         </span>
       </li>
       <li class="text-[12px]">Phone Number: {{ props.contact.phone_number || "09XX XXX XXXX" }}</li>
