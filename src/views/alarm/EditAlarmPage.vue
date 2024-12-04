@@ -9,8 +9,6 @@
     IonHeader,
     IonIcon,
     IonInput,
-    IonItem,
-    IonList,
     IonPage,
     IonSelect,
     IonSelectOption,
@@ -173,77 +171,59 @@
 
 
       <section class="ion-padding mt-4">
-        <div class="bg-white rounded-lg" :class="{ 'py-1': isPlatform('ios') }">
-          <ion-list :inset="true">
-            <ion-item lines="none">
-              <ion-input v-model="form.title"
-                         label="Title"
-                         placeholder="Medication"
-                         class="ion-text-right"
-                         :class="{ 'ion-touched ion-invalid': formErrors.title.length > 0 }"
-                         :error-text="getErrorMessage('title')"
-                         @ionInput="() => formErrors.title = []">
-              </ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-input v-model="form.message"
-                         label="Description"
-                         placeholder="e.g. Very important!"
-                         class="ion-text-right"
-                         :class="{ 'ion-touched ion-invalid': formErrors.message.length > 0 }"
-                         :error-text="getErrorMessage('message')"
-                         @ionInput="() => formErrors.message = []">
-              </ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-select
-                  v-model="form.weekdays"
-                  label="Repeat every"
-                  aria-label="Repeat every"
-                  placeholder="None"
-                  justify="space-between"
-                  :multiple="true"
-                  :value="form.weekdays"
-              >
-                <ion-select-option :value="Weekday.Sunday">
-                  Sunday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Monday">
-                  Monday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Tuesday">
-                  Tuesday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Wednesday">
-                  Wednesday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Thursday">
-                  Thursday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Friday">
-                  Friday
-                </ion-select-option>
-                <ion-select-option :value="Weekday.Saturday">
-                  Saturday
-                </ion-select-option>
-              </ion-select>
-            </ion-item>
-<!--            <ion-item lines="none">-->
-<!--              <ion-select-->
-<!--                  label="Sound"-->
-<!--                  aria-label="Sound"-->
-<!--                  justify="space-between"-->
-<!--                  :value="form.sound"-->
-<!--              >-->
-<!--                <ion-select-option value="default">-->
-<!--                  Default-->
-<!--                </ion-select-option>-->
-<!--                <ion-select-option value="bird">-->
-<!--                  Bird-->
-<!--                </ion-select-option>-->
-<!--              </ion-select>-->
-<!--            </ion-item>-->
-          </ion-list>
+        <div class="bg-white rounded-lg px-4 py-6 mb-4">
+          <div class="flex flex-col gap-4">
+            <ion-input v-model="form.title"
+                       label="Title"
+                       label-placement="floating"
+                       mode="md"
+                       fill="outline"
+                       :class="{ 'ion-touched ion-invalid': formErrors.title.length > 0 }"
+                       :error-text="getErrorMessage('title')"
+                       @ionInput="() => formErrors.title = []">
+            </ion-input>
+            <ion-input v-model="form.message"
+                       label="Description"
+                       label-placement="floating"
+                       mode="md"
+                       fill="outline"
+                       :class="{ 'ion-touched ion-invalid': formErrors.message.length > 0 }"
+                       :error-text="getErrorMessage('message')"
+                       @ionInput="() => formErrors.message = []">
+            </ion-input>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4">
+          <ion-select v-model="form.weekdays"
+                      label="Repeat every"
+                      aria-label="Repeat every"
+                      placeholder="None"
+                      justify="space-between"
+                      :multiple="true"
+                      :value="form.weekdays">
+            <ion-select-option :value="Weekday.Sunday">
+              Sunday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Monday">
+              Monday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Tuesday">
+              Tuesday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Wednesday">
+              Wednesday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Thursday">
+              Thursday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Friday">
+              Friday
+            </ion-select-option>
+            <ion-select-option :value="Weekday.Saturday">
+              Saturday
+            </ion-select-option>
+          </ion-select>
         </div>
 
         <div v-if="!isPlatform('ios')" class="flex gap-2">
